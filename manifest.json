@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "ProxMux Manager",
-  "version": "1.0.0",
-  "description": "Quick access to Proxmox VMs and containers console.",
+  "short_name": "ProxMux",
+  "version": "1.0.0.1",
+  "description": "Professional Proxmox VE cluster management for your browser. Quickly monitor resources, access consoles (noVNC, SPICE), and manage nodes with high-availability failover support.",
   "permissions": [
     "storage",
     "tabs",

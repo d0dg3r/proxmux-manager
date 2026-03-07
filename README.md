@@ -34,3 +34,20 @@ A dedicated Chrome Extension for Proxmox VE cluster management, providing instan
 
 - Proxmox VE 6.x or newer.
 - API Token with appropriate permissions (`VM.Console` is required for console access).
+
+## Installation
+
+### From Chrome Web Store (Recommended)
+You can install ProxMux Manager directly from the [Chrome Web Store](https://chrome.google.com/webstore/detail/proxmux-manager) (Coming Soon).
+
+### From Source (Developer Mode)
+1. Clone this repository.
+2. Open Chrome and go to `chrome://extensions/`.
+3. Enable **Developer mode**.
+4. Click **Load unpacked** and select the extension folder.
+
+## Version 1.0.0 Release Notes
+- **High Availability**: Automatic cluster node discovery and failover.
+- **Dedicated Settings**: New options page for secure and easy configuration.
+- **Enhanced Consoles**: Support for SPICE (with auto-open), noVNC, and Shell.
+- **Linux Optimized**: Intelligent SSH detection for VMs and LXCs.

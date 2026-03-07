@@ -29,11 +29,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const api = new ProxmoxAPI(settings.proxmoxUrl, settings.apiToken, settings.failoverUrls || []);
-    console.log('Fetching resources from:', settings.proxmoxUrl);
+    // console.log('Fetching resources from:', settings.proxmoxUrl);
 
     try {
         const resources = await api.getResources();
-        console.log('Resources received:', resources.length);
+        // console.log('Resources received:', resources.length);
         loadingOverlay.classList.add('hidden');
         renderResources(resources, api);
         

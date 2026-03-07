@@ -1,0 +1,64 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Get Version from Tag
+        id: get_version
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          # Strip 'v' prefix
+          VERSION=${TAG_NAME#v}
+          # Handle beta suffix for Chrome Manifest (e.g. 1.0.0-beta.1 -> 1.0.0.1)
+          # Chrome only allows dot-separated integers
+          CLEAN_VERSION=$(echo $VERSION | sed -E 's/-beta\.?([0-9]+)/.\1/')
+          CLEAN_VERSION=$(echo $CLEAN_VERSION | sed -E 's/-.*//') # Fallback to strip other suffixes
+          
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "clean_version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+          
+          if [[ $TAG_NAME == *"beta"* ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Manifest Version
+        run: |
+          VERSION=${{ steps.get_version.outputs.clean_version }}
+          # Simple sed to replace version in manifest.json
+          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" manifest.json
+
+      - name: Create Release ZIP
+        run: |
+          ZIP_NAME="proxmux-${{ steps.get_version.outputs.tag_name }}.zip"
+          zip -r $ZIP_NAME . -x "*.git*" -x "*.gemini*" -x ".github*" -x "node_modules*" -x "*.zip"
+          echo "zip_name=$ZIP_NAME" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.get_version.outputs.tag_name }}
+          tag_name: ${{ steps.get_version.outputs.tag_name }}
+          prerelease: ${{ steps.get_version.outputs.prerelease == 'true' }}
+          files: ${{ env.zip_name }}
+          body: |
+            ## ProxMux Manager ${{ steps.get_version.outputs.tag_name }}
+            
+            This is an automated release build.
+            
+            - **Version**: ${{ steps.get_version.outputs.version }}
+            - **Type**: ${{ steps.get_version.outputs.prerelease == 'true' && 'Beta (Prerelease)' || 'Final' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
