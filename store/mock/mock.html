@@ -5,12 +5,43 @@
     <title>PROXMUX Mock</title>
     <link rel="stylesheet" href="popup.css">
     <style>
-        body { width: 550px; height: auto; min-height: 500px; margin: 0; padding: 0; }
+        :root {
+            --bg-page-light: #f0f2f5;
+            --bg-page-dark: #0f111a;
+        }
+        body { 
+            width: 1280px; 
+            height: 800px; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background-color: var(--bg-page-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background-color: var(--bg-page-dark); }
+        }
+        #extension-wrapper {
+            width: 550px;
+            height: 600px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
         .overlay { display: none !important; }
         #resource-list { display: flex !important; }
+        /* Ensure the extension content fills the wrapper */
+        header { border-radius: 0; }
     </style>
 </head>
 <body id="mock-body">
+    <div id="extension-wrapper">
     <header>
         <div class="logo-container">
             <img src="icon48.png" alt="Logo" class="logo">
@@ -66,5 +97,6 @@
             </div>
         </div>
     </main>
+    </div>
 </body>
 </html>

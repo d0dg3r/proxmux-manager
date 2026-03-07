@@ -10,28 +10,36 @@ const fs = require('fs');
 
   // 1. Capture Dark Mode
   const darkContext = await browser.newContext({
-    viewport: { width: 550, height: 600 },
-    deviceScaleFactor: 2,
+    viewport: { width: 1280, height: 800 },
+    deviceScaleFactor: 1,
     colorScheme: 'dark'
   });
   const darkPage = await darkContext.newPage();
   await darkPage.goto(mockPath);
   await darkPage.waitForTimeout(1000);
-  await darkPage.screenshot({ path: path.join(storeDir, 'screenshot_dark.png') });
-  console.log('Saved screenshot_dark.png (Forced Dark Mode)');
+  await darkPage.screenshot({ 
+    path: path.join(storeDir, 'screenshot_dark.jpg'),
+    type: 'jpeg',
+    quality: 90
+  });
+  console.log('Saved screenshot_dark.jpg (1280x800, JPEG)');
   await darkContext.close();
 
   // 2. Capture Light Mode
   const lightContext = await browser.newContext({
-    viewport: { width: 550, height: 600 },
-    deviceScaleFactor: 2,
+    viewport: { width: 1280, height: 800 },
+    deviceScaleFactor: 1,
     colorScheme: 'light'
   });
   const lightPage = await lightContext.newPage();
   await lightPage.goto(mockPath);
   await lightPage.waitForTimeout(1000);
-  await lightPage.screenshot({ path: path.join(storeDir, 'screenshot_light.png') });
-  console.log('Saved screenshot_light.png (Forced Light Mode)');
+  await lightPage.screenshot({ 
+    path: path.join(storeDir, 'screenshot_light.jpg'),
+    type: 'jpeg',
+    quality: 90
+  });
+  console.log('Saved screenshot_light.jpg (1280x800, JPEG)');
   await lightContext.close();
 
   await browser.close();

@@ -32,6 +32,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add store/*.png
-          git diff --quiet && git diff --staged --quiet || git commit -m "chore: update store screenshots [skip ci]"
+          git add store/*.png store/*.jpg
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: update store screenshots (1280x800 JPG) [skip ci]"
           git push
