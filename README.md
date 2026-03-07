@@ -1,7 +1,7 @@
 ![ProxMux Banner](store/banner_ad.png)
 
 <p align="center">
-  <a href="https://github.com/d0dg3r/ProxMux/releases"><img src="https://img.shields.io/github/v/release/d0dg3r/ProxMux" alt="Release"></a>
+  <a href="https://github.com/d0dg3r/ProxMux/releases"><img src="https://img.shields.io/github/v/release/d0dg3r/ProxMux?style=flat-square&logo=github" alt="Release"></a>
   <a href="https://github.com/d0dg3r/ProxMux/releases?q=pre"><img src="https://img.shields.io/github/v/release/d0dg3r/ProxMux?include_prereleases&label=pre-release&logo=github&style=flat-square" alt="Pre-release"></a>
   <a href="https://chrome.google.com/webstore/detail/proxmux-manager"><img src="https://img.shields.io/badge/Chrome_Web_Store-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a>
 </p>
