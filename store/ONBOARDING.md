@@ -74,7 +74,25 @@ Perfekt für DevOps-Engineers und Home-Server-Enthusiasten, die eine schnelle, p
 
 ---
 
-## 4. Visual Assets Checklist
+## 4. Instructions for Reviewers (Mandatory)
+*This is required for the "Testing Instructions" field.*
+
+**Important**: This extension is a management tool for self-hosted Proxmox VE virtualization clusters. Accessing a live environment requires private infrastructure. 
+
+### Recommended approach:
+"This extension manages private, self-hosted Proxmox VE clusters. Since a live cluster is required for full functionality, I have provided a video demonstration showing the extension connecting to a test environment, listing resources, and launching consoles."
+
+### How to test manually (if you have a test environment):
+1. Install the extension.
+2. Click the extension icon and then the 'Gear' icon to open Settings.
+3. Enter valid Proxmox VE API credentials (URL, User, Token ID, Secret).
+4. Save settings.
+5. The extension will populate the resource list with VMs and Containers.
+6. Verify console buttons (noVNC, SPICE) appear based on resource configuration.
+
+---
+
+## 5. Visual Assets Checklist
 - **Icon**: 128x128 pixels (provided in `icons/icon128.png`).
 - **Screenshots**: 1280x800 JPEG (provided in `store/screenshot_dark.jpg` and `store/screenshot_light.jpg`).
 - **Marquee/Tile**: 440x280 pixels.
