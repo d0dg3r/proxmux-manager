@@ -18,11 +18,9 @@ const fs = require('fs');
   await darkPage.goto(mockPath);
   await darkPage.waitForTimeout(1000);
   await darkPage.screenshot({ 
-    path: path.join(storeDir, 'screenshot_dark.jpg'),
-    type: 'jpeg',
-    quality: 90
+    path: path.join(storeDir, 'screenshot_dark.png')
   });
-  console.log('Saved screenshot_dark.jpg (1280x800, JPEG)');
+  console.log('Saved screenshot_dark.png (1280x800, PNG)');
   await darkContext.close();
 
   // 2. Capture Light Mode
@@ -35,11 +33,9 @@ const fs = require('fs');
   await lightPage.goto(mockPath);
   await lightPage.waitForTimeout(1000);
   await lightPage.screenshot({ 
-    path: path.join(storeDir, 'screenshot_light.jpg'),
-    type: 'jpeg',
-    quality: 90
+    path: path.join(storeDir, 'screenshot_light.png')
   });
-  console.log('Saved screenshot_light.jpg (1280x800, JPEG)');
+  console.log('Saved screenshot_light.png (1280x800, PNG)');
   await lightContext.close();
 
   await browser.close();
