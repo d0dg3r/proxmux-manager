@@ -21,12 +21,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             const translation = chrome.i18n.getMessage(key);
             if (translation) el.title = translation;
         });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            const translation = chrome.i18n.getMessage(key);
+            if (translation) el.placeholder = translation;
+        });
     }
 
     initI18n();
 
+    let allResources = [];
+    const searchInput = document.getElementById('search-input');
+
     // UI Event Listeners
     settingsBtn.addEventListener('click', () => chrome.runtime.openOptionsPage());
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        filterAndRender(query);
+    });
     
     sidepanelBtn.addEventListener('click', async () => {
         const window = await chrome.windows.getCurrent();
@@ -49,10 +62,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const resources = await api.getResources();
+        allResources = resources;
         // console.log('Resources received:', resources.length);
         loadingOverlay.classList.add('hidden');
         renderResources(resources, api);
         
+        // Auto-focus search for speed
+        searchInput.focus();
+
         // Asynchronously discover and update cluster nodes for failover
         updateFailoverNodes(resources, settings.proxmoxUrl);
     } catch (error) {
@@ -110,6 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res.type !== 'node') {
                 // Fetch IP and OS info
                 api.getResourceDetails(res).then(details => {
+                    res.ip = details.ip;
+                    res.os = details.os;
                     if (details.os) {
                         osTag.textContent = details.os;
                         osTag.classList.remove('hidden');
@@ -195,6 +214,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             alert(`Failed to get SPICE proxy: ${error.message}`);
         }
+    }
+
+    function filterAndRender(query) {
+        if (!query) {
+            renderResources(allResources, api);
+            return;
+        }
+
+        const filtered = allResources.filter(res => {
+            const name = (res.name || res.vmid || res.node || '').toString().toLowerCase();
+            const vmid = (res.vmid || '').toString().toLowerCase();
+            const node = (res.node || '').toString().toLowerCase();
+            const type = (res.type || '').toString().toLowerCase();
+            const ip = (res.ip || '').toString().toLowerCase();
+            
+            return name.includes(query) || vmid.includes(query) || node.includes(query) || 
+                   type.includes(query) || ip.includes(query);
+        });
+
+        renderResources(filtered, api);
     }
 
     async function updateFailoverNodes(resources, primaryUrl) {

@@ -64,5 +64,8 @@
     },
     "shell": {
         "message": "Shell"
+    },
+    "searchPlaceholder": {
+        "message": "Ressourcen suchen..."
     }
 }
