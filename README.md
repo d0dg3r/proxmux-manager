@@ -31,15 +31,19 @@ A dedicated Chrome Extension for Proxmox VE cluster management, providing instan
 ## Configuration
 
 1. Click the extension icon in the toolbar.
-2. Go to **Settings** (gear icon).
-3. Enter your **Proxmox URL** (e.g., `https://192.168.1.100:8006`).
-4. Enter your **API Token** (Format: `USER@REALM!TOKENID=UUID`).
-5. Click **Save Settings** and allow the host permissions when prompted.
+2. Click the **Settings** (gear icon) in the top right to open the dedicated options page.
+3. Enter your **Proxmox Cluster Details**:
+    - **Proxmox URL**: Your primary node URL (e.g., `https://px01.example.com:8006`).
+    - **User & Realm**: e.g., `root@pam`.
+    - **Token ID**: your API token name (e.g., `automation`).
+    - **API Secret**: the token secret value.
+4. Click **Save Settings** and grant host permissions.
+5. **High Availability**: Once configured, the extension will automatically discover other cluster nodes and store them for failover.
 
 ## Requirements
 
 - Proxmox VE 6.x or newer.
-- API Token with appropriate permissions (`VM.Console` is required for console access).
+- API Token with appropriate permissions (`VM.Console` and `Sys.Audit` for node discovery).
 
 ## Installation
 
