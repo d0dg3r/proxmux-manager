@@ -43,10 +43,11 @@ jobs:
           sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" manifest.json
 
       - name: Create Release ZIP
+        id: create_zip
         run: |
           ZIP_NAME="proxmux-${{ steps.get_version.outputs.tag_name }}.zip"
           zip -r $ZIP_NAME . -x "*.git*" -x "*.gemini*" -x ".github*" -x "node_modules*" -x "*.zip"
-          echo "zip_name=$ZIP_NAME" >> $GITHUB_ENV
+          echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         id: create_release
@@ -55,7 +56,7 @@ jobs:
           name: Release ${{ steps.get_version.outputs.tag_name }}
           tag_name: ${{ steps.get_version.outputs.tag_name }}
           prerelease: ${{ steps.get_version.outputs.prerelease == 'true' }}
-          files: ${{ env.zip_name }}
+          files: ${{ steps.create_zip.outputs.zip_name }}
           body: |
             ## ProxMux Manager ${{ steps.get_version.outputs.tag_name }}
             
