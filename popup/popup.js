@@ -31,14 +31,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     initI18n();
 
     let allResources = [];
+    let activeFilters = {
+        type: 'all', // 'all', 'node', 'qemu', 'lxc'
+        status: 'all' // 'all', 'running', 'stopped'
+    };
     const searchInput = document.getElementById('search-input');
+    const filterPills = document.querySelectorAll('.filter-pill');
 
     // UI Event Listeners
     settingsBtn.addEventListener('click', () => chrome.runtime.openOptionsPage());
 
     searchInput.addEventListener('input', () => {
-        const query = searchInput.value.toLowerCase().trim();
-        filterAndRender(query);
+        filterAndRender();
+    });
+
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const type = pill.getAttribute('data-filter-type');
+            const status = pill.getAttribute('data-filter-status');
+
+            if (type) {
+                // If clicking type, clear existing type indicators
+                filterPills.forEach(p => {
+                    if (p.hasAttribute('data-filter-type')) p.classList.remove('active');
+                });
+                activeFilters.type = type;
+            } else if (status) {
+                // Toggle status filter if clicking same status, otherwise switch
+                if (activeFilters.status === status) {
+                    activeFilters.status = 'all';
+                    pill.classList.remove('active');
+                } else {
+                    filterPills.forEach(p => {
+                        if (p.hasAttribute('data-filter-status')) p.classList.remove('active');
+                    });
+                    activeFilters.status = status;
+                }
+            }
+
+            // Always ensure the correct type pill is active
+            if (type) pill.classList.add('active');
+            else {
+                // If toggled status, ensure status pill is active if not 'all'
+                if (activeFilters.status !== 'all') pill.classList.add('active');
+            }
+
+            filterAndRender();
+        });
     });
     
     sidepanelBtn.addEventListener('click', async () => {
@@ -216,13 +255,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function filterAndRender(query) {
-        if (!query) {
-            renderResources(allResources, api);
-            return;
-        }
-
+    function filterAndRender() {
+        const query = searchInput.value.toLowerCase().trim();
+        
         const filtered = allResources.filter(res => {
+            // 1. Type filter
+            if (activeFilters.type !== 'all' && res.type !== activeFilters.type) return false;
+
+            // 2. Status filter
+            if (activeFilters.status !== 'all' && res.status !== activeFilters.status) return false;
+
+            // 3. Search query
+            if (!query) return true;
+
             const name = (res.name || res.vmid || res.node || '').toString().toLowerCase();
             const vmid = (res.vmid || '').toString().toLowerCase();
             const node = (res.node || '').toString().toLowerCase();

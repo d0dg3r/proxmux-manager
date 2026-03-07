@@ -132,6 +132,45 @@ h1 {
     box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
 }
 
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.filter-pill {
+    background-color: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.filter-pill:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.filter-pill.active {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 2px 6px rgba(88, 166, 255, 0.3);
+}
+
+.filter-divider {
+    width: 1px;
+    height: 16px;
+    background-color: var(--border);
+    margin: 0 2px;
+}
+
 main {
     flex: 1;
     overflow-y: auto;

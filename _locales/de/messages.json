@@ -67,5 +67,23 @@
     },
     "searchPlaceholder": {
         "message": "Ressourcen suchen..."
+    },
+    "filterAll": {
+        "message": "Alle"
+    },
+    "filterNode": {
+        "message": "Node"
+    },
+    "filterVM": {
+        "message": "VM"
+    },
+    "filterLXC": {
+        "message": "LXC"
+    },
+    "filterRunning": {
+        "message": "Online"
+    },
+    "filterStopped": {
+        "message": "Offline"
     }
 }
