@@ -14,14 +14,14 @@ const fs = require('fs');
   const storeDir = path.resolve(__dirname);
 
   // 1. Capture Dark Mode
-  await context.emulateMedia({ colorScheme: 'dark' });
+  await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto(mockPath);
   await page.waitForTimeout(1000); // Wait for CSS to settle
   await page.screenshot({ path: path.join(storeDir, 'screenshot_dark.png') });
   console.log('Saved screenshot_dark.png (Dark Mode)');
 
   // 2. Capture Light Mode
-  await context.emulateMedia({ colorScheme: 'light' });
+  await page.emulateMedia({ colorScheme: 'light' });
   await page.reload(); // Ensure media queries re-evaluate
   await page.waitForTimeout(1000);
   await page.screenshot({ path: path.join(storeDir, 'screenshot_light.png') });
