@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build and Distribution
+dist/
+*.zip
+*.crx
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+store/screenshot_*.jpg
+!store/screenshot_*.png
+/home/joe/Development/devops-geek/ProxMux/store/screenshot_*.jpg
+/home/joe/Development/devops-geek/ProxMux/tmp/
