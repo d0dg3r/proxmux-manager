@@ -46,9 +46,78 @@ header {
     padding: 12px 16px;
     background-color: var(--card-bg);
     border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    flex-shrink: 0;
+}
+
+.top-bar {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    z-index: 100;
+}
+
+.search-container {
+    padding: 10px 16px;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+#search-input {
+    width: 100%;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 8px 12px 8px 34px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.filter-pill {
+    background-color: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.filter-pill.active {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.filter-divider {
+    width: 1px;
+    height: 16px;
+    background-color: var(--border);
+    margin: 0 2px;
 }
 
 .logo-container {
