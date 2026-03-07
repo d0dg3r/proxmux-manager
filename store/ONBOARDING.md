@@ -58,6 +58,9 @@ Perfekt für DevOps-Engineers und Home-Server-Enthusiasten, die eine schnelle, p
 2. **`sidePanel`**:
    - *Justification*: Used to provide a persistent management interface that remains visible alongside the user's browser tabs for efficient cluster monitoring.
 
+3. **`tabs`**:
+   - *Justification*: Required to programmatically open and manage new browser tabs for Proxmox console interfaces (noVNC, SPICE, and Shell).
+
 3. **`downloads` & `downloads.open`**:
    - *Justification*: Necessary to generate and automatically launch SPICE configuration files (.vv) for external viewer applications like remote-viewer.
 
