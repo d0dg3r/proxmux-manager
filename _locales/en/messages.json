@@ -64,5 +64,26 @@
     },
     "shell": {
         "message": "Shell"
+    },
+    "searchPlaceholder": {
+        "message": "Search resources..."
+    },
+    "filterAll": {
+        "message": "All"
+    },
+    "filterNode": {
+        "message": "Node"
+    },
+    "filterVM": {
+        "message": "VM"
+    },
+    "filterLXC": {
+        "message": "LXC"
+    },
+    "filterRunning": {
+        "message": "Online"
+    },
+    "filterStopped": {
+        "message": "Offline"
     }
 }

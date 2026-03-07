@@ -21,12 +21,64 @@ document.addEventListener('DOMContentLoaded', async () => {
             const translation = chrome.i18n.getMessage(key);
             if (translation) el.title = translation;
         });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            const translation = chrome.i18n.getMessage(key);
+            if (translation) el.placeholder = translation;
+        });
     }
 
     initI18n();
 
+    let allResources = [];
+    let activeFilters = {
+        type: 'all', // 'all', 'node', 'qemu', 'lxc'
+        status: 'all' // 'all', 'running', 'stopped'
+    };
+    const searchInput = document.getElementById('search-input');
+    const filterPills = document.querySelectorAll('.filter-pill');
+
     // UI Event Listeners
     settingsBtn.addEventListener('click', () => chrome.runtime.openOptionsPage());
+
+    searchInput.addEventListener('input', () => {
+        filterAndRender();
+    });
+
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const type = pill.getAttribute('data-filter-type');
+            const status = pill.getAttribute('data-filter-status');
+
+            if (type) {
+                // If clicking type, clear existing type indicators
+                filterPills.forEach(p => {
+                    if (p.hasAttribute('data-filter-type')) p.classList.remove('active');
+                });
+                activeFilters.type = type;
+            } else if (status) {
+                // Toggle status filter if clicking same status, otherwise switch
+                if (activeFilters.status === status) {
+                    activeFilters.status = 'all';
+                    pill.classList.remove('active');
+                } else {
+                    filterPills.forEach(p => {
+                        if (p.hasAttribute('data-filter-status')) p.classList.remove('active');
+                    });
+                    activeFilters.status = status;
+                }
+            }
+
+            // Always ensure the correct type pill is active
+            if (type) pill.classList.add('active');
+            else {
+                // If toggled status, ensure status pill is active if not 'all'
+                if (activeFilters.status !== 'all') pill.classList.add('active');
+            }
+
+            filterAndRender();
+        });
+    });
     
     sidepanelBtn.addEventListener('click', async () => {
         const window = await chrome.windows.getCurrent();
@@ -49,10 +101,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const resources = await api.getResources();
+        allResources = resources;
         // console.log('Resources received:', resources.length);
         loadingOverlay.classList.add('hidden');
         renderResources(resources, api);
         
+        // Auto-focus search for speed
+        searchInput.focus();
+
         // Asynchronously discover and update cluster nodes for failover
         updateFailoverNodes(resources, settings.proxmoxUrl);
     } catch (error) {
@@ -110,6 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res.type !== 'node') {
                 // Fetch IP and OS info
                 api.getResourceDetails(res).then(details => {
+                    res.ip = details.ip;
+                    res.os = details.os;
                     if (details.os) {
                         osTag.textContent = details.os;
                         osTag.classList.remove('hidden');
@@ -195,6 +253,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             alert(`Failed to get SPICE proxy: ${error.message}`);
         }
+    }
+
+    function filterAndRender() {
+        const query = searchInput.value.toLowerCase().trim();
+        
+        const filtered = allResources.filter(res => {
+            // 1. Type filter
+            if (activeFilters.type !== 'all' && res.type !== activeFilters.type) return false;
+
+            // 2. Status filter
+            if (activeFilters.status !== 'all' && res.status !== activeFilters.status) return false;
+
+            // 3. Search query
+            if (!query) return true;
+
+            const name = (res.name || res.vmid || res.node || '').toString().toLowerCase();
+            const vmid = (res.vmid || '').toString().toLowerCase();
+            const node = (res.node || '').toString().toLowerCase();
+            const type = (res.type || '').toString().toLowerCase();
+            const ip = (res.ip || '').toString().toLowerCase();
+            
+            return name.includes(query) || vmid.includes(query) || node.includes(query) || 
+                   type.includes(query) || ip.includes(query);
+        });
+
+        renderResources(filtered, api);
     }
 
     async function updateFailoverNodes(resources, primaryUrl) {

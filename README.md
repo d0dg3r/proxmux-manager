@@ -10,15 +10,14 @@
 
 A dedicated Chrome Extension for Proxmox VE cluster management, providing instant access to VM, container, and node consoles.
 
-## Features
-
-- **Quick Overview**: List all cluster resources (VMs, LXCs, Nodes) directly from the toolbar.
-- **Status Indicators**: Real-time status (running/stopped) at a glance.
+- **Real-time Search**: Instant filtering by name, ID, node, type, or IP directly in the popup.
+- **Advanced Resource Filters**: Quick-access pills to isolate Nodes, VMs, LXCs, and power status (Online/Offline).
 - **Intelligent Consoles**:
     - **noVNC**: Direct links to web consoles for VMs and containers.
     - **SPICE**: Detects SPICE availability and provides a one-click .vv file download for remote-viewer.
     - **Shell**: Quick access to host node shells.
-- **Secure**: Uses Proxmox API Tokens for authentication.
+- **Improved UX**: Sticky navigation header and automatic search focus for a seamless management experience.
+- **Secure**: Uses Proxmox API Tokens for authentication; all credentials stay local.
 - **Premium UI**: Modern design with full **Dark** and **Light** mode support (follows system preference).
 
 ## UI & Themes
@@ -61,3 +60,9 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - **Dedicated Settings**: New options page for secure and easy configuration.
 - **Enhanced Consoles**: Support for SPICE (with auto-open), noVNC, and Shell.
 - **Linux Optimized**: Intelligent SSH detection for VMs and LXCs.
+
+## Version 1.1.0 Release Notes
+- **Real-time Search**: Integrated deep search across your entire cluster.
+- **Resource Filtering**: New type-based (Node/VM/LXC) and status-based (Online/Offline) filters.
+- **Sticky UI**: Fixed header and search bar using robust Flexbox layout for better scrolling.
+- **Auto-Focus**: Instant interaction with the search field upon opening.
