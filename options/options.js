@@ -7,6 +7,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const status = document.getElementById('status');
     const toggleSecretBtn = document.getElementById('toggle-secret');
 
+    // i18n Initialization
+    function initI18n() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const translation = chrome.i18n.getMessage(key);
+            if (translation) el.textContent = translation;
+        });
+    }
+
+    initI18n();
+
     // Load saved settings
     chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret'], (items) => {
         if (items.proxmoxUrl) proxmoxUrlInput.value = items.proxmoxUrl;

@@ -9,6 +9,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const openSettingsOverlayBtn = document.getElementById('open-settings-overlay');
     const template = document.getElementById('resource-item-template');
 
+    // i18n Initialization
+    function initI18n() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const translation = chrome.i18n.getMessage(key);
+            if (translation) el.textContent = translation;
+        });
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            const key = el.getAttribute('data-i18n-title');
+            const translation = chrome.i18n.getMessage(key);
+            if (translation) el.title = translation;
+        });
+    }
+
+    initI18n();
+
     // UI Event Listeners
     settingsBtn.addEventListener('click', () => chrome.runtime.openOptionsPage());
     

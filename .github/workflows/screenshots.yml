@@ -1,0 +1,37 @@
+name: Generate Store Screenshots
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'store/mock/**'
+      - 'store/generate_screenshots_ci.js'
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install dependencies
+        run: npm install playwright
+        
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+        
+      - name: Generate Screenshots
+        run: node store/generate_screenshots_ci.js
+        
+      - name: Commit screenshots
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add store/*.png
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: update store screenshots [skip ci]"
+          git push

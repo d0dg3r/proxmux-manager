@@ -1,4 +1,5 @@
 :root {
+    /* Dark Mode (Default) */
     --bg-color: #0d1117;
     --card-bg: #161b22;
     --text-primary: #c9d1d9;
@@ -8,6 +9,20 @@
     --error: #f85149;
     --border: #30363d;
     --hover-bg: #21262d;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-color: #ffffff;
+        --card-bg: #f6f8fa;
+        --text-primary: #24292f;
+        --text-secondary: #57606a;
+        --accent: #0969da;
+        --success: #1a7f37;
+        --error: #cf222e;
+        --border: #d0d7de;
+        --hover-bg: #eaeef2;
+    }
 }
 
 body {

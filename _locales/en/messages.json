@@ -1,0 +1,68 @@
+{
+    "extName": {
+        "message": "ProxMux Manager"
+    },
+    "extDescription": {
+        "message": "Professional Proxmox VE cluster management for your browser. Quickly monitor resources, access consoles (noVNC, SPICE), and manage nodes with high-availability failover support."
+    },
+    "settings": {
+        "message": "Settings"
+    },
+    "connecting": {
+        "message": "Connecting to Proxmox..."
+    },
+    "noAuthTitle": {
+        "message": "Welcome to ProxMux"
+    },
+    "noAuthDesc": {
+        "message": "Please configure your API credentials to start managing your cluster."
+    },
+    "openSettings": {
+        "message": "Open Settings"
+    },
+    "saveSettings": {
+        "message": "Save Settings"
+    },
+    "proxmoxUrl": {
+        "message": "Proxmox URL"
+    },
+    "apiUser": {
+        "message": "User & Realm"
+    },
+    "apiTokenId": {
+        "message": "Token ID"
+    },
+    "apiSecret": {
+        "message": "API Secret"
+    },
+    "saveSuccess": {
+        "message": "Settings saved successfully!"
+    },
+    "connectionFailed": {
+        "message": "Connection Failed"
+    },
+    "retry": {
+        "message": "Retry"
+    },
+    "nodes": {
+        "message": "Nodes"
+    },
+    "vms": {
+        "message": "Virtual Machines"
+    },
+    "containers": {
+        "message": "Containers"
+    },
+    "ssh": {
+        "message": "SSH"
+    },
+    "novnc": {
+        "message": "noVNC"
+    },
+    "spice": {
+        "message": "SPICE"
+    },
+    "shell": {
+        "message": "Shell"
+    }
+}
