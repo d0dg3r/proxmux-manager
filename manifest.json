@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "ProxMux Manager",
+  "version": "1.0.0",
+  "description": "Quick access to Proxmox VMs and containers console.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "downloads",
+    "downloads.open",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://*/*"
+  ],
+  "side_panel": {
+    "default_path": "popup/popup.html"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options/options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

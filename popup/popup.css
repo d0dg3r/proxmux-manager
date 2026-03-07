@@ -1,0 +1,352 @@
+:root {
+    --bg-color: #0d1117;
+    --card-bg: #161b22;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --success: #2ea043;
+    --error: #f85149;
+    --border: #30363d;
+    --hover-bg: #21262d;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    width: 550px;
+    height: 600px;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 24px;
+    height: 24px;
+}
+
+h1 {
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 600;
+    background: linear-gradient(135deg, #58a6ff, #1f6feb);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+#settings-btn, #sidepanel-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px;
+    display: flex;
+}
+
+#settings-btn:hover, #sidepanel-btn:hover {
+    color: var(--accent);
+}
+
+main {
+    position: relative;
+    min-height: 100px;
+}
+
+.overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(88, 166, 255, 0.2);
+    border-top: 3px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.2s;
+    gap: 12px;
+}
+
+.resource-item:hover {
+    background-color: var(--hover-bg);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-running { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
+.status-stopped { background-color: var(--error); }
+.status-unknown { background-color: var(--text-secondary); }
+
+.info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.95rem;
+}
+
+.node {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.meta-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.tag {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: var(--hover-bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.tag.ip {
+    color: var(--accent);
+    border-color: rgba(88, 166, 255, 0.3);
+}
+
+.tag.os {
+    text-transform: capitalize;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background-color: var(--border);
+    color: var(--text-primary);
+    border: 1px solid transparent;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #3e444d;
+    border-color: var(--text-secondary);
+}
+
+.action-btn.novnc {
+    background-color: rgba(88, 166, 255, 0.1);
+    color: var(--accent);
+    border-color: rgba(88, 166, 255, 0.4);
+}
+
+.action-btn.novnc:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+.action-btn.ssh {
+    background-color: rgba(46, 160, 67, 0.1);
+    color: var(--success);
+    border-color: rgba(46, 160, 67, 0.4);
+}
+
+.action-btn.ssh:hover {
+    background-color: var(--success);
+    color: white;
+}
+
+#no-auth button, .primary-btn {
+    margin-top: 12px;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: 600;
+}
+
+.primary-btn:hover {
+    background-color: #1f6feb;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--hover-bg);
+}
+
+.modal-header h2 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+#close-modal {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    width: 100%;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-icon input {
+    padding-right: 40px;
+}
+
+.icon-btn {
+    position: absolute;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.icon-btn:hover {
+    color: var(--text-primary);
+}
+
+#save-status {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    text-align: center;
+}

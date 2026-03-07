@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ProxMux Options</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ProxMux Settings</h1>
+        <div class="form-group">
+            <label for="proxmox-url">Proxmox URL</label>
+            <input type="text" id="proxmox-url" placeholder="https://192.168.1.100:8006">
+        </div>
+        <div class="form-group">
+            <label for="api-user">API User & Realm</label>
+            <input type="text" id="api-user" placeholder="root@pam">
+        </div>
+        <div class="form-group">
+            <label for="api-tokenid">Token ID</label>
+            <input type="text" id="api-tokenid" placeholder="my-token">
+        </div>
+        <div class="form-group">
+            <label for="api-secret">API Secret (Value)</label>
+            <input type="password" id="api-secret" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+        </div>
+        <button id="save-btn">Save Settings</button>
+        <div id="status"></div>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>
