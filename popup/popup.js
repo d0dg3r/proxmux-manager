@@ -196,4 +196,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert(`Failed to get SPICE proxy: ${error.message}`);
         }
     }
+
+    async function updateFailoverNodes(resources, primaryUrl) {
+        try {
+            const nodes = resources.filter(res => res.type === 'node');
+            if (nodes.length <= 1) return;
+
+            const urlObj = new URL(primaryUrl);
+            const port = urlObj.port || (urlObj.protocol === 'https:' ? '8006' : '80');
+            const protocol = urlObj.protocol;
+
+            // Generate URLs for all nodes, assuming they listen on the same port
+            const failoverUrls = nodes.map(n => `${protocol}//${n.node}:${port}`);
+            
+            // Unique URLs including the primary one
+            const uniqueUrls = [...new Set([primaryUrl, ...failoverUrls])];
+            
+            await chrome.storage.local.set({ failoverUrls: uniqueUrls });
+        } catch (e) {
+            console.error('Failed to update failover nodes:', e);
+        }
+    }
 });
