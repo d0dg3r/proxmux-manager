@@ -22,11 +22,13 @@ This document contains all the text, metadata, and justifications required to su
 PROXMUX Manager is the professional Chrome extension for Proxmox VE administrators. Access your virtualization cluster instantly to monitor nodes, VMs, and containers without leaving your current tab.
 
 Key Features:
-- Quick Access: List and monitor all cluster resources (VMs, LXCs, Nodes).
+- Real-time Search: Instant filtering by name, ID, node, type, or IP.
+- Advanced Filters: Quick-access pills for Nodes, VMs, Containers, and status.
+- Professional UI: Sticky navigation and auto-focus for a seamless experience.
 - Intelligent Consoles: Support for noVNC, SPICE (remote-viewer), and Node Shells.
-- Modern Design: Full Dark and Light mode support following your system preference.
+- Modern Design: Full Dark and Light mode support based on system preference.
 - High Availability: Automatic cluster node discovery and seamless failover.
-- Secure: Your API Tokens are stored locally and never leave your browser.
+- Secure: API Tokens are stored locally and never leave your browser.
 
 Perfect for DevOps engineers and home-server enthusiasts who need a fast, professional, and secure way to manage their Proxmox infrastructure.
 ```
@@ -36,7 +38,9 @@ Perfect for DevOps engineers and home-server enthusiasts who need a fast, profes
 PROXMUX Manager ist die professionelle Chrome-Erweiterung für Proxmox VE Administratoren. Greifen Sie sofort auf Ihren Virtualisierungs-Cluster zu, um Nodes, VMs und Container zu überwachen, ohne Ihren aktuellen Tab zu verlassen.
 
 Hauptfunktionen:
-- Schnellübersicht: Alle Cluster-Ressourcen (VMs, LXCs, Nodes) im Blick.
+- Echtzeit-Suche: Sofortiges Filtern nach Name, ID, Node, Typ oder IP.
+- Erweiterte Filter: Schnellzugriff-Pills für Nodes, VMs, Container und Status.
+- Profi-UI: Sticky-Navigation und Auto-Fokus für flüssiges Arbeiten.
 - Intelligente Konsolen: Unterstützung für noVNC, SPICE (remote-viewer) und Node-Shells.
 - Modernes Design: Volle Unterstützung für Dark- und Light-Mode (folgt den Systemeinstellungen).
 - Hochverfügbarkeit: Automatische Node-Erkennung und nahtloses Failover.
