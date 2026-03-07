@@ -1,11 +1,11 @@
-# Privacy Policy for ProxMux Manager
+# Privacy Policy for PROXMUX Manager
 
 Last Updated: March 7, 2026
 
-ProxMux Manager is committed to protecting your privacy. This Privacy Policy explains how our Chrome Extension handles your information.
+PROXMUX Manager is committed to protecting your privacy. This Privacy Policy explains how our Chrome Extension handles your information.
 
 ## 1. Information We Collect
-ProxMux Manager **does not collect, store, or transmit any personal data** to our servers or any third-party services.
+PROXMUX Manager **does not collect, store, or transmit any personal data** to our servers or any third-party services.
 
 ## 2. Authentication and Credentials
 To function, the extension requires:
@@ -28,4 +28,4 @@ All communication occurs directly between your browser and your Proxmox VE host 
 We may update this policy occasionally. Any changes will be reflected in this document.
 
 ## 6. Contact
-If you have any questions, please contact the developer via the GitHub repository: https://github.com/d0dg3r/ProxMux
+If you have any questions, please contact the developer via the GitHub repository: https://github.com/d0dg3r/PROXMUX

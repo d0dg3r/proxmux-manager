@@ -1,6 +1,6 @@
 {
     "extName": {
-        "message": "ProxMux Manager"
+        "message": "PROXMUX Manager"
     },
     "extDescription": {
         "message": "Professionelles Proxmox VE Cluster-Management für deinen Browser. Ressourcen überwachen, Konsolen (noVNC, SPICE) öffnen und Nodes mit Failover-Unterstützung verwalten."
@@ -12,7 +12,7 @@
         "message": "Verbindung zu Proxmox wird hergestellt..."
     },
     "noAuthTitle": {
-        "message": "Willkommen bei ProxMux"
+        "message": "Willkommen bei PROXMUX"
     },
     "noAuthDesc": {
         "message": "Bitte konfiguriere deine API-Zugangsdaten, um dein Cluster zu verwalten."
