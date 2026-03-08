@@ -4,6 +4,7 @@
   <a href="https://github.com/d0dg3r/proxmux-manager/releases"><img src="https://img.shields.io/github/v/release/d0dg3r/proxmux-manager?style=flat-square&logo=github" alt="Release"></a>
   <a href="https://github.com/d0dg3r/proxmux-manager/releases?q=pre"><img src="https://img.shields.io/github/v/release/d0dg3r/proxmux-manager?include_prereleases&label=pre-release&logo=github&style=flat-square" alt="Pre-release"></a>
   <a href="https://chrome.google.com/webstore/detail/proxmux-manager"><img src="https://img.shields.io/badge/Chrome_Web_Store-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a>
+  <a href="https://github.com/sponsors/d0dg3r"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4&style=flat-square" alt="Sponsor"></a>
 </p>
 
 # PROXMUX Manager Chrome Extension
@@ -72,3 +73,11 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - **Dedicated Settings**: New options page for secure and easy configuration.
 - **Enhanced Consoles**: Support for SPICE (with auto-open), noVNC, and Shell.
 - **Linux Optimized**: Intelligent SSH detection for VMs and LXCs.
+
+## Support the Project
+
+If you find **PROXMUX Manager** useful, please consider supporting its development:
+
+- **Star the Repository**: Help others discover the project.
+- **GitHub Sponsors**: [Sponsor d0dg3r](https://github.com/sponsors/d0dg3r) to help maintain the extension.
+- **Contribute**: Feel free to open issues or pull requests to improve the extension.
