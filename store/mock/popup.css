@@ -131,14 +131,21 @@ header {
     height: 24px;
 }
 
-h1 {
+h1.branded-title {
     font-size: 1.1rem;
     margin: 0;
-    font-weight: 600;
-    background: linear-gradient(135deg, #58a6ff, #1f6feb);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    background: none;
+}
+
+h1.branded-title .prox {
+    color: #40E0D0; /* Turquoise */
+}
+
+h1.branded-title .mux {
+    color: #D2691E; /* Orange/Brown */
 }
 
 .header-actions {

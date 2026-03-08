@@ -67,14 +67,29 @@ header {
     height: 24px;
 }
 
-h1 {
+h1.branded-title {
     font-size: 1.1rem;
     margin: 0;
-    font-weight: 600;
-    background: linear-gradient(135deg, #58a6ff, #1f6feb);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    background: none;
+    -webkit-text-fill-color: initial;
+}
+
+h1.branded-title .prox {
+    color: #40E0D0; /* Turquoise */
+}
+
+h1.branded-title .mux {
+    color: #D2691E; /* Orange/Brown */
+}
+
+h1.branded-title .title-suffix {
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 6px;
+    font-size: 0.9rem;
 }
 
 .header-actions {
@@ -337,6 +352,38 @@ main {
 
 .primary-btn:hover {
     background-color: #1f6feb;
+}
+
+.secondary-btn {
+    margin-top: 12px;
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.overlay-content {
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.overlay-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
 }
 
 /* Modal Styles */

@@ -5,10 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0] - Unreleased
+## [1.1.1] - 2026-03-08
 
 ### Added
-- Started development of v1.1.0.
+- Robust session detection using `chrome.cookies` API for consoles.
+- New **Login Required** overlay to guide users when their Proxmox session expires.
+- Turquoise (**PROX**) and Orange/Brown (**MUX**) branding overhaul for a premium look.
+- Detailed debugging status in the popup for easier troubleshooting.
+
+### Fixed
+- Resolved 401 errors when opening consoles due to expired browser sessions.
+
+## [1.1.0] - 2026-03-08
+- Feature release with improved UI and session handling (Internal).
 
 ## [1.0.2] - 2026-03-07
 

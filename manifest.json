@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extName__",
   "short_name": "PROXMUX",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "permissions": [
@@ -10,7 +10,8 @@
     "tabs",
     "downloads",
     "downloads.open",
-    "sidePanel"
+    "sidePanel",
+    "cookies"
   ],
   "host_permissions": [
     "https://*/*"
