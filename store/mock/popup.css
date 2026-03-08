@@ -120,6 +120,41 @@ header {
     margin: 0 2px;
 }
 
+.tag-filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.tag-filter-pill {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background-color: var(--tag-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: lowercase;
+}
+
+.tag-filter-pill:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.tag-filter-pill.active {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 2px 4px rgba(88, 166, 255, 0.2);
+}
+
+
 .logo-container {
     display: flex;
     align-items: center;
@@ -153,18 +188,20 @@ h1.branded-title .mux {
     gap: 8px;
 }
 
-#settings-btn, #sidepanel-btn {
+#settings-btn, #sidepanel-btn, #refresh-btn, #theme-toggle-btn {
     background: transparent;
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: color 0.2s;
-    padding: 4px;
+    transition: all 0.2s;
+    padding: 6px;
     display: flex;
+    border-radius: 6px;
 }
 
-#settings-btn:hover, #sidepanel-btn:hover {
+#settings-btn:hover, #sidepanel-btn:hover, #refresh-btn:hover, #theme-toggle-btn:hover {
     color: var(--accent);
+    background-color: var(--hover-bg);
 }
 
 main {
@@ -244,10 +281,30 @@ main {
     font-size: 0.95rem;
 }
 
+.resource-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .node {
     font-size: 0.75rem;
     color: var(--text-secondary);
 }
+
+.uptime {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.uptime::before {
+    content: "•";
+    margin-right: 4px;
+    opacity: 0.5;
+}
+
 
 .meta-tags {
     display: flex;
@@ -272,6 +329,30 @@ main {
 .tag.os {
     text-transform: capitalize;
 }
+
+.user-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.tag-pill {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: var(--tag-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    text-transform: lowercase;
+}
+
+.resource-item:hover .tag-pill {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
 
 .actions {
     display: flex;

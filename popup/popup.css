@@ -12,7 +12,35 @@
     --tag-bg: #21262d;
 }
 
+/* Theme overrides */
+body.light-theme {
+    --bg-color: #ffffff;
+    --card-bg: #f6f8fa;
+    --text-primary: #24292f;
+    --text-secondary: #57606a;
+    --accent: #0969da;
+    --success: #1a7f37;
+    --error: #cf222e;
+    --border: #d0d7de;
+    --hover-bg: #eaeef2;
+    --tag-bg: #eff2f5;
+}
+
+body.dark-theme {
+    --bg-color: #0d1117;
+    --card-bg: #161b22;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --success: #2ea043;
+    --error: #f85149;
+    --border: #30363d;
+    --hover-bg: #21262d;
+    --tag-bg: #21262d;
+}
+
 @media (prefers-color-scheme: light) {
+
     :root {
         --bg-color: #ffffff;
         --card-bg: #f6f8fa;
@@ -35,11 +63,20 @@ body {
     padding: 0;
     width: 550px;
     height: 600px;
-    max-height: 700px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
+
+/* In Sidepanel or if resized */
+@media screen and (min-width: 551px), screen and (min-height: 601px) {
+    body {
+        width: 100vw;
+        height: 100vh;
+    }
+}
+
+
 
 .top-bar {
     flex-shrink: 0;
@@ -97,19 +134,23 @@ h1.branded-title .title-suffix {
     gap: 8px;
 }
 
-#settings-btn, #sidepanel-btn {
+#settings-btn, #sidepanel-btn, #refresh-btn, #theme-toggle-btn {
     background: transparent;
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: color 0.2s;
-    padding: 4px;
+    transition: all 0.2s;
+    padding: 6px;
     display: flex;
+    border-radius: 6px;
 }
 
-#settings-btn:hover, #sidepanel-btn:hover {
+#settings-btn:hover, #sidepanel-btn:hover, #refresh-btn:hover, #theme-toggle-btn:hover {
     color: var(--accent);
+    background-color: var(--hover-bg);
 }
+
+
 
 .search-container {
     padding: 10px 16px;
@@ -185,6 +226,87 @@ h1.branded-title .title-suffix {
     background-color: var(--border);
     margin: 0 2px;
 }
+
+.tag-filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.tag-filter-pill {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background-color: var(--tag-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: lowercase;
+}
+
+.tag-filter-pill:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.tag-filter-pill.active {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 2px 4px rgba(88, 166, 255, 0.2);
+}
+
+/* Header Alerts */
+.header-alert {
+    padding: 8px 16px;
+    background-color: rgba(248, 81, 73, 0.1);
+    border-bottom: 1px solid var(--error);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.header-alert p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.header-alert-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.header-alert .compact-btn {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    border: 1px solid var(--error);
+    background: transparent;
+    color: var(--error);
+    white-space: nowrap;
+}
+
+.header-alert .compact-btn.primary {
+    background-color: var(--error);
+    color: white;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
 
 main {
     flex: 1;
@@ -265,9 +387,28 @@ main {
     font-size: 0.95rem;
 }
 
+.resource-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .node {
     font-size: 0.75rem;
     color: var(--text-secondary);
+}
+
+.uptime {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.uptime::before {
+    content: "•";
+    margin-right: 4px;
+    opacity: 0.5;
 }
 
 .meta-tags {
@@ -293,6 +434,30 @@ main {
 .tag.os {
     text-transform: capitalize;
 }
+
+.user-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.tag-pill {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background-color: var(--tag-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    text-transform: lowercase;
+}
+
+.resource-item:hover .tag-pill {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
 
 .actions {
     display: flex;

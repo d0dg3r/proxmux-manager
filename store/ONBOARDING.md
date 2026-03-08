@@ -10,7 +10,7 @@ This document contains all the text, metadata, and justifications required to su
 - **Summary**: Manage your Proxmox VE cluster. Monitor resources, access consoles (noVNC, SPICE), and manage nodes with failover support.
 - **Category**: Developer Tools
 - **Additional Category**: Productivity
-- **Verified Website**: (Your GitHub Repo URL) https://github.com/d0dg3r/proxmux-manager
+- **Verified Website**: (Your GitHub Repo URL) https://github.com/d0dg3r/PROXMUX-Manager
 - **Single Purpose Statement**: Provide a monitoring and management interface for Proxmox VE clusters directly within the browser.
 
 ---
@@ -22,13 +22,14 @@ This document contains all the text, metadata, and justifications required to su
 PROXMUX Manager is the professional Chrome extension for Proxmox VE administrators. Access your virtualization cluster instantly to monitor nodes, VMs, and containers without leaving your current tab.
 
 Key Features:
-- Real-time Search: Instant filtering by name, ID, node, type, or IP.
-- Advanced Filters: Quick-access pills for Nodes, VMs, Containers, and status.
-- Professional UI: Sticky navigation and auto-focus for a seamless experience.
-- Intelligent Consoles: Support for noVNC, SPICE (remote-viewer), and Node Shells.
-- Modern Design: Full Dark and Light mode support based on system preference.
-- High Availability: Automatic cluster node discovery and seamless failover.
-- Secure: API Tokens are stored locally and never leave your browser.
+- **Interactive Tags**: Discover and click cluster-wide tags for instant categorical filtering.
+- **Uptime Display**: Real-time, human-readable uptime (e.g., 2d 5h) for all running resources.
+- **Improved Monitoring**: See VM/LXC status, OS types, and IP addresses at a glance.
+- **Tabbed Settings UI**: Organized "General", "Help", and "About" sections for better configuration.
+- **Intelligent Consoles**: Support for noVNC, SPICE (remote-viewer), and Node Shells.
+- **Modern Design**: Selection of Dark, Light, or Follow System themes.
+- **High Availability**: Automatic cluster node discovery and seamless failover support.
+- **Secure**: API Tokens are stored locally and never leave your browser.
 
 Perfect for DevOps engineers and home-server enthusiasts who need a fast, professional, and secure way to manage their Proxmox infrastructure.
 ```
@@ -38,13 +39,14 @@ Perfect for DevOps engineers and home-server enthusiasts who need a fast, profes
 PROXMUX Manager ist die professionelle Chrome-Erweiterung für Proxmox VE Administratoren. Greifen Sie sofort auf Ihren Virtualisierungs-Cluster zu, um Nodes, VMs und Container zu überwachen, ohne Ihren aktuellen Tab zu verlassen.
 
 Hauptfunktionen:
-- Echtzeit-Suche: Sofortiges Filtern nach Name, ID, Node, Typ oder IP.
-- Erweiterte Filter: Schnellzugriff-Pills für Nodes, VMs, Container und Status.
-- Profi-UI: Sticky-Navigation und Auto-Fokus für flüssiges Arbeiten.
-- Intelligente Konsolen: Unterstützung für noVNC, SPICE (remote-viewer) und Node-Shells.
-- Modernes Design: Volle Unterstützung für Dark- und Light-Mode (folgt den Systemeinstellungen).
-- Hochverfügbarkeit: Automatische Node-Erkennung und nahtloses Failover.
-- Sicher: Ihre API-Token werden lokal gespeichert und verlassen niemals Ihren Browser.
+- **Interaktive Tags**: Automatische Erkennung und klickbare Filter-Pills für Ihre Cluster-Tags.
+- **Uptime-Anzeige**: Human-readable Uptime (z.B. 2d 5h) für alle laufenden Ressourcen auf einen Blick.
+- **Optimierte Überwachung**: Monitor-Status, OS-Typen und IP-Adressen direkt in der Liste.
+- **Tabbed Settings UI**: Strukturierte Einstellungen in den Bereichen "Allgemein", "Hilfe" und "Über".
+- **Intelligente Konsolen**: Unterstützung für noVNC, SPICE (remote-viewer) und Node-Shells.
+- **Modernes Design**: Manuelle Wahl zwischen Dark-, Light-Mode oder Systemeinstellungen.
+- **Hochverfügbarkeit**: Automatische Node-Erkennung und nahtloses Cluster-Failover.
+- **Sicher**: API-Token werden lokal gespeichert und verlassen niemals Ihren Browser.
 
 Perfekt für DevOps-Engineers und Home-Server-Enthusiasten, die eine schnelle, professionelle und sichere Lösung für ihre Proxmox-Infrastruktur suchen.
 ```

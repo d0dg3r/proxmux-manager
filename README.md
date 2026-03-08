@@ -1,8 +1,8 @@
 ![PROXMUX Banner](store/banner_ad.png)
 
 <p align="center">
-  <a href="https://github.com/d0dg3r/proxmux-manager/releases"><img src="https://img.shields.io/github/v/release/d0dg3r/proxmux-manager?style=flat-square&logo=github" alt="Release"></a>
-  <a href="https://github.com/d0dg3r/proxmux-manager/releases?q=pre"><img src="https://img.shields.io/github/v/release/d0dg3r/proxmux-manager?include_prereleases&label=pre-release&logo=github&style=flat-square" alt="Pre-release"></a>
+  <a href="https://github.com/d0dg3r/PROXMUX-Manager/releases"><img src="https://img.shields.io/github/v/release/d0dg3r/PROXMUX-Manager?style=flat-square&logo=github" alt="Release"></a>
+  <a href="https://github.com/d0dg3r/PROXMUX-Manager/releases?q=pre"><img src="https://img.shields.io/github/v/release/d0dg3r/PROXMUX-Manager?include_prereleases&label=pre-release&logo=github&style=flat-square" alt="Pre-release"></a>
   <a href="https://chrome.google.com/webstore/detail/proxmux-manager"><img src="https://img.shields.io/badge/Chrome_Web_Store-4285F4?style=flat-square&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a>
   <a href="https://github.com/sponsors/d0dg3r"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4&style=flat-square" alt="Sponsor"></a>
 </p>
@@ -11,16 +11,15 @@
 
 A dedicated Chrome Extension for Proxmox VE cluster management, providing instant access to VM, container, and node consoles.
 
-- **Real-time Search**: Instant filtering by name, ID, node, type, or IP directly in the popup.
-- **Advanced Resource Filters**: Quick-access pills to isolate Nodes, VMs, LXCs, and power status (Online/Offline).
-- **Intelligent Consoles**:
-    - **noVNC**: Direct links to web consoles for VMs and containers.
-    - **SPICE**: Detects SPICE availability and provides a one-click .vv file download for remote-viewer.
-    - **Shell**: Quick access to host node shells.
-- **Improved UX**: Sticky navigation header and automatic search focus for a seamless management experience.
+- **Interactive Tags**: Discover and click cluster-wide tags in the search bar for instant categorical filtering.
+- **Uptime Monitoring**: Real-time, human-readable uptime (e.g., `2d 5h`) for all running resources.
+- **Enhanced Filters**: Quick-access pills to isolate Nodes, VMs, LXCs, and power status.
+- **Improved Monitoring**: See VM/LXC status, OS types, and IP addresses at a glance.
+- **Intelligent Consoles**: Support for noVNC, SPICE (remote-viewer), and Node Shells.
+- **Tabbed Settings UI**: Organized "General", "Help", and "About" sections for easier configuration.
+- **Theme Selection**: Manually toggle between **Dark**, **Light**, or **System** themes.
+- **Stability and Performance**: Automated node discovery with seamless failover and expired session detection.
 - **Secure**: Uses Proxmox API Tokens for authentication; all credentials stay local.
-- **Premium UI**: Modern design with full **Dark** and **Light** mode support. Now features a sleek Turquoise/Orange branded title.
-- **Session Aware**: Automatically detects expired Proxmox sessions and prompts for re-authentication before opening consoles.
 
 ## UI & Themes
 
@@ -56,8 +55,15 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - Proxmox VE 6.x or newer.
 - API Token with appropriate permissions (VM.Console and Sys.Audit for node discovery).
 
+## Version 1.1.2 Release Notes (New!)
+- **Power Features**: Introduced **Interactive Tags** and **Uptime Display** for better cluster oversight.
+- **Settings Refactor**: New **Tabbed UI** for settings with expanded **Help** guides (SPICE, SSH, SSL).
+- **Theme Control**: Manual theme overrides (Dark/Light/Auto).
+- **Branding Excellence**: Official rename to **PROXMUX-Manager** and repository-wide synchronization.
+- **Manual Refresh**: Dedicated refresh button in the header.
+- **Stability**: Fixed sidepanel height and improved character encoding (UTF-8).
+
 ## Version 1.1.1 Release Notes
-- **Branding Excellence**: Refined UI with premium Turquoise/Orange colors.
 - **Session Safety**: Robust detection of expired browser sessions using cookie-level checks to prevent 401 errors.
 - **Debug Insights**: Real-time status indicators in the popup for better transparency.
 

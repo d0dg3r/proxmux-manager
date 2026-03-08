@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-03-08
+
+### Added
+- **Tags Support**: Machine tags from Proxmox are now displayed as pills in the resource list.
+- **Interactive Tag Filters**: Discover and click cluster-wide tags in the search bar for instant filtering.
+- **Uptime Display**: Real-time, human-readable uptime (e.g., `2d 5h`) for all running resources.
+- **Tabbed Settings UI**: Organized "General", "Help", and "About" sections.
+- **Enhanced Help**: Comprehensive troubleshooting guide for SPICE, SSH (Guest Agent), SSL, and more.
+- **Theme Selection**: Dedicated toggle button in the popup header for quick-switching, plus advanced settings in the options page.
+- **Manual Refresh**: Dedicated button in the popup header for on-demand updates.
+- **Test Connection**: Instant API validation in the settings page.
+
+### Fixed
+- Sidepanel height: now properly fills the screen space.
+- Header-based alerts: login/session prompts are always visible during scroll.
+- Character Encoding: Fixed heart emoji (❤️) and UTF-8 meta tags.
+- Renamed project to **PROXMUX-Manager** and updated all repository references.
+
 ## [1.1.1] - 2026-03-08
 
 ### Added
@@ -51,6 +69,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Side Panel support for persistent cluster management.
 - Proxmox API integration for resource monitoring.
 
-[1.0.1]: https://github.com/d0dg3r/proxmux-manager/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/d0dg3r/proxmux-manager/compare/v1.0.0-beta.2...v1.0.0
-[1.0.0-beta.2]: https://github.com/d0dg3r/proxmux-manager/releases/tag/v1.0.0-beta.2
+[1.0.1]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.0.0-beta.2...v1.0.0
+[1.0.0-beta.2]: https://github.com/d0dg3r/PROXMUX-Manager/releases/tag/v1.0.0-beta.2

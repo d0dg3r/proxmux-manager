@@ -1,9 +1,13 @@
+import { ProxmoxAPI } from '../lib/proxmox-api.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const proxmoxUrlInput = document.getElementById('proxmox-url');
     const apiUserInput = document.getElementById('api-user');
     const apiTokenIdInput = document.getElementById('api-tokenid');
     const apiSecretInput = document.getElementById('api-secret');
+    const themeSelect = document.getElementById('theme-select');
     const saveBtn = document.getElementById('save-settings-btn');
+    const testBtn = document.getElementById('test-connection-btn');
     const status = document.getElementById('status');
     const toggleSecretBtn = document.getElementById('toggle-secret');
 
@@ -18,12 +22,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initI18n();
 
+    // Tab Management
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            
+            tab.classList.add('active');
+            document.getElementById(target).classList.add('active');
+        });
+    });
+
+    // Theme Management
+    function applyTheme(theme) {
+        document.body.classList.remove('light-theme', 'dark-theme');
+        if (theme === 'light') {
+            document.body.classList.add('light-theme');
+        } else if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+        // 'auto' does nothing, letting CSS media query handle it
+    }
+
     // Load saved settings
-    chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret'], (items) => {
+    chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret', 'theme'], (items) => {
         if (items.proxmoxUrl) proxmoxUrlInput.value = items.proxmoxUrl;
         if (items.apiUser) apiUserInput.value = items.apiUser;
         if (items.apiTokenId) apiTokenIdInput.value = items.apiTokenId;
         if (items.apiSecret) apiSecretInput.value = items.apiSecret;
+        if (items.theme) {
+            themeSelect.value = items.theme;
+            applyTheme(items.theme);
+        }
+    });
+
+    themeSelect.addEventListener('change', () => {
+        applyTheme(themeSelect.value);
     });
 
     // Toggle Secret Visibility
@@ -41,6 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const user = apiUserInput.value.trim();
         const tokenId = apiTokenIdInput.value.trim();
         const secret = apiSecretInput.value.trim();
+        const theme = themeSelect.value;
 
         if (!url || !user || !tokenId || !secret) {
             status.textContent = 'Please fill in all fields.';
@@ -55,7 +95,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             apiUser: user,
             apiTokenId: tokenId,
             apiSecret: secret,
-            apiToken: fullToken
+            apiToken: fullToken,
+            theme: theme
         });
 
         status.textContent = 'Settings saved successfully!';
@@ -73,4 +114,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             status.textContent = '';
         }, 3000);
     });
+
+    // Test Connection
+    testBtn.addEventListener('click', async () => {
+        const url = proxmoxUrlInput.value.trim().replace(/\/$/, '');
+        const user = apiUserInput.value.trim();
+        const tokenId = apiTokenIdInput.value.trim();
+        const secret = apiSecretInput.value.trim();
+
+        if (!url || !user || !tokenId || !secret) {
+            status.textContent = 'Please fill in all fields to test.';
+            status.style.color = 'var(--error)';
+            return;
+        }
+
+        status.textContent = 'Testing connection...';
+        status.style.color = 'var(--text-secondary)';
+
+        try {
+            const fullToken = `${user}!${tokenId}=${secret}`;
+            const api = new ProxmoxAPI(url, fullToken);
+            const version = await api.get('/version');
+            
+            status.textContent = `Connection successful! Proxmox Version: ${version.data.version}`;
+            status.style.color = 'var(--success)';
+        } catch (error) {
+            console.error('Test Connection Failed:', error);
+            status.textContent = `Connection failed: ${error.message}`;
+            status.style.color = 'var(--error)';
+        }
+    });
 });
+

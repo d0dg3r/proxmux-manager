@@ -1,56 +1,136 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>PROXMUX Options</title>
     <link rel="stylesheet" href="options.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <img src="../icons/icon48.png" alt="Logo" class="logo">
-            <h1 class="branded-title">
-                <span class="prox">PROX</span><span class="mux">MUX</span>
-                <span class="title-suffix" data-i18n="settings">Settings</span>
-            </h1>
+            <div class="header-main">
+                <img src="../icons/icon48.png" alt="Logo" class="logo">
+                <h1 class="branded-title">
+                    <span class="prox">PROX</span><span class="mux">MUX</span>
+                    <span class="title-suffix" data-i18n="settings">Settings</span>
+                </h1>
+            </div>
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="general">General</button>
+                <button class="tab-btn" data-tab="help">Help</button>
+                <button class="tab-btn" data-tab="about">About</button>
+            </nav>
         </header>
-        
-        <div class="card">
-            <div class="form-group">
-                <label for="proxmox-url" data-i18n="proxmoxUrl">Proxmox URL</label>
-                <input type="text" id="proxmox-url" placeholder="https://192.168.1.100:8006">
-                <small>The primary URL of your Proxmox cluster.</small>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="api-user" data-i18n="apiUser">User & Realm</label>
-                    <input type="text" id="api-user" placeholder="root@pam">
-                </div>
-                <div class="form-group">
-                    <label for="api-tokenid" data-i18n="apiTokenId">Token ID</label>
-                    <input type="text" id="api-tokenid" placeholder="automation">
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="api-secret" data-i18n="apiSecret">API Secret</label>
-                <div class="input-with-icon">
-                    <input type="password" id="api-secret" placeholder="Secret Value">
-                    <button id="toggle-secret" class="icon-btn">
-                        <svg id="eye-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
-                    </button>
+        <!-- General Tab -->
+        <div id="general" class="tab-content active">
+            <div class="card">
+                <div class="form-group">
+                    <label for="proxmox-url" data-i18n="proxmoxUrl">Proxmox URL</label>
+                    <input type="text" id="proxmox-url" placeholder="https://192.168.1.100:8006">
+                    <small>The primary URL of your Proxmox cluster.</small>
                 </div>
-            </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="api-user" data-i18n="apiUser">User & Realm</label>
+                        <input type="text" id="api-user" placeholder="root@pam">
+                    </div>
+                    <div class="form-group">
+                        <label for="api-tokenid" data-i18n="apiTokenId">Token ID</label>
+                        <input type="text" id="api-tokenid" placeholder="automation">
+                    </div>
+                </div>
 
-            <button id="save-settings-btn" class="primary-btn" data-i18n="saveSettings">Save Settings</button>
-            <div id="status"></div>
+                <div class="form-group">
+                    <label for="api-secret" data-i18n="apiSecret">API Secret</label>
+                    <div class="input-with-icon">
+                        <input type="password" id="api-secret" placeholder="Secret Value">
+                        <button id="toggle-secret" class="icon-btn">
+                            <svg id="eye-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="theme-select">Theme</label>
+                    <select id="theme-select" class="form-control">
+                        <option value="auto">Auto (System)</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button id="save-settings-btn" class="primary-btn" data-i18n="saveSettings">Save Settings</button>
+                    <button id="test-connection-btn" class="secondary-btn">Test Connection</button>
+                </div>
+                <div id="status"></div>
+            </div>
         </div>
-        
-        <div class="info-card">
-            <h3>Configuration Tip</h3>
-            <p>Ensure your API Token has at least `VM.Console` and `Sys.Audit` permissions. For SPICE support, `VM.Config.Options` or `PVEVMAdmin` is recommended.</p>
+
+        <!-- Help Tab -->
+        <div id="help" class="tab-content">
+            <div class="card">
+                <h3>Troubleshooting & Quick Start</h3>
+                
+                <div class="help-item">
+                    <h4>SPICE Support</h4>
+                    <p>To use SPICE, your VM must have a <strong>Display</strong> set to "SPICE" in Proxmox. When you click the SPICE button, the extension downloads a <code>.vv</code> file. You need <strong>Virt-Viewer (remote-viewer)</strong> installed on your computer to open these files automatically.</p>
+                </div>
+
+                <div class="help-item">
+                    <h4>SSH Shells</h4>
+                    <p>The Shell icon appears for Linux-based VMs and LXC containers when a valid IP address is detected. It uses the <code>ssh://</code> protocol. Ensure your OS has a default handler for SSH links.</p>
+                    <p><strong>Pro Tip:</strong> For VMs, make sure the <strong>QEMU Guest Agent</strong> is enabled in Proxmox and installed in the VM, otherwise the extension cannot detect the IP address.</p>
+                </div>
+
+                <div class="help-item">
+                    <h4>Self-Signed Certificates</h4>
+                    <p>If you use a self-signed certificate, the extension might fail to connect. Try opening your Proxmox URL in a new browser tab and click "Proceed to..." to trust the site manually.</p>
+                </div>
+
+                <div class="help-item">
+                    <h4>Required Permissions</h4>
+                    <p>Your API Token needs <code>VM.Console</code> and <code>Sys.Audit</code> permissions. For SPICE, <code>VM.Config.Options</code> or <code>PVEVMAdmin</code> is required to fetch the configuration.</p>
+                </div>
+
+                <div class="help-item">
+                    <h4>Firewall & Ports</h4>
+                    <p>Ensure your Proxmox node is reachable on port <code>8006</code>. If you are behind a corporate proxy, you might need to whitelist the IP addresses of your cluster nodes.</p>
+                </div>
+
+                <div class="help-item">
+                    <h4>Automatic Failover</h4>
+                    <p>Once you connect to your first node, the extension automatically discovers all other nodes in your cluster. If your primary node goes down, the extension will attempt to fetch data from the other nodes automatically.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- About Tab -->
+        <div id="about" class="tab-content">
+            <div class="card about-card">
+                <img src="../icons/icon128.png" alt="Logo" class="about-logo">
+                <h2>PROXMUX Manager</h2>
+                <p class="version">Version 1.1.2</p>
+                <p>A premium extension for managing your Proxmox VE cluster with ease.</p>
+                <div class="about-footer">
+                    <div class="about-links">
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" class="link-btn">GitHub</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" class="link-btn">Issues</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/sponsors/d0dg3r" target="_blank" class="sponsor-link">Sponsor</a>
+                    </div>
+                    <div class="credits">
+                        Made for DevOps & Sysadmins
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <script src="options.js"></script>
+    <script type="module" src="options.js"></script>
 </body>
 </html>
+

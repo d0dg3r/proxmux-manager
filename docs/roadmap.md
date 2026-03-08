@@ -32,4 +32,4 @@ This document outlines the planned features, improvements, and technical debt fo
 - [ ] **Error Logging**: Centralized error reporting within the UI for better user feedback.
 
 ### Feedback
-If you have ideas or feature requests, please open an issue on [GitHub](https://github.com/d0dg3r/proxmux-manager/issues).
+If you have ideas or feature requests, please open an issue on [GitHub](https://github.com/d0dg3r/PROXMUX-Manager/issues).
