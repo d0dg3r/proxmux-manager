@@ -22,7 +22,7 @@ jobs:
           node-version: 20
           
       - name: Install dependencies
-        run: npm install playwright
+        run: npm ci
         
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
@@ -35,4 +35,9 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add store/*.png store/*.jpg
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update store screenshots (1280x800 JPG) [skip ci]" && git push origin HEAD:${{ github.ref_name }})
+          if [ -n "$(git status --porcelain store/*.png store/*.jpg)" ]; then
+            git commit -m "chore: update store screenshots (1280x800 JPG) [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "No changes to screenshots, skipping commit."
+          fi
