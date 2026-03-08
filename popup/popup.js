@@ -227,8 +227,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             indicator.classList.add((res.status === 'running' || res.status === 'online') ? 'status-running' : (res.status === 'stopped' ? 'status-stopped' : 'status-unknown'));
 
-            if (res.type !== 'node') {
-                // Fetch IP and OS info
+            // Fetch details (IP, OS) for all types if status allows
+            if (res.status === 'running' || res.status === 'online' || res.type === 'node') {
                 api.getResourceDetails(res).then(details => {
                     res.ip = details.ip;
                     res.os = details.os;
@@ -236,13 +236,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         osTag.textContent = details.os;
                         osTag.classList.remove('hidden');
                         
-                        // Show SSH for Linux/Unix systems or ANY LXC (since they are Linux-based)
+                        // Show SSH for Linux/Unix/Nodes with IP
                         const os = details.os ? details.os.toLowerCase() : '';
-                        const linuxDistros = ['linux', 'debian', 'ubuntu', 'alpine', 'centos', 'fedora', 'arch', 'suse'];
+                        const linuxDistros = ['linux', 'debian', 'ubuntu', 'alpine', 'centos', 'fedora', 'arch', 'suse', 'proxmox'];
                         const isLinux = linuxDistros.some(d => os.includes(d)) || os.startsWith('l');
                         
-                        // Rule: LXC with IP or Linux VM with IP
-                        if ((res.type === 'lxc' || isLinux) && details.ip) {
+                        // Rule: LXC/Node with IP or Linux VM with IP
+                        if ((res.type === 'lxc' || res.type === 'node' || isLinux) && details.ip) {
                             sshBtn.classList.remove('hidden');
                             sshBtn.addEventListener('click', (e) => {
                                 e.stopPropagation();
