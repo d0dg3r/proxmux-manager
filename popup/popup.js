@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let allResources = [];
+    const pendingStatusOverrides = new Map();
     const tagFiltersContainer = document.getElementById('tag-filters');
     let activeFilters = {
         type: 'all', // 'all', 'node', 'qemu', 'lxc'
@@ -69,13 +70,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         tag: null // 'null' or string
     };
     const searchInput = document.getElementById('search-input');
+    const searchClearBtn = document.getElementById('search-clear-btn');
     const filterPills = document.querySelectorAll('.filter-pill');
+    const filterToggleBtn = document.getElementById('filter-toggle-btn');
+    const displaySettingsBtn = document.getElementById('display-settings-btn');
+    const collapsibleFilters = document.getElementById('collapsible-filters');
+    const displaySettingsMenu = document.getElementById('display-settings-menu');
+
+    let displaySettings = {
+        uptime: true,
+        ip: true,
+        os: true,
+        vmid: true,
+        tags: true
+    };
+    
+    let currentExpandedId = localStorage.getItem('lastActiveResource') || null;
 
     // UI Event Listeners
     settingsBtn.addEventListener('click', () => chrome.runtime.openOptionsPage());
 
-    searchInput.addEventListener('input', () => {
+    const updateSearchClearState = () => {
+        searchClearBtn.classList.toggle('hidden', !searchInput.value.trim());
+    };
+
+    const resetSearch = () => {
+        if (!searchInput.value) return;
+        searchInput.value = '';
+        localStorage.setItem('lastSearchQuery', '');
+        updateSearchClearState();
         filterAndRender();
+        searchInput.focus();
+    };
+
+    searchInput.addEventListener('input', () => {
+        localStorage.setItem('lastSearchQuery', searchInput.value);
+        updateSearchClearState();
+        filterAndRender();
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            resetSearch();
+        }
+    });
+
+    searchClearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        resetSearch();
     });
 
     filterPills.forEach(pill => {
@@ -109,6 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (activeFilters.status !== 'all') pill.classList.add('active');
             }
 
+            localStorage.setItem('lastFilters', JSON.stringify(activeFilters));
             filterAndRender();
         });
     });
@@ -119,7 +164,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.close(); // Close the popup
     });
     openSettingsOverlayBtn.addEventListener('click', () => chrome.runtime.openOptionsPage());
-    refreshBtn.addEventListener('click', () => location.reload());
+    refreshBtn.addEventListener('click', () => {
+        localStorage.removeItem('lastActiveResource');
+        currentExpandedId = null;
+        fetchAndRender();
+    });
 
     themeToggleBtn.addEventListener('click', async () => {
         const result = await chrome.storage.local.get(['theme']);
@@ -140,8 +189,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         await chrome.storage.local.set({ theme: newTheme });
     });
 
+    filterToggleBtn.addEventListener('click', () => {
+        collapsibleFilters.classList.toggle('collapsed');
+        filterToggleBtn.classList.toggle('active', !collapsibleFilters.classList.contains('collapsed'));
+    });
+    filterToggleBtn.classList.toggle('active', !collapsibleFilters.classList.contains('collapsed'));
+
+    displaySettingsBtn.addEventListener('click', () => {
+        displaySettingsMenu.classList.toggle('hidden');
+    });
+
+    // Close settings menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!displaySettingsMenu.contains(e.target) && !displaySettingsBtn.contains(e.target)) {
+            displaySettingsMenu.classList.add('hidden');
+        }
+    });
+
+    // Handle Display Settings Changes
+    ['uptime', 'ip', 'os', 'vmid', 'tags'].forEach(setting => {
+        const checkbox = document.getElementById(`show-${setting}`);
+        checkbox.addEventListener('change', async () => {
+            displaySettings[setting] = checkbox.checked;
+            applyDisplaySettings();
+            await chrome.storage.local.set({ displaySettings });
+        });
+    });
+
+    function applyDisplaySettings() {
+        resourceList.classList.toggle('hide-uptime', !displaySettings.uptime);
+        resourceList.classList.toggle('hide-ip', !displaySettings.ip);
+        resourceList.classList.toggle('hide-os', !displaySettings.os);
+        resourceList.classList.toggle('hide-vmid', !displaySettings.vmid);
+        resourceList.classList.toggle('hide-tags', !displaySettings.tags);
+    }
+
     // Load saved settings
-    const settings = await chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret', 'apiToken', 'failoverUrls', 'theme']);
+    const stored = await chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret', 'apiToken', 'failoverUrls', 'theme', 'displaySettings']);
+    const settings = stored;
+    
+    if (settings.displaySettings) {
+        displaySettings = settings.displaySettings;
+        // Update checkboxes
+        Object.keys(displaySettings).forEach(s => {
+            const cb = document.getElementById(`show-${s}`);
+            if (cb) cb.checked = displaySettings[s];
+        });
+    }
+    applyDisplaySettings();
     
     if (settings.theme) {
         applyTheme(settings.theme);
@@ -154,40 +249,87 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const api = new ProxmoxAPI(settings.proxmoxUrl, settings.apiToken, settings.failoverUrls || []);
-    // console.log('Fetching resources from:', settings.proxmoxUrl);
 
-    try {
-        const resources = await api.getResources();
-        allResources = resources;
-        // console.log('Resources received:', resources.length);
-        loadingOverlay.classList.add('hidden');
-        renderResources(resources, api);
-        renderTagFilters(resources);
+    const getResourceKey = (res) => (res.vmid ? `${res.node}/${res.type}/${res.vmid}` : `node/${res.node}`);
+
+    const fetchAndRender = async (showLoading = false) => {
+        if (showLoading) loadingOverlay.classList.remove('hidden');
+        try {
+            const resources = await api.getResources();
+            allResources = resources;
+
+            // Keep optimistic status changes until cluster/resources catches up.
+            allResources.forEach(resource => {
+                const key = getResourceKey(resource);
+                if (!pendingStatusOverrides.has(key)) return;
+
+                const expectedStatus = pendingStatusOverrides.get(key);
+                if (resource.status === expectedStatus) {
+                    pendingStatusOverrides.delete(key);
+                } else {
+                    resource.status = expectedStatus;
+                }
+            });
+
+            filterAndRender();
+        } catch (error) {
+            console.error('Proxmox API Error:', error);
+            if (showLoading) {
+                loadingOverlay.innerHTML = `
+                    <div style="color:var(--error); padding: 20px;">
+                        <p><strong>Connection Failed</strong></p>
+                        <p style="font-size: 0.8rem; margin: 10px 0;">${error.message}</p>
+                        <button id="retry-btn" class="action-btn" style="margin-top: 15px;">Retry</button>
+                    </div>
+                `;
+                document.getElementById('retry-btn').addEventListener('click', () => fetchAndRender(true));
+            }
+        } finally {
+            if (showLoading) loadingOverlay.classList.add('hidden');
+        }
+    };
+
+    const refreshUntilSynced = (attempt = 0) => {
+        const delays = [3000, 6000, 12000];
+        if (attempt >= delays.length || pendingStatusOverrides.size === 0) return;
+
+        setTimeout(async () => {
+            await fetchAndRender();
+            if (pendingStatusOverrides.size > 0) {
+                refreshUntilSynced(attempt + 1);
+            }
+        }, delays[attempt]);
+    };
+
+    // Initial load
+    fetchAndRender(true).then(() => {
+        // Restore Search & Filters
+        const savedSearch = localStorage.getItem('lastSearchQuery');
+        if (savedSearch) {
+            searchInput.value = savedSearch;
+        }
+        updateSearchClearState();
+        const savedFilters = localStorage.getItem('lastFilters');
+        if (savedFilters) {
+            activeFilters = JSON.parse(savedFilters);
+            // Update UI for restored filters
+            filterPills.forEach(pill => {
+                const pType = pill.getAttribute('data-filter-type');
+                const pStatus = pill.getAttribute('data-filter-status');
+                pill.classList.remove('active');
+                if (pType === activeFilters.type) pill.classList.add('active');
+                if (pStatus === activeFilters.status && pStatus !== 'all') pill.classList.add('active');
+            });
+        }
+
+        if (savedSearch || savedFilters) {
+            filterAndRender();
+        }
         
-        // Auto-focus search for speed
+        renderTagFilters(allResources);
         searchInput.focus();
-
-        // Asynchronously discover and update cluster nodes for failover
-        updateFailoverNodes(resources, settings.proxmoxUrl);
-    } catch (error) {
-        console.error('Proxmox API Error:', error);
-        loadingOverlay.innerHTML = `
-            <div style="color:var(--error); padding: 20px;">
-                <p><strong>Connection Failed</strong></p>
-                <p style="font-size: 0.8rem; margin: 10px 0;">${error.message}</p>
-                <div style="text-align: left; font-size: 0.75rem; color: var(--text-secondary); border-top: 1px solid var(--border); pt-10;">
-                    <p>Possible reasons:</p>
-                    <ul style="padding-left: 15px;">
-                        <li>Host is unreachable</li>
-                        <li>Invalid API Token</li>
-                        <li>Self-signed certificate (Try opening the Proxmox URL in a new tab and clicking "Proceed")</li>
-                    </ul>
-                </div>
-                <button id="retry-btn" class="action-btn" style="margin-top: 15px;">Retry</button>
-            </div>
-        `;
-        document.getElementById('retry-btn').addEventListener('click', () => location.reload());
-    }
+        updateFailoverNodes(allResources, settings.proxmoxUrl);
+    });
 
     async function renderResources(resources, api) {
         resourceList.innerHTML = '';
@@ -206,9 +348,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (const res of sorted) {
             const clone = template.content.cloneNode(true);
             const item = clone.querySelector('.resource-item');
+            
+            // Set unique ID for persistence
+            const resId = res.vmid ? `vm-${res.vmid}` : `node-${res.node}`;
+            item.setAttribute('data-id', resId);
+
+            const itemMain = clone.querySelector('.item-main');
             const indicator = clone.querySelector('.status-indicator');
             const nameEl = clone.querySelector('.name');
-            const nodeEl = clone.querySelector('.node');
+            const typeNodeEl = clone.querySelector('.type-node');
+            const nodeIdEl = clone.querySelector('.node-id');
             const uptimeEl = clone.querySelector('.uptime');
             const osTag = clone.querySelector('.tag.os');
             const ipTag = clone.querySelector('.tag.ip');
@@ -216,9 +365,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const spiceBtn = clone.querySelector('.spice');
             const sshBtn = clone.querySelector('.ssh');
             const shellBtn = clone.querySelector('.shell');
+            const userTags = clone.querySelector('.user-tags');
+
+            // Resource Details Elements
+            const cpuBar = clone.querySelector('.cpu-bar');
+            const cpuValue = clone.querySelector('.cpu-value');
+            const memBar = clone.querySelector('.mem-bar');
+            const memValue = clone.querySelector('.mem-value');
+            const diskBar = clone.querySelector('.disk-bar');
+            const diskValue = clone.querySelector('.disk-value');
+            const diskRow = clone.querySelector('#disk-row');
 
             nameEl.textContent = res.name || res.vmid || res.node;
-            nodeEl.textContent = `${res.type.toUpperCase()} @ ${res.node} ${res.vmid ? `(ID ${res.vmid})` : ''}`;
+            typeNodeEl.textContent = `${res.type.toUpperCase()} @ ${res.node}`;
+            if (res.vmid) {
+                nodeIdEl.textContent = `(ID ${res.vmid})`;
+            }
 
             if (res.uptime && (res.status === 'running' || res.status === 'online')) {
                 uptimeEl.textContent = formatUptime(res.uptime);
@@ -227,32 +389,98 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             indicator.classList.add((res.status === 'running' || res.status === 'online') ? 'status-running' : (res.status === 'stopped' ? 'status-stopped' : 'status-unknown'));
 
-            // Fetch details (IP, OS) for all types if status allows
+            if (currentExpandedId === resId) {
+                item.classList.add('expanded');
+            }
+            itemMain.addEventListener('click', () => {
+                const isExpanded = item.classList.contains('expanded');
+                // Close others
+                document.querySelectorAll('.resource-item.expanded').forEach(el => {
+                    if (el !== item) el.classList.remove('expanded');
+                });
+                item.classList.toggle('expanded');
+                currentExpandedId = item.classList.contains('expanded') ? resId : null;
+                if (currentExpandedId) {
+                    localStorage.setItem('lastActiveResource', currentExpandedId);
+                } else {
+                    localStorage.removeItem('lastActiveResource');
+                }
+            });
+
+            // Usage Stats (Initial from cluster/resources)
+            updateUsageStats(clone, res);
+
+            // Fetch details (IP, OS, Disks) for all types if status allows
             if (res.status === 'running' || res.status === 'online' || res.type === 'node') {
                 api.getResourceDetails(res).then(details => {
-                    res.ip = details.ip;
-                    res.os = details.os;
+                    // Update stats with potentially more accurate data from status/current
+                    updateUsageStats(item, res);
+
                     if (details.os) {
                         osTag.textContent = details.os;
                         osTag.classList.remove('hidden');
-                        
-                        // Show SSH for Linux/Unix/Nodes with IP
-                        const os = details.os ? details.os.toLowerCase() : '';
-                        const linuxDistros = ['linux', 'debian', 'ubuntu', 'alpine', 'centos', 'fedora', 'arch', 'suse', 'proxmox'];
-                        const isLinux = linuxDistros.some(d => os.includes(d)) || os.startsWith('l');
-                        
-                        // Rule: LXC/Node with IP or Linux VM with IP
-                        if ((res.type === 'lxc' || res.type === 'node' || isLinux) && details.ip) {
-                            sshBtn.classList.remove('hidden');
-                            sshBtn.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                chrome.tabs.create({ url: `ssh://${details.ip}` });
-                            });
-                        }
                     }
                     if (details.ip) {
                         ipTag.textContent = details.ip;
                         ipTag.classList.remove('hidden');
+
+                        // Handle SSH visibility
+                        const os = (details.os || '').toLowerCase();
+                        const linuxDistros = ['linux', 'debian', 'ubuntu', 'alpine', 'centos', 'fedora', 'arch', 'suse', 'proxmox'];
+                        const isLinux = linuxDistros.some(d => os.includes(d)) || os.startsWith('l');
+                        
+                        if (res.type === 'node' || res.type === 'lxc' || isLinux) {
+                            sshBtn.classList.remove('hidden');
+                            sshBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                chrome.tabs.create({ url: `ssh://${details.ip}` });
+                            };
+                        }
+                    }
+
+                    // Render Disks
+                    const disksContainer = item.querySelector('#disks-container');
+                    if (disksContainer) {
+                        disksContainer.innerHTML = '';
+                        if (details.disks && details.disks.length > 0) {
+                            details.disks.forEach(disk => {
+                                const diskRow = document.createElement('div');
+                                diskRow.className = 'stat-row';
+                                const isVM = res.type === 'qemu';
+                                const perc = isVM ? 100 : ((disk.used !== null) ? (disk.used / disk.max * 100).toFixed(1) : 0);
+                                const usedText = (disk.used !== null && !isVM) ? `${formatBytes(disk.used)} / ` : '';
+                                
+                                diskRow.innerHTML = `
+                                    <span class="stat-label">
+                                        <svg class="stat-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M6,2H18A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2M12,4A1,1 0 0,0 11,5A1,1 0 0,0 12,6A1,1 0 0,0 13,5A1,1 0 0,0 12,4M18,20V4H6V20H18M12,18A3,3 0 0,1 9,15A3,3 0 0,1 12,12A3,3 0 0,1 15,15A3,3 0 0,1 12,18M12,14A1,1 0 0,0 11,15A1,1 0 0,0 12,16A1,1 0 0,0 13,15A1,1 0 0,0 12,14Z"/></svg>
+                                        ${disk.name}
+                                    </span>
+                                    <div class="progress-container">
+                                        <div class="progress-bar disk-bar ${isVM ? 'allocated' : ''}" style="width: ${perc}%"></div>
+                                    </div>
+                                    <span class="stat-value">${usedText}${formatBytes(disk.max)}</span>
+                                `;
+                                disksContainer.appendChild(diskRow);
+                            });
+                        } else if (res.maxdisk) {
+                            const diskRow = document.createElement('div');
+                            diskRow.className = 'stat-row';
+                            const isVM = res.type === 'qemu';
+                            const diskPerc = isVM ? 100 : (res.disk / res.maxdisk * 100).toFixed(1);
+                            const usedText = !isVM ? `${formatBytes(res.disk)} / ` : '';
+                            
+                            diskRow.innerHTML = `
+                                <span class="stat-label">
+                                    <svg class="stat-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M6,2H18A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2M12,4A1,1 0 0,0 11,5A1,1 0 0,0 12,6A1,1 0 0,0 13,5A1,1 0 0,0 12,4M18,20V4H6V20H18M12,18A3,3 0 0,1 9,15A3,3 0 0,1 12,12A3,3 0 0,1 15,15A3,3 0 0,1 12,18M12,14A1,1 0 0,0 11,15A1,1 0 0,0 12,16A1,1 0 0,0 13,15A1,1 0 0,0 12,14Z"/></svg>
+                                    DISK
+                                </span>
+                                <div class="progress-container">
+                                    <div class="progress-bar disk-bar ${isVM ? 'allocated' : ''}" style="width: ${diskPerc}%"></div>
+                                </div>
+                                <span class="stat-value">${usedText}${formatBytes(res.maxdisk)}</span>
+                            `;
+                            disksContainer.appendChild(diskRow);
+                        }
                     }
                 }).catch(err => console.error('Details error:', err));
             }
@@ -271,29 +499,153 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
 
+            // Power Controls
+            const powerControls = clone.querySelector('.power-controls');
+            const btnStart = powerControls.querySelector('.b-start');
+            const btnShutdown = powerControls.querySelector('.b-shutdown');
+            const btnStop = powerControls.querySelector('.b-stop');
+            const btnReboot = powerControls.querySelector('.b-reboot');
+            const powerStatus = powerControls.querySelector('.power-status');
+
+            const updatePowerButtons = () => {
+                const status = res.status;
+                const type = res.type;
+                [btnStart, btnShutdown, btnStop, btnReboot].forEach(b => b.classList.add('hidden'));
+
+                if (type === 'node') {
+                    btnShutdown.classList.remove('hidden');
+                    btnReboot.classList.remove('hidden');
+                } else {
+                    if (status === 'stopped') {
+                        btnStart.classList.remove('hidden');
+                    } else if (status === 'running') {
+                        btnShutdown.classList.remove('hidden');
+                        btnStop.classList.remove('hidden');
+                        btnReboot.classList.remove('hidden');
+                    }
+                }
+            };
+
+            updatePowerButtons();
+
+            const pollStatus = async (targetStatus, maxAttempts = 20) => {
+                let attempts = 0;
+                const check = async () => {
+                    attempts++;
+                    try {
+                        let currentStatus;
+                        if (res.type === 'node') {
+                            const data = await api.getNodeStatus(res.node);
+                            // Proxmox nodes report 'online' when up
+                            currentStatus = data.status === 'online' ? 'running' : 'stopped';
+                        } else {
+                            const data = await api.getResourceStatus(res.node, res.type, res.vmid);
+                            currentStatus = data.status;
+                        }
+
+                        if (currentStatus === targetStatus || attempts >= maxAttempts) {
+                            // Optimistic Update: update local state immediately if reached
+                            if (currentStatus === targetStatus) {
+                                const expectedStatus = (res.type === 'node' && targetStatus === 'running') ? 'online' : targetStatus;
+                                pendingStatusOverrides.set(getResourceKey(res), expectedStatus);
+                                res.status = (res.type === 'node' && targetStatus === 'running') ? 'online' : targetStatus;
+                                filterAndRender();
+                            }
+                            powerStatus.textContent = chrome.i18n.getMessage('finalizing') || 'Finalizing...';
+                            setTimeout(() => {
+                                fetchAndRender().then(() => refreshUntilSynced());
+                            }, 2500); // Wait a bit, then keep refreshing until cluster/resources catches up.
+                        } else {
+                            powerStatus.textContent = `${chrome.i18n.getMessage('actionSent') || 'Action sent!'} (${attempts}/${maxAttempts})`;
+                            setTimeout(check, 2000);
+                        }
+                    } catch (err) {
+                        console.error('Polling failed:', err);
+                        fetchAndRender();
+                    }
+                };
+                setTimeout(check, 2000);
+            };
+
+            const handleAction = async (action) => {
+                powerStatus.classList.remove('hidden');
+                powerStatus.textContent = chrome.i18n.getMessage('sendingAction') || 'Sending...';
+                [btnStart, btnShutdown, btnStop, btnReboot].forEach(b => b.style.pointerEvents = 'none');
+
+                try {
+                    if (res.type === 'node') {
+                        await api.nodeAction(res.node, action);
+                    } else {
+                        await api.vmAction(res.node, res.type, res.vmid, action);
+                    }
+                    powerStatus.textContent = chrome.i18n.getMessage('actionSent') || 'Action sent!';
+                    
+                    // Store the ID to scroll/expand back to it after reload
+                    const resId = res.vmid ? `vm-${res.vmid}` : `node-${res.node}`;
+                    localStorage.setItem('lastActiveResource', resId);
+
+                    // Determine target status for polling
+                    if (action === 'start') {
+                        pollStatus('running');
+                    } else if (action === 'shutdown' || action === 'stop') {
+                        pollStatus('stopped');
+                    } else {
+                        // Reboot or other: wait fixed time
+                        setTimeout(() => fetchAndRender(), 4500);
+                    }
+                } catch (err) {
+                    console.error('Action failed:', err);
+                    powerStatus.textContent = 'Error!';
+                    setTimeout(() => {
+                        powerStatus.classList.add('hidden');
+                        [btnStart, btnShutdown, btnStop, btnReboot].forEach(b => b.style.pointerEvents = 'auto');
+                    }, 3000);
+                }
+            };
+
+            btnStart.onclick = (e) => { e.stopPropagation(); handleAction('start'); };
+            btnShutdown.onclick = (e) => { e.stopPropagation(); handleAction('shutdown'); };
+            btnStop.onclick = (e) => { e.stopPropagation(); handleAction('stop'); };
+            btnReboot.onclick = (e) => { e.stopPropagation(); handleAction('reboot'); };
+
+            // Console and Spice Logic
             if (res.type === 'node') {
                 novncBtn.classList.add('hidden');
                 shellBtn.classList.remove('hidden');
-                shellBtn.addEventListener('click', () => {
+                shellBtn.onclick = (e) => {
+                    e.stopPropagation();
                     openConsole(res.node, 'node', null, res.node);
-                });
+                };
             } else {
-                novncBtn.addEventListener('click', () => {
+                novncBtn.onclick = (e) => {
+                    e.stopPropagation();
                     openConsole(res.node, res.type, res.vmid, res.name);
-                });
+                };
 
                 if (res.type === 'qemu' && res.status === 'running') {
-                    // Check for SPICE asynchronously
                     api.isSpiceEnabled(res.node, res.type, res.vmid).then(enabled => {
                         if (enabled) {
                             spiceBtn.classList.remove('hidden');
-                            spiceBtn.addEventListener('click', () => downloadSpiceFile(res, api));
+                            spiceBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                downloadSpiceFile(res, api);
+                            };
                         }
                     });
                 }
             }
 
             resourceList.appendChild(clone);
+        }
+
+        // Persistence: Check if we need to scroll to an item
+        if (currentExpandedId) {
+            const lastActiveItem = resourceList.querySelector(`[data-id="${currentExpandedId}"]`);
+            if (lastActiveItem) {
+                setTimeout(() => {
+                    lastActiveItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
         }
     }
 
@@ -452,6 +804,62 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function updateUsageStats(container, res) {
+        const cpuBar = container.querySelector('.cpu-bar');
+        const cpuValue = container.querySelector('.cpu-value');
+        const memBar = container.querySelector('.mem-bar');
+        const memValue = container.querySelector('.mem-value');
+        const loadRow = container.querySelector('#load-row');
+        const loadValue = container.querySelector('.load-value');
+        const ioDiskValue = container.querySelector('.io-disk-value');
+        const ioNetValue = container.querySelector('.io-net-value');
+        const haRow = container.querySelector('#ha-row');
+        const haValue = container.querySelector('.ha-value');
+
+        if (!cpuBar || !memBar) return;
+
+        if (res.status === 'running' || res.status === 'online' || res.type === 'node') {
+            // CPU
+            const cpuPerc = (res.cpu * 100).toFixed(1);
+            cpuBar.style.width = `${cpuPerc}%`;
+            cpuValue.textContent = `${cpuPerc}%`;
+
+            // RAM
+            const memPerc = (res.maxmem > 0) ? (res.mem / res.maxmem * 100).toFixed(1) : 0;
+            memBar.style.width = `${memPerc}%`;
+            memValue.textContent = `${formatBytes(res.mem)} / ${formatBytes(res.maxmem)}`;
+
+            // IO Stats
+            if (ioDiskValue) {
+                const read = formatBytes(res.diskread || 0);
+                const write = formatBytes(res.diskwrite || 0);
+                ioDiskValue.textContent = `R: ${read}/s W: ${write}/s`;
+            }
+            if (ioNetValue) {
+                const inNet = formatBytes(res.netin || 0);
+                const outNet = formatBytes(res.netout || 0);
+                ioNetValue.textContent = `IN: ${inNet}/s OUT: ${outNet}/s`;
+            }
+
+            // Node specifics
+            if (res.type === 'node' && loadRow) {
+                loadRow.classList.remove('hidden');
+                // Proxmox node status has loadavg array
+                if (Array.isArray(res.loadavg)) {
+                    loadValue.textContent = res.loadavg.join(', ');
+                } else if (res.loadavg) {
+                    loadValue.textContent = res.loadavg;
+                }
+            }
+
+            // HA
+            if (res.hastatus && haRow) {
+                haRow.classList.remove('hidden');
+                haValue.textContent = res.hastatus;
+            }
+        }
+    }
+
     function formatUptime(seconds) {
         if (!seconds) return '';
         const d = Math.floor(seconds / (3600 * 24));
@@ -485,5 +893,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
             console.error('Failed to update failover nodes:', e);
         }
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (!+bytes) return '0 B';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
     }
 });
