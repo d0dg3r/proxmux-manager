@@ -13,12 +13,22 @@ const fs = require('fs');
 
   // 1. Capture Dark Mode
   const darkContext = await browser.newContext({
-    viewport: { width: 1280, height: 800 },
+    viewport: { width: 608, height: 820 },
     deviceScaleFactor: 1,
     colorScheme: 'dark'
   });
   const darkPage = await darkContext.newPage();
   await darkPage.goto(mockPath);
+  await darkPage.evaluate(() => {
+    const panel = document.getElementById('collapsible-filters');
+    const toggle = document.getElementById('filter-toggle-btn');
+    if (panel && !panel.classList.contains('collapsed')) panel.classList.add('collapsed');
+    if (toggle) toggle.classList.remove('active');
+  });
+  await darkPage.evaluate(() => {
+    const main = document.querySelector('main');
+    if (main) main.scrollTop = 0;
+  });
   
   // Inject Sun icon for Dark Mode (Action to go light)
   await darkPage.evaluate((path) => {
@@ -28,32 +38,40 @@ const fs = require('fs');
     }
   }, sunPath);
 
-  await darkPage.waitForTimeout(1000);
+  await darkPage.waitForTimeout(400);
   await darkPage.screenshot({ 
     path: path.join(storeDir, 'screenshot_dark.png')
   });
-  console.log('Saved screenshot_dark.png (1280x800, PNG)');
+  console.log('Saved screenshot_dark.png (608x820, PNG)');
   await darkContext.close();
 
   // 2. Capture Light Mode
   const lightContext = await browser.newContext({
-    viewport: { width: 1280, height: 800 },
+    viewport: { width: 608, height: 820 },
     deviceScaleFactor: 1,
     colorScheme: 'light'
   });
   const lightPage = await lightContext.newPage();
   await lightPage.goto(mockPath);
+  await lightPage.evaluate(() => {
+    const panel = document.getElementById('collapsible-filters');
+    const toggle = document.getElementById('filter-toggle-btn');
+    if (panel && !panel.classList.contains('collapsed')) panel.classList.add('collapsed');
+    if (toggle) toggle.classList.remove('active');
+    const main = document.querySelector('main');
+    if (main) main.scrollTop = 0;
+  });
 
   // Inject Moon icon for Light Mode (Action to go dark)
   await lightPage.evaluate((path) => {
     document.querySelector('#theme-toggle-btn svg').innerHTML = `<path fill="currentColor" d="${path}"/>`;
   }, moonPath);
 
-  await lightPage.waitForTimeout(1000);
+  await lightPage.waitForTimeout(400);
   await lightPage.screenshot({ 
     path: path.join(storeDir, 'screenshot_light.png')
   });
-  console.log('Saved screenshot_light.png (1280x800, PNG)');
+  console.log('Saved screenshot_light.png (608x820, PNG)');
   await lightContext.close();
 
   await browser.close();

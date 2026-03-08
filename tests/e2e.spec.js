@@ -20,8 +20,10 @@ test.describe('PROXMUX Popup (Mock Environment)', () => {
 
   test('should show resource items from mock data', async ({ page }) => {
     const items = page.locator('.resource-item');
-    await expect(items).toHaveCount(4); // We have 4 items in mock.html
-    await expect(items.first()).toContainText('pve-node-01');
+    const count = await items.count();
+    expect(count).toBeGreaterThanOrEqual(10);
+    await expect(page.locator('.resource-item .name').first()).toContainText('pve-node-01');
+    await expect(page.locator('.resource-item .name')).toContainText(['pve-node-01', 'docker', 'gitea']);
   });
 
   test('should allow typing in the search input', async ({ page }) => {
@@ -31,10 +33,51 @@ test.describe('PROXMUX Popup (Mock Environment)', () => {
     await expect(searchInput).toHaveValue('ubuntu');
   });
 
+  test('should show and use search clear button', async ({ page }) => {
+    const searchInput = page.locator('#search-input');
+    const clearBtn = page.locator('#search-clear-btn');
+
+    await expect(clearBtn).toHaveClass(/hidden/);
+    await searchInput.fill('git');
+    await expect(clearBtn).not.toHaveClass(/hidden/);
+
+    await clearBtn.click();
+    await expect(searchInput).toHaveValue('');
+    await expect(clearBtn).toHaveClass(/hidden/);
+  });
+
+  test('should reset search with Escape key', async ({ page }) => {
+    const searchInput = page.locator('#search-input');
+    const clearBtn = page.locator('#search-clear-btn');
+
+    await searchInput.fill('proxmux');
+    await expect(clearBtn).not.toHaveClass(/hidden/);
+    await searchInput.press('Escape');
+
+    await expect(searchInput).toHaveValue('');
+    await expect(clearBtn).toHaveClass(/hidden/);
+  });
+
   test('should have operational filter pills', async ({ page }) => {
     const pills = page.locator('.filter-pill');
     await expect(pills).toHaveCount(6); // All, Node, VM, LXC, Online, Offline
     await expect(pills.first()).toHaveClass(/active/);
+  });
+
+  test('should toggle filter panel visibility and active state', async ({ page }) => {
+    const filterToggleBtn = page.locator('#filter-toggle-btn');
+    const filterPanel = page.locator('#collapsible-filters');
+
+    await expect(filterToggleBtn).toHaveClass(/active/);
+    await expect(filterPanel).not.toHaveClass(/collapsed/);
+
+    await filterToggleBtn.click();
+    await expect(filterPanel).toHaveClass(/collapsed/);
+    await expect(filterToggleBtn).not.toHaveClass(/active/);
+
+    await filterToggleBtn.click();
+    await expect(filterPanel).not.toHaveClass(/collapsed/);
+    await expect(filterToggleBtn).toHaveClass(/active/);
   });
 
   test('should toggle dark/light mode', async ({ page }) => {

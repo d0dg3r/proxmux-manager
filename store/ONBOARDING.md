@@ -103,5 +103,5 @@ Perfekt für DevOps-Engineers und Home-Server-Enthusiasten, die eine schnelle, p
 
 ## 5. Visual Assets Checklist
 - **Icon**: 128x128 pixels (provided in `icons/icon128.png`).
-- **Screenshots**: 1280x800 JPEG (provided in `store/screenshot_dark.jpg` and `store/screenshot_light.jpg`).
+- **Screenshots**: 1280x800 PNG (provided in `store/screenshot_dark.png` and `store/screenshot_light.png`).
 - **Marquee/Tile**: 440x280 pixels.
