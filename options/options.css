@@ -52,14 +52,29 @@ header {
     height: 32px;
 }
 
-h1 {
+h1.branded-title {
     font-size: 1.5rem;
     margin: 0;
-    font-weight: 600;
-    background: linear-gradient(135deg, #58a6ff, #1f6feb);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    background: none;
+    -webkit-text-fill-color: initial;
+}
+
+h1.branded-title .prox {
+    color: #40E0D0; /* Turquoise */
+}
+
+h1.branded-title .mux {
+    color: #D2691E; /* Orange/Brown */
+}
+
+h1.branded-title .title-suffix {
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 10px;
+    font-size: 1.1rem;
 }
 
 .card {

@@ -9,7 +9,9 @@
         <header>
             <div class="logo-container">
                 <img src="../icons/icon48.png" alt="Logo" class="logo">
-                <h1 data-i18n="extName">PROXMUX Manager</h1>
+                <h1 class="branded-title">
+                    <span class="prox">PROX</span><span class="mux">MUX</span>
+                </h1>
             </div>
             <div class="header-actions">
                 <button id="sidepanel-btn" title="Open Side Panel">
@@ -35,6 +37,7 @@
                 <button class="filter-pill" data-i18n="filterRunning" data-filter-status="running">Online</button>
                 <button class="filter-pill" data-i18n="filterStopped" data-filter-status="stopped">Offline</button>
             </div>
+            <div id="debug-status" style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 8px; font-style: italic; display: none;"></div>
         </div>
     </div>
     
@@ -50,6 +53,19 @@
             <h2 data-i18n="noAuthTitle">Welcome to PROXMUX</h2>
             <p data-i18n="noAuthDesc">Please configure your API credentials to start managing your cluster.</p>
             <button id="open-settings-overlay" class="primary-btn" data-i18n="openSettings">Open Settings</button>
+        </div>
+
+        <!-- Session Expired State -->
+        <div id="session-error" class="overlay hidden">
+            <div class="overlay-content">
+                <svg viewBox="0 0 24 24" width="48" height="48" style="color:var(--error);margin-bottom:15px;"><path fill="currentColor" d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                <h2 data-i18n="sessionExpiredTitle">Session Expired</h2>
+                <p data-i18n="sessionExpiredDesc">Your Proxmox browser session has expired. Please log in to your Proxmox Web UI to access consoles.</p>
+                <div class="overlay-actions">
+                    <button id="login-btn" class="primary-btn" data-i18n="loginNow">Log in</button>
+                    <button id="close-session-error" class="secondary-btn" data-i18n="close">Close</button>
+                </div>
+            </div>
         </div>
 
         <div id="resource-list" class="list">

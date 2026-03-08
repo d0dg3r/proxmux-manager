@@ -197,13 +197,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 novncBtn.classList.add('hidden');
                 shellBtn.classList.remove('hidden');
                 shellBtn.addEventListener('click', () => {
-                    const url = api.getConsoleUrl(res.node, 'node', null, res.node);
-                    chrome.tabs.create({ url });
+                    openConsole(res.node, 'node', null, res.node);
                 });
             } else {
                 novncBtn.addEventListener('click', () => {
-                    const url = api.getConsoleUrl(res.node, res.type, res.vmid, res.name);
-                    chrome.tabs.create({ url });
+                    openConsole(res.node, res.type, res.vmid, res.name);
                 });
 
                 if (res.type === 'qemu' && res.status === 'running') {
@@ -218,6 +216,54 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             resourceList.appendChild(clone);
+        }
+    }
+
+    const sessionErrorOverlay = document.getElementById('session-error');
+    const loginBtn = document.getElementById('login-btn');
+    const closeSessionErrorBtn = document.getElementById('close-session-error');
+
+    loginBtn.addEventListener('click', () => {
+        chrome.tabs.create({ url: settings.proxmoxUrl });
+        sessionErrorOverlay.classList.add('hidden');
+    });
+
+    closeSessionErrorBtn.addEventListener('click', () => {
+        sessionErrorOverlay.classList.add('hidden');
+    });
+
+    const debugStatus = document.getElementById('debug-status');
+
+    async function openConsole(node, type, vmid, name) {
+        debugStatus.style.display = 'block';
+        debugStatus.textContent = 'Checking session...';
+        console.log(`[Popup] Attempting to open console for ${node} ${vmid || ''}`);
+        
+        try {
+            const hasSession = await api.checkSession();
+            console.log(`[Popup] Session check result: ${hasSession}`);
+            
+            if (!hasSession) {
+                console.log('[Popup] Showing session error overlay');
+                debugStatus.textContent = 'Session invalid. Login required.';
+                sessionErrorOverlay.classList.remove('hidden');
+                return;
+            }
+            
+            const url = api.getConsoleUrl(node, type, vmid, name);
+            if (url) {
+                console.log(`[Popup] Opening console URL: ${url}`);
+                debugStatus.textContent = 'Opening console...';
+                chrome.tabs.create({ url });
+                // Hide status after a short delay
+                setTimeout(() => { debugStatus.style.display = 'none'; }, 2000);
+            }
+        } catch (e) {
+            console.error('[Popup] Failed to open console:', e);
+            debugStatus.textContent = `Error: ${e.message}`;
+            // Fallback
+            const url = api.getConsoleUrl(node, type, vmid, name);
+            if (url) chrome.tabs.create({ url });
         }
     }
 

@@ -5,6 +5,9 @@
     "extDescription": {
         "message": "Manage your Proxmox VE cluster. Monitor resources, access consoles (noVNC, SPICE), and manage nodes with failover support."
     },
+    "manager": {
+        "message": "Manager"
+    },
     "settings": {
         "message": "Settings"
     },
@@ -85,5 +88,17 @@
     },
     "filterStopped": {
         "message": "Offline"
+    },
+    "sessionExpiredTitle": {
+        "message": "Login Required"
+    },
+    "sessionExpiredDesc": {
+        "message": "To open a console, you must be logged into the Proxmox Web UI in your browser. Please log in first."
+    },
+    "loginNow": {
+        "message": "Log in"
+    },
+    "close": {
+        "message": "Close"
     }
 }

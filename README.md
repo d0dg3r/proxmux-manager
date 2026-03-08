@@ -18,7 +18,8 @@ A dedicated Chrome Extension for Proxmox VE cluster management, providing instan
     - **Shell**: Quick access to host node shells.
 - **Improved UX**: Sticky navigation header and automatic search focus for a seamless management experience.
 - **Secure**: Uses Proxmox API Tokens for authentication; all credentials stay local.
-- **Premium UI**: Modern design with full **Dark** and **Light** mode support (follows system preference).
+- **Premium UI**: Modern design with full **Dark** and **Light** mode support. Now features a sleek Turquoise/Orange branded title.
+- **Session Aware**: Automatically detects expired Proxmox sessions and prompts for re-authentication before opening consoles.
 
 ## UI & Themes
 
@@ -60,6 +61,11 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - **Dedicated Settings**: New options page for secure and easy configuration.
 - **Enhanced Consoles**: Support for SPICE (with auto-open), noVNC, and Shell.
 - **Linux Optimized**: Intelligent SSH detection for VMs and LXCs.
+
+## Version 1.1.1 Release Notes
+- **Branding Excellence**: Refined UI with premium Turquoise/Orange colors.
+- **Session Safety**: Robust detection of expired browser sessions using cookie-level checks to prevent 401 errors.
+- **Debug Insights**: Real-time status indicators in the popup for better transparency.
 
 ## Version 1.1.0 Release Notes
 - **Real-time Search**: Integrated deep search across your entire cluster.

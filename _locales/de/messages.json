@@ -5,6 +5,9 @@
     "extDescription": {
         "message": "Verwalte deinen Proxmox VE Cluster. Ressourcen überwachen, Konsolen (noVNC, SPICE) öffnen und Nodes mit Failover verwalten."
     },
+    "manager": {
+        "message": "Manager"
+    },
     "settings": {
         "message": "Einstellungen"
     },
@@ -85,5 +88,17 @@
     },
     "filterStopped": {
         "message": "Offline"
+    },
+    "sessionExpiredTitle": {
+        "message": "Anmeldung erforderlich"
+    },
+    "sessionExpiredDesc": {
+        "message": "Um eine Konsole zu öffnen, musst du in der Proxmox Web-Oberfläche angemeldet sein. Bitte melde dich zuerst an."
+    },
+    "loginNow": {
+        "message": "Anmelden"
+    },
+    "close": {
+        "message": "Schließen"
     }
 }
