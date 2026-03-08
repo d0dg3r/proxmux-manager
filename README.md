@@ -55,13 +55,6 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - Proxmox VE 6.x or newer.
 - API Token with appropriate permissions (VM.Console and Sys.Audit for node discovery).
 
-## Version 1.0.0 Release Notes
-- **Theme Support**: Full Dark and Light mode support.
-- **High Availability**: Automatic cluster node discovery and failover.
-- **Dedicated Settings**: New options page for secure and easy configuration.
-- **Enhanced Consoles**: Support for SPICE (with auto-open), noVNC, and Shell.
-- **Linux Optimized**: Intelligent SSH detection for VMs and LXCs.
-
 ## Version 1.1.1 Release Notes
 - **Branding Excellence**: Refined UI with premium Turquoise/Orange colors.
 - **Session Safety**: Robust detection of expired browser sessions using cookie-level checks to prevent 401 errors.
@@ -72,3 +65,10 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - **Resource Filtering**: New type-based (Node/VM/LXC) and status-based (Online/Offline) filters.
 - **Sticky UI**: Fixed header and search bar using robust Flexbox layout for better scrolling.
 - **Auto-Focus**: Instant interaction with the search field upon opening.
+
+## Version 1.0.0 Release Notes
+- **Theme Support**: Full Dark and Light mode support.
+- **High Availability**: Automatic cluster node discovery and failover.
+- **Dedicated Settings**: New options page for secure and easy configuration.
+- **Enhanced Consoles**: Support for SPICE (with auto-open), noVNC, and Shell.
+- **Linux Optimized**: Intelligent SSH detection for VMs and LXCs.
