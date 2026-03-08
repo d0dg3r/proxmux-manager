@@ -23,6 +23,9 @@
     "openSettings": {
         "message": "Einstellungen öffnen"
     },
+    "openFullSettings": {
+        "message": "Erweiterte Einstellungen"
+    },
     "saveSettings": {
         "message": "Einstellungen speichern"
     },
@@ -69,7 +72,28 @@
         "message": "Shell"
     },
     "searchPlaceholder": {
-        "message": "Ressourcen suchen..."
+        "message": "Nodes, VMs, LXC, IPs oder Tags suchen..."
+    },
+    "displaySettings": {
+        "message": "Anzeige-Optionen"
+    },
+    "showUptime": {
+        "message": "Uptime"
+    },
+    "showIP": {
+        "message": "IP-Adresse"
+    },
+    "showOS": {
+        "message": "Betriebssystem"
+    },
+    "showID": {
+        "message": "IDs (VMID)"
+    },
+    "showTags": {
+        "message": "Tags (Benutzer)"
+    },
+    "filterToggle": {
+        "message": "Filter umschalten"
     },
     "filterAll": {
         "message": "Alle"
@@ -100,5 +124,14 @@
     },
     "close": {
         "message": "Schließen"
+    },
+    "sendingAction": {
+        "message": "Aktion wird gesendet..."
+    },
+    "actionSent": {
+        "message": "Aktion erfolgreich gesendet!"
+    },
+    "finalizing": {
+        "message": "Abschluss..."
     }
 }
