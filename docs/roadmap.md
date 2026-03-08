@@ -26,6 +26,7 @@ This document outlines the planned features, improvements, and technical debt fo
 - [ ] **Performance**: Optimize the rendering of large resource lists (virtual scrolling).
 
 ### Medium Priority
+- [x] **E2E Testing**: Implemented Playwright tests and GitHub Actions workflow.
 - [ ] **Refactoring**: Move i18n logic into a shared utility.
 - [ ] **Testing**: Implement unit tests for `ProxmoxAPI` logic using Jest.
 - [ ] **Error Logging**: Centralized error reporting within the UI for better user feedback.

@@ -1,7 +1,11 @@
 {
   "name": "proxmux-manager",
   "version": "1.1.1",
-  "dependencies": {
-    "playwright": "^1.58.2"
+  "scripts": {
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
   }
 }
