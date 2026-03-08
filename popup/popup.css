@@ -1,62 +1,59 @@
 :root {
+    /* Brand Colors */
+    --brand-prox: #40E0D0; /* Turquoise */
+    --brand-mux: #D2691E; /* Orange/Brown */
+    --brand-gradient: linear-gradient(135deg, var(--brand-prox) 0%, #4facfe 100%);
+    --brand-mux-gradient: linear-gradient(135deg, var(--brand-mux) 0%, #f39c12 100%);
+
     /* Dark Mode (Default) */
-    --bg-color: #0d1117;
-    --card-bg: #161b22;
-    --text-primary: #c9d1d9;
-    --text-secondary: #8b949e;
-    --accent: #58a6ff;
-    --success: #2ea043;
-    --error: #f85149;
-    --border: #30363d;
-    --hover-bg: #21262d;
-    --tag-bg: #21262d;
+    --bg-color: hsl(210, 15%, 7%);
+    --card-bg: hsla(210, 15%, 11%, 0.8);
+    --text-primary: hsl(210, 15%, 90%);
+    --text-secondary: hsl(210, 10%, 65%);
+    --accent: var(--brand-prox);
+    --success: hsl(140, 60%, 45%);
+    --error: hsl(0, 70%, 55%);
+    --border: hsla(210, 15%, 25%, 0.6);
+    --hover-bg: hsla(210, 15%, 20%, 0.7);
+    --tag-bg: hsla(210, 15%, 15%, 0.9);
+    --glass-bg: hsla(210, 15%, 11%, 0.75);
+    --glass-border: hsla(0, 0%, 100%, 0.1);
 }
 
-/* Theme overrides */
 body.light-theme {
-    --bg-color: #ffffff;
-    --card-bg: #f6f8fa;
-    --text-primary: #24292f;
-    --text-secondary: #57606a;
-    --accent: #0969da;
-    --success: #1a7f37;
-    --error: #cf222e;
-    --border: #d0d7de;
-    --hover-bg: #eaeef2;
-    --tag-bg: #eff2f5;
-}
-
-body.dark-theme {
-    --bg-color: #0d1117;
-    --card-bg: #161b22;
-    --text-primary: #c9d1d9;
-    --text-secondary: #8b949e;
-    --accent: #58a6ff;
-    --success: #2ea043;
-    --error: #f85149;
-    --border: #30363d;
-    --hover-bg: #21262d;
-    --tag-bg: #21262d;
+    --bg-color: hsl(210, 20%, 98%);
+    --card-bg: hsla(210, 20%, 95%, 0.8);
+    --text-primary: hsl(210, 15%, 10%);
+    --text-secondary: hsl(210, 15%, 35%);
+    --accent: hsl(190, 80%, 35%);
+    --success: hsl(140, 65%, 30%);
+    --error: hsl(0, 75%, 45%);
+    --border: hsla(210, 15%, 80%, 0.8);
+    --hover-bg: hsla(210, 20%, 90%, 0.9);
+    --tag-bg: hsla(210, 15%, 88%, 0.9);
+    --glass-bg: hsla(0, 0%, 100%, 0.85);
+    --glass-border: hsla(0, 0%, 0%, 0.1);
 }
 
 @media (prefers-color-scheme: light) {
-
     :root {
-        --bg-color: #ffffff;
-        --card-bg: #f6f8fa;
-        --text-primary: #24292f;
-        --text-secondary: #57606a;
-        --accent: #0969da;
-        --success: #1a7f37;
-        --error: #cf222e;
-        --border: #d0d7de;
-        --hover-bg: #eaeef2;
-        --tag-bg: #eff2f5;
+        --bg-color: hsl(210, 20%, 98%);
+        --card-bg: hsla(210, 20%, 95%, 0.8);
+        --text-primary: hsl(210, 15%, 10%);
+        --text-secondary: hsl(210, 15%, 35%);
+        --accent: hsl(190, 80%, 35%);
+        --success: hsl(140, 65%, 30%);
+        --error: hsl(0, 75%, 45%);
+        --border: hsla(210, 15%, 80%, 0.8);
+        --hover-bg: hsla(210, 20%, 90%, 0.9);
+        --tag-bg: hsla(210, 15%, 88%, 0.9);
+        --glass-bg: hsla(0, 0%, 100%, 0.85);
+        --glass-border: hsla(0, 0%, 0%, 0.1);
     }
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-primary);
     margin: 0;
@@ -66,6 +63,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: background-color 0.3s ease;
 }
 
 /* In Sidepanel or if resized */
@@ -76,42 +74,42 @@ body {
     }
 }
 
-
-
 .top-bar {
     flex-shrink: 0;
     z-index: 100;
-    background-color: var(--card-bg);
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 14px 18px;
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .logo {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
+    filter: drop-shadow(0 0 8px rgba(64, 224, 208, 0.3));
 }
 
 h1.branded-title {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin: 0;
     font-weight: 700;
     display: flex;
     align-items: center;
-    background: none;
-    -webkit-text-fill-color: initial;
+    letter-spacing: -0.02em;
 }
 
 h1.branded-title .prox {
@@ -153,8 +151,8 @@ h1.branded-title .title-suffix {
 
 
 .search-container {
-    padding: 10px 16px;
-    background-color: var(--card-bg);
+    padding: 12px 18px;
+    background-color: transparent;
     border-bottom: 1px solid var(--border);
 }
 
@@ -166,33 +164,39 @@ h1.branded-title .title-suffix {
 
 .search-icon {
     position: absolute;
-    left: 10px;
+    left: 12px;
     color: var(--text-secondary);
     pointer-events: none;
+    transition: color 0.2s;
 }
 
 #search-input {
     width: 100%;
-    background-color: var(--bg-color);
+    background-color: var(--tag-bg);
     border: 1px solid var(--border);
     color: var(--text-primary);
-    padding: 8px 12px 8px 34px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    transition: all 0.2s;
+    padding: 10px 14px 10px 38px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #search-input:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+    background-color: var(--bg-color);
+    box-shadow: 0 0 0 4px hsla(180, 70%, 50%, 0.15);
+}
+
+#search-input:focus + .search-icon {
+    color: var(--accent);
 }
 
 .filter-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
+    gap: 8px;
+    margin-top: 12px;
     align-items: center;
 }
 
@@ -200,46 +204,48 @@ h1.branded-title .title-suffix {
     background-color: var(--tag-bg);
     border: 1px solid var(--border);
     color: var(--text-secondary);
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     font-weight: 500;
 }
 
 .filter-pill:hover {
-    border-color: var(--text-secondary);
+    border-color: var(--accent);
     color: var(--text-primary);
+    transform: translateY(-1px);
 }
 
 .filter-pill.active {
-    background-color: var(--accent);
+    background-image: var(--brand-mux-gradient);
     color: white;
-    border-color: var(--accent);
-    box-shadow: 0 2px 6px rgba(88, 166, 255, 0.3);
+    border-color: transparent;
+    box-shadow: 0 4px 12px hsla(25, 80%, 50%, 0.35);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .filter-divider {
     width: 1px;
-    height: 16px;
+    height: 18px;
     background-color: var(--border);
-    margin: 0 2px;
+    margin: 0 4px;
 }
 
 .tag-filters-container {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
 }
 
 .tag-filter-pill {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 500;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 12px;
     background-color: var(--tag-bg);
     color: var(--text-secondary);
@@ -256,9 +262,11 @@ h1.branded-title .title-suffix {
 
 .tag-filter-pill.active {
     background-color: var(--accent);
-    color: white;
+    color: white; 
     border-color: var(--accent);
-    box-shadow: 0 2px 4px rgba(88, 166, 255, 0.2);
+    box-shadow: 0 3px 8px hsla(180, 70%, 50%, 0.3);
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Header Alerts */
@@ -351,25 +359,33 @@ main {
 .resource-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-bottom: 1px solid var(--border);
-    transition: background-color 0.2s;
-    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 14px;
 }
 
 .resource-item:hover {
     background-color: var(--hover-bg);
+    padding-left: 22px;
 }
 
 .status-indicator {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     flex-shrink: 0;
+    transition: all 0.3s ease;
 }
 
-.status-running { background-color: var(--success); box-shadow: 0 0 8px var(--success); }
-.status-stopped { background-color: var(--error); }
+.status-running { 
+    background-color: var(--success); 
+    box-shadow: 0 0 10px hsla(140, 60%, 45%, 0.4); 
+}
+.status-stopped { 
+    background-color: var(--error); 
+    box-shadow: 0 0 8px hsla(0, 70%, 55%, 0.2);
+}
 .status-unknown { background-color: var(--text-secondary); }
 
 .info {
@@ -380,21 +396,23 @@ main {
 }
 
 .name {
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
 }
 
 .resource-subtitle {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-top: 2px;
 }
 
 .node {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
 }
 
@@ -402,7 +420,7 @@ main {
     font-size: 0.75rem;
     color: var(--text-secondary);
     font-style: italic;
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 .uptime::before {
@@ -418,17 +436,19 @@ main {
 }
 
 .tag {
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background-color: var(--hover-bg);
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background-color: var(--tag-bg);
     border: 1px solid var(--border);
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 .tag.ip {
     color: var(--accent);
-    border-color: rgba(88, 166, 255, 0.3);
+    background-color: hsla(190, 80%, 40%, 0.1);
+    border-color: hsla(190, 80%, 40%, 0.3);
 }
 
 .tag.os {
@@ -438,24 +458,26 @@ main {
 .user-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 6px;
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .tag-pill {
     font-size: 0.65rem;
-    font-weight: 500;
-    padding: 1px 6px;
+    font-weight: 600;
+    padding: 2px 8px;
     border-radius: 4px;
-    background-color: var(--tag-bg);
+    background-color: var(--hover-bg);
     color: var(--text-secondary);
     border: 1px solid var(--border);
     text-transform: lowercase;
+    transition: all 0.2s ease;
 }
 
 .resource-item:hover .tag-pill {
     border-color: var(--accent);
     color: var(--text-primary);
+    background-color: var(--tag-bg);
 }
 
 
@@ -465,42 +487,47 @@ main {
 }
 
 .action-btn {
-    background-color: var(--border);
+    background-color: var(--tag-bg);
     color: var(--text-primary);
-    border: 1px solid transparent;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
+    font-weight: 600;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .action-btn:hover {
-    background-color: #3e444d;
+    background-color: var(--hover-bg);
     border-color: var(--text-secondary);
+    transform: translateY(-1px);
 }
 
 .action-btn.novnc {
-    background-color: rgba(88, 166, 255, 0.1);
-    color: var(--accent);
-    border-color: rgba(88, 166, 255, 0.4);
+    background-color: hsla(180, 70%, 50%, 0.1);
+    color: var(--brand-prox);
+    border-color: hsla(180, 70%, 50%, 0.3);
 }
 
 .action-btn.novnc:hover {
-    background-color: var(--accent);
-    color: white;
+    background-color: var(--brand-prox);
+    color: hsl(210, 15%, 7%);
+    border-color: var(--brand-prox);
+    box-shadow: 0 4px 12px hsla(180, 70%, 50%, 0.3);
 }
 
 .action-btn.ssh {
-    background-color: rgba(46, 160, 67, 0.1);
+    background-color: hsla(140, 60%, 45%, 0.1);
     color: var(--success);
-    border-color: rgba(46, 160, 67, 0.4);
+    border-color: hsla(140, 60%, 45%, 0.3);
 }
 
 .action-btn.ssh:hover {
     background-color: var(--success);
     color: white;
+    border-color: var(--success);
+    box-shadow: 0 4px 12px hsla(140, 60%, 45%, 0.3);
 }
 
 #no-auth button, .primary-btn {
