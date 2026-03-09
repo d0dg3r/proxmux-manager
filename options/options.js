@@ -135,9 +135,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const fullToken = `${user}!${tokenId}=${secret}`;
             const api = new ProxmoxAPI(url, fullToken);
-            const version = await api.get('/version');
-            
-            status.textContent = `Connection successful! Proxmox Version: ${version.data.version}`;
+            const version = await api.fetch('/version');
+
+            status.textContent = `Connection successful! Proxmox Version: ${version.version}`;
             status.style.color = 'var(--success)';
         } catch (error) {
             console.error('Test Connection Failed:', error);
