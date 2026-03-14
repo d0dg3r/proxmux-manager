@@ -22,7 +22,14 @@ test.describe('PROXMUX Popup (Mock Environment)', () => {
     const items = page.locator('.resource-item');
     const count = await items.count();
     expect(count).toBeGreaterThanOrEqual(10);
-    await expect(page.locator('.resource-item .name').first()).toContainText('pve-node-01');
+    
+    // Verify first node has IP tag and Shell/SSH buttons
+    const firstNode = items.first();
+    await expect(firstNode.locator('.name')).toContainText('pve-node-01');
+    await expect(firstNode.locator('.tag.ip')).toContainText('10.1.1.10');
+    await expect(firstNode.locator('.action-btn.shell')).toBeVisible();
+    await expect(firstNode.locator('.action-btn.ssh')).toBeVisible();
+
     const resourceNames = await page.locator('.resource-item .name').allTextContents();
     expect(resourceNames).toEqual(expect.arrayContaining(['pve-node-01', 'docker', 'gitea']));
   });
