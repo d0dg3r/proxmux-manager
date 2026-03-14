@@ -1,0 +1,24 @@
+name: Update Dependencies (Manual)
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Update npm dependencies
+        run: |
+          npm update
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package-lock.json
+          if [ -n "$(git status --porcelain package-lock.json)" ]; then
+            git commit -m "chore: update dependencies"
+            git push
+          else
+            echo "No updates found."
+          fi
