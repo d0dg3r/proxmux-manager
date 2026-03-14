@@ -1,4 +1,4 @@
-![PROXMUX Banner](store/banner_ad.png)
+![PROXMUX Banner](store/small_promo_tile_new.png)
 
 <p align="center">
   <a href="https://github.com/d0dg3r/PROXMUX-Manager/releases"><img src="https://img.shields.io/github/v/release/d0dg3r/PROXMUX-Manager?style=flat-square&logo=github" alt="Release"></a>
