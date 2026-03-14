@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Load saved settings
-    chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret', 'theme'], (items) => {
+    chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret', 'theme', 'consoleTabMode'], (items) => {
         if (items.proxmoxUrl) proxmoxUrlInput.value = items.proxmoxUrl;
         if (items.apiUser) apiUserInput.value = items.apiUser;
         if (items.apiTokenId) apiTokenIdInput.value = items.apiTokenId;
@@ -139,6 +139,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (items.theme) {
             themeSelect.value = items.theme;
             applyTheme(items.theme);
+        }
+        if (items.consoleTabMode) {
+            document.getElementById('tab-mode-select').value = items.consoleTabMode;
         }
     });
 
@@ -178,7 +181,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             apiTokenId: tokenId,
             apiSecret: secret,
             apiToken: fullToken,
-            theme: theme
+            theme: theme,
+            consoleTabMode: document.getElementById('tab-mode-select').value
         });
 
         status.textContent = 'Settings saved successfully!';

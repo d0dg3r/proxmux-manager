@@ -681,17 +681,45 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             
             const url = api.getConsoleUrl(node, type, vmid, name);
-            if (url) {
-                console.log(`[Popup] Opening console URL: ${url}`);
-                debugStatus.textContent = 'Opening console...';
-                chrome.tabs.create({ url });
-                // Hide status after a short delay
-                setTimeout(() => { debugStatus.style.display = 'none'; }, 2000);
+            if (!url) return;
+
+            const tabSettings = await chrome.storage.local.get(['consoleTabMode']);
+            const mode = tabSettings.consoleTabMode || 'duplicate';
+
+            if (mode === 'single') {
+                // Reuse any existing Proxmox console tab (novnc or xtermjs)
+                const tabs = await chrome.tabs.query({ url: `${settings.proxmoxUrl}/*` });
+                const consoleTab = tabs.find(t => t.url.includes('console=') && (t.url.includes('novnc=1') || t.url.includes('xtermjs=1')));
+                if (consoleTab) {
+                    await chrome.tabs.update(consoleTab.id, { url, active: true });
+                    debugStatus.textContent = 'Updated existing console tab.';
+                    setTimeout(() => { debugStatus.style.display = 'none'; }, 2000);
+                    return;
+                }
+            } else if (mode === 'duplicate') {
+                // Focus existing tab for this specific resource
+                const resourceIdParam = vmid ? `vmid=${vmid}` : `node=${node}`;
+                const tabs = await chrome.tabs.query({ url: `${settings.proxmoxUrl}/*` });
+                const existingTab = tabs.find(t => 
+                    t.url.includes(resourceIdParam) && 
+                    t.url.includes('console=') && 
+                    (t.url.includes('novnc=1') || t.url.includes('xtermjs=1'))
+                );
+                if (existingTab) {
+                    await chrome.tabs.update(existingTab.id, { active: true });
+                    debugStatus.textContent = 'Focusing existing tab.';
+                    setTimeout(() => { debugStatus.style.display = 'none'; }, 2000);
+                    return;
+                }
             }
+
+            console.log(`[Popup] Opening console URL: ${url}`);
+            debugStatus.textContent = 'Opening console...';
+            chrome.tabs.create({ url });
+            setTimeout(() => { debugStatus.style.display = 'none'; }, 2000);
         } catch (e) {
             console.error('[Popup] Failed to open console:', e);
             debugStatus.textContent = `Error: ${e.message}`;
-            // Fallback
             const url = api.getConsoleUrl(node, type, vmid, name);
             if (url) chrome.tabs.create({ url });
         }

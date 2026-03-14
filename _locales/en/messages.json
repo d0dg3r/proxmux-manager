@@ -133,5 +133,23 @@
     },
     "finalizing": {
         "message": "Finalizing..."
+    },
+    "tabManagement": {
+        "message": "Tab Management"
+    },
+    "consoleTabMode": {
+        "message": "Console Tab Behavior"
+    },
+    "tabMultiple": {
+        "message": "Open new tab every time"
+    },
+    "tabSingle": {
+        "message": "Reuse one single console tab"
+    },
+    "tabDuplicate": {
+        "message": "Focus same machine if already open"
+    },
+    "tabModeHelp": {
+        "message": "Choose how browser tabs are managed when opening consoles."
     }
 }

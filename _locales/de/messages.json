@@ -133,5 +133,23 @@
     },
     "finalizing": {
         "message": "Abschluss..."
+    },
+    "tabManagement": {
+        "message": "Tab-Verwaltung"
+    },
+    "consoleTabMode": {
+        "message": "Konsolen-Tab Verhalten"
+    },
+    "tabMultiple": {
+        "message": "Immer neuen Tab öffnen"
+    },
+    "tabSingle": {
+        "message": "Nur einen Konsolen-Tab nutzen"
+    },
+    "tabDuplicate": {
+        "message": "Gleiche Maschine fokussieren"
+    },
+    "tabModeHelp": {
+        "message": "Wähle aus, wie Browser-Tabs für Konsolen verwaltet werden."
     }
 }
