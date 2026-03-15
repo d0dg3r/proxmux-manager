@@ -515,6 +515,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // #region agent log
         fetch('http://127.0.0.1:7798/ingest/8f8b8b84-5f94-4b2f-8d6c-8ff99af9d9f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4f7b19'},body:JSON.stringify({sessionId:'4f7b19',runId:'connection-refresh-pre-fix',hypothesisId:'H3',location:'popup/popup.js:513',message:'inline save completed, post-save runtime state',data:{settingsUrlAfterSave:settings?.proxmoxUrl ?? null,apiBaseUrlStill:api?.baseUrl ?? null,sameApiAndSettingsUrl:(api?.baseUrl ?? null)===(settings?.proxmoxUrl ?? null),allResourcesCount:Array.isArray(allResources)?allResources.length:null},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
+        const connectionChanged = previousUrl !== payload.proxmoxUrl || previousToken !== payload.apiToken;
+        if (connectionChanged) {
+            // #region agent log
+            fetch('http://127.0.0.1:7798/ingest/8f8b8b84-5f94-4b2f-8d6c-8ff99af9d9f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4f7b19'},body:JSON.stringify({sessionId:'4f7b19',runId:'connection-refresh-post-fix',hypothesisId:'H4',location:'popup/popup.js:520',message:'connection changed, forcing runtime reload',data:{previousUrl,nextUrl:payload.proxmoxUrl,tokenChanged:previousToken!==payload.apiToken,urlChanged:previousUrl!==payload.proxmoxUrl},timestamp:Date.now()})}).catch(()=>{});
+            // #endregion
+            window.location.reload();
+            return;
+        }
         try {
             await ensureHostPermission(normalized.originPattern);
         } catch (_error) {
@@ -1027,12 +1035,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         applyTheme(settings.theme);
     }
 
-    if (settings.scriptsPanelCollapsed) {
+    // #region agent log
+    fetch('http://127.0.0.1:7798/ingest/8f8b8b84-5f94-4b2f-8d6c-8ff99af9d9f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4f7b19'},body:JSON.stringify({sessionId:'4f7b19',runId:'scripts-default-pre-fix',hypothesisId:'S1',location:'popup/popup.js:1022',message:'scripts panel startup state from storage',data:{storedScriptsPanelCollapsed:settings?.scriptsPanelCollapsed ?? null,isStoredValueUndefined:typeof settings?.scriptsPanelCollapsed==='undefined'},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    const scriptsPanelCollapsedOnStartup = typeof settings.scriptsPanelCollapsed === 'undefined'
+        ? true
+        : Boolean(settings.scriptsPanelCollapsed);
+    if (typeof settings.scriptsPanelCollapsed === 'undefined') {
+        chrome.storage.local.set({ scriptsPanelCollapsed: true }).catch(() => {});
+    }
+    if (scriptsPanelCollapsedOnStartup) {
         scriptsBody.classList.add('hidden');
         scriptsToggleBtn.textContent = chrome.i18n.getMessage('scriptsShow') || 'Show';
     } else {
         scriptsToggleBtn.textContent = chrome.i18n.getMessage('scriptsToggle') || 'Hide';
     }
+    // #region agent log
+    fetch('http://127.0.0.1:7798/ingest/8f8b8b84-5f94-4b2f-8d6c-8ff99af9d9f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4f7b19'},body:JSON.stringify({sessionId:'4f7b19',runId:'scripts-default-post-fix',hypothesisId:'S5',location:'popup/popup.js:1036',message:'scripts panel startup default resolved and applied',data:{storedScriptsPanelCollapsed:settings?.scriptsPanelCollapsed ?? null,resolvedCollapsedDefault:scriptsPanelCollapsedOnStartup,scriptsBodyHidden:scriptsBody.classList.contains('hidden'),toggleLabel:scriptsToggleBtn.textContent || null},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     
     if (!settings.proxmoxUrl || !settings.apiToken) {
         loadingOverlay.classList.add('hidden');
@@ -1094,6 +1114,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         scriptsToggleBtn.textContent = hidden
             ? (chrome.i18n.getMessage('scriptsShow') || 'Show')
             : (chrome.i18n.getMessage('scriptsToggle') || 'Hide');
+        // #region agent log
+        fetch('http://127.0.0.1:7798/ingest/8f8b8b84-5f94-4b2f-8d6c-8ff99af9d9f2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'4f7b19'},body:JSON.stringify({sessionId:'4f7b19',runId:'scripts-default-pre-fix',hypothesisId:'S3',location:'popup/popup.js:1090',message:'scripts panel toggled by user',data:{hiddenAfterToggle:hidden,toggleLabel:scriptsToggleBtn.textContent || null},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         await chrome.storage.local.set({ scriptsPanelCollapsed: hidden });
     });
 
