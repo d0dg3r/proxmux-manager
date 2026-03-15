@@ -60,15 +60,20 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 
 - Default recommendation: create a dedicated API user and assign ACLs explicitly.
 - Root token setup is available as a fallback for lab/test environments.
-- Full guide: `docs/proxmox-token-setup.md`
-- Interactive helper script (run on Proxmox host):
-  - `bash scripts/setup_proxmox_token.sh`
-  - or fresh from GitHub:
-    - `curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'`
+- Full guide: [docs/proxmox-token-setup.md](docs/proxmox-token-setup.md)
+- Interactive helper script (run on Proxmox host): `bash scripts/setup_proxmox_token.sh`
+- Or run the latest script directly from GitHub:
+
+```bash
+curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
+```
 - The helper asks whether to store the token in a uniquely named local file with restrictive permissions (`600`), default `Yes`.
 - Import the token into your password manager immediately, then delete the local token file (`shred -u` preferred, otherwise `rm`).
 - zsh-safe curl sample (quotes are important):
-  - `curl -k -s -H 'Authorization: PVEAPIToken=USER_REALM!TOKEN_ID=TOKEN_SECRET' 'https://YOUR_HOST:8006/api2/json/cluster/resources?type=vm'`
+
+```bash
+curl -k -s -H 'Authorization: PVEAPIToken=USER_REALM!TOKEN_ID=TOKEN_SECRET' 'https://YOUR_HOST:8006/api2/json/cluster/resources?type=vm'
+```
 
 If PROXMUX only shows nodes but not VMs/LXCs, validate token rights first (`Sys.Audit` and VM/LXC audit scope) using the curl checks in the guide.
 
@@ -82,7 +87,7 @@ If PROXMUX only shows nodes but not VMs/LXCs, validate token rights first (`Sys.
 - Catalog source strategy: API/JSON first, website fallback.
 - Script descriptions are loaded from Community Scripts metadata/page content.
 - Install flow is safe assisted: copy command + open shell; no automatic remote execution.
-- Integration details: `docs/community-scripts-integration.md`.
+- Integration details: [docs/community-scripts-integration.md](docs/community-scripts-integration.md).
 
 ## What's New in v1.2.0-beta.1
 
