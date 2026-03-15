@@ -134,6 +134,129 @@
     "finalizing": {
         "message": "Abschluss..."
     },
+    "communityScriptsTitle": {
+        "message": "Proxmox VE Scripts"
+    },
+    "scriptsHint": {
+        "message": "Waehle ein Skript aus, kopiere den Installationsbefehl und oeffne anschliessend die Node-Shell."
+    },
+    "scriptsSearchPlaceholder": {
+        "message": "Skripte suchen..."
+    },
+    "scriptsRefresh": {
+        "message": "Aktualisieren"
+    },
+    "scriptsToggle": {
+        "message": "Ausblenden"
+    },
+    "scriptsShow": {
+        "message": "Einblenden"
+    },
+    "scriptsInstallAction": {
+        "message": "Befehle kopieren + Shell öffnen"
+    },
+    "scriptsLoading": {
+        "message": "Skriptkatalog wird geladen..."
+    },
+    "scriptsLoadedGithubSuffix": {
+        "message": "Skripte von GitHub geladen"
+    },
+    "scriptsLoadedCacheSuffix": {
+        "message": "Skripte aus dem Cache geladen"
+    },
+    "scriptsLoadedCacheFallbackSuffix": {
+        "message": "Skripte aus dem Cache geladen (GitHub aktuell nicht erreichbar)"
+    },
+    "scriptsSelectedSuffix": {
+        "message": "ausgewählt"
+    },
+    "scriptsLoadFailed": {
+        "message": "Skriptkatalog konnte nicht geladen werden."
+    },
+    "scriptsLoadActionHint": {
+        "message": "Skriptkatalog konnte nicht geladen werden. Prüfe den Internetzugriff auf api.github.com/raw.githubusercontent.com und klicke auf Aktualisieren."
+    },
+    "scriptsNoResults": {
+        "message": "Keine passenden Skripte gefunden."
+    },
+    "scriptsNoDescription": {
+        "message": "Keine Beschreibung verfügbar."
+    },
+    "scriptsSelectFirst": {
+        "message": "Bitte wähle mindestens ein Skript aus."
+    },
+    "scriptsNoInstallUrl": {
+        "message": "Für die ausgewählten Skripte wurden keine Installations-URLs gefunden."
+    },
+    "scriptsNoNode": {
+        "message": "Kein Node zum Öffnen der Shell verfügbar."
+    },
+    "scriptsCopiedOpening": {
+        "message": "Befehle kopiert. Shell wird geöffnet..."
+    },
+    "scriptsActionFailed": {
+        "message": "Skript-Aktion fehlgeschlagen."
+    },
+    "scriptsNodeAuto": {
+        "message": "Node automatisch"
+    },
+    "scriptsTypeAll": {
+        "message": "ALLE"
+    },
+    "scriptsTypeCt": {
+        "message": "CT"
+    },
+    "scriptsTypeAlpine": {
+        "message": "ALPINE"
+    },
+    "scriptsTypeVm": {
+        "message": "VM"
+    },
+    "scriptsTypeTurnkey": {
+        "message": "TURNKEY"
+    },
+    "scriptsGuideOpen": {
+        "message": "Anleitung"
+    },
+    "scriptsGuideClose": {
+        "message": "Schließen"
+    },
+    "scriptsGuideLoading": {
+        "message": "Anleitung wird geladen..."
+    },
+    "scriptsGuideFailed": {
+        "message": "Anleitungsinhalt ist derzeit nicht verfügbar. Du kannst die volle Seite öffnen."
+    },
+    "scriptsGuideOpenFullPage": {
+        "message": "Volle Seite öffnen"
+    },
+    "scriptsGuideAboutLabel": {
+        "message": "Über"
+    },
+    "scriptsGuideNotesLabel": {
+        "message": "Hinweise"
+    },
+    "scriptsGuideInstallLabel": {
+        "message": "Installation"
+    },
+    "scriptsGuideDetailsLabel": {
+        "message": "Details"
+    },
+    "scriptsGuideInstallMethodsLabel": {
+        "message": "Install-Methoden"
+    },
+    "scriptsGuideTitleFallback": {
+        "message": "Script-Anleitung"
+    },
+    "scriptsCacheHours": {
+        "message": "Katalog-Cache-Dauer (Stunden)"
+    },
+    "scriptsDefaultNode": {
+        "message": "Standard-Shell-Node (optional)"
+    },
+    "scriptsSettingsHelp": {
+        "message": "GitHub-Katalog wird bevorzugt. Bei GitHub-Ausfall werden automatisch gecachte Skripte genutzt."
+    },
     "tabManagement": {
         "message": "Tab-Verwaltung"
     },

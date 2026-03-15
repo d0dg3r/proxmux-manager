@@ -126,6 +126,18 @@ h1.branded-title .title-suffix {
     margin-bottom: 24px;
 }
 
+.form-group.separator {
+    margin-bottom: 12px;
+}
+
+.form-group.separator h3 {
+    margin: 0;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
 .form-group label {
     display: block;
     font-size: 0.95rem;

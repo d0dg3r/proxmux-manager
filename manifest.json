@@ -22,15 +22,15 @@
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
-      "16": "icons/proxmux_logo.png",
-      "48": "icons/proxmux_logo.png",
-      "128": "icons/proxmux_logo.png"
+      "16": "store/proxmux_logo.png",
+      "48": "store/proxmux_logo.png",
+      "128": "store/proxmux_logo.png"
     }
   },
   "options_page": "options/options.html",
   "icons": {
-    "16": "icons/proxmux_logo.png",
-    "48": "icons/proxmux_logo.png",
-    "128": "icons/proxmux_logo.png"
+    "16": "store/proxmux_logo.png",
+    "48": "store/proxmux_logo.png",
+    "128": "store/proxmux_logo.png"
   }
 }

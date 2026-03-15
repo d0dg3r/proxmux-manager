@@ -94,6 +94,130 @@
             </div>
         </div>
 
+        <section class="scripts-panel">
+            <div class="scripts-header">
+                <h2>Proxmox VE Scripts</h2>
+                <div class="scripts-header-actions">
+                    <button id="scripts-refresh-btn" class="scripts-btn ghost">Refresh</button>
+                    <button id="scripts-toggle-btn" class="scripts-btn ghost">Hide</button>
+                </div>
+            </div>
+            <div id="scripts-body">
+                <p class="scripts-hint">Select one script, then copy install commands and open the node shell.</p>
+                <div class="scripts-controls">
+                    <div class="scripts-search-wrapper">
+                        <input id="scripts-search-input" type="text" placeholder="Search scripts...">
+                        <button id="scripts-search-clear-btn" class="search-clear-btn hidden" title="Clear scripts search" aria-label="Clear scripts search">
+                            <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M18.3,5.71L12,12L5.71,5.71L4.29,7.12L10.59,13.41L4.29,19.71L5.71,21.12L12,14.83L18.3,21.12L19.71,19.71L13.41,13.41L19.71,7.12L18.3,5.71Z"/></svg>
+                        </button>
+                    </div>
+                    <select id="scripts-node-select">
+                        <option value="">Auto node</option>
+                        <option value="pve-node-01">pve-node-01</option>
+                    </select>
+                </div>
+                <div id="scripts-type-filters" class="scripts-type-filters">
+                    <button class="scripts-type-pill active" data-script-type="all">ALL</button>
+                    <button class="scripts-type-pill" data-script-type="ct">CT</button>
+                    <button class="scripts-type-pill" data-script-type="alpine">ALPINE</button>
+                    <button class="scripts-type-pill" data-script-type="vm">VM</button>
+                    <button class="scripts-type-pill" data-script-type="turnkey">TURNKEY</button>
+                </div>
+                <div id="scripts-list" class="scripts-list">
+                    <label class="script-row" data-script-type="ct">
+                        <div class="script-row-main">
+                            <input type="checkbox" class="mock-script-checkbox" value="docker">
+                            <div class="script-info">
+                                <div class="script-title-row">
+                                    <div class="script-title">Docker</div>
+                                    <span class="script-type-badge type-ct">CT</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="scripts-btn ghost script-guide-btn" data-script-slug="docker">Guide</button>
+                    </label>
+                    <label class="script-row" data-script-type="vm">
+                        <div class="script-row-main">
+                            <input type="checkbox" class="mock-script-checkbox" value="ubuntu-vm">
+                            <div class="script-info">
+                                <div class="script-title-row">
+                                    <div class="script-title">Ubuntu VM</div>
+                                    <span class="script-type-badge type-vm">VM</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="scripts-btn ghost script-guide-btn" data-script-slug="ubuntu-vm">Guide</button>
+                    </label>
+                    <div class="scripts-group-header">Alpine-LXC</div>
+                    <label class="script-row" data-script-type="alpine">
+                        <div class="script-row-main">
+                            <input type="checkbox" class="mock-script-checkbox" value="alpine-adguard">
+                            <div class="script-info">
+                                <div class="script-title-row">
+                                    <div class="script-title">Alpine AdGuard</div>
+                                    <span class="script-type-badge type-ct">CT</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="scripts-btn ghost script-guide-btn" data-script-slug="alpine-adguard">Guide</button>
+                    </label>
+                    <div class="scripts-group-header">TOOLS / ADDON</div>
+                    <label class="script-row" data-script-type="tools-group">
+                        <div class="script-row-main">
+                            <input type="checkbox" class="mock-script-checkbox" value="usb-mount-helper">
+                            <div class="script-info">
+                                <div class="script-title-row">
+                                    <div class="script-title">USB Mount Helper</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="scripts-btn ghost script-guide-btn" data-script-slug="usb-mount-helper">Guide</button>
+                    </label>
+                    <div class="scripts-group-header">TOOLS / PVE</div>
+                    <label class="script-row" data-script-type="tools-group">
+                        <div class="script-row-main">
+                            <input type="checkbox" class="mock-script-checkbox" value="pve-kernel-cleanup">
+                            <div class="script-info">
+                                <div class="script-title-row">
+                                    <div class="script-title">PVE Kernel Cleanup</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="scripts-btn ghost script-guide-btn" data-script-slug="pve-kernel-cleanup">Guide</button>
+                    </label>
+                    <div class="scripts-group-header">TOOLS / COPY-DATA</div>
+                    <label class="script-row" data-script-type="tools-group">
+                        <div class="script-row-main">
+                            <input type="checkbox" class="mock-script-checkbox" value="copy-data-migrate">
+                            <div class="script-info">
+                                <div class="script-title-row">
+                                    <div class="script-title">Copy Data Migrate</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="scripts-btn ghost script-guide-btn" data-script-slug="copy-data-migrate">Guide</button>
+                    </label>
+                </div>
+                <div class="scripts-footer">
+                    <button id="scripts-install-btn" class="scripts-btn primary">Copy commands + open shell</button>
+                    <div id="scripts-feedback" class="scripts-feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <div id="scripts-guide-modal" class="scripts-guide-modal hidden">
+            <div class="scripts-guide-modal-content">
+                <div class="scripts-guide-modal-header">
+                    <h3 id="scripts-guide-title">Script Guide</h3>
+                    <button id="scripts-guide-close" class="scripts-btn ghost">Close</button>
+                </div>
+                <div id="scripts-guide-body" class="scripts-guide-body"></div>
+                <div class="scripts-guide-modal-footer">
+                    <button id="scripts-guide-open-page" class="scripts-btn ghost">Open full page</button>
+                </div>
+            </div>
+        </div>
+
         <main>
             <div id="resource-list" class="list">
                 <div class="resource-item">
@@ -428,6 +552,46 @@
         const searchClearBtn = document.getElementById('search-clear-btn');
         const filterToggleBtn = document.getElementById('filter-toggle-btn');
         const collapsibleFilters = document.getElementById('collapsible-filters');
+        const scriptsToggleBtn = document.getElementById('scripts-toggle-btn');
+        const scriptsBody = document.getElementById('scripts-body');
+        const scriptsSearchInput = document.getElementById('scripts-search-input');
+        const scriptsSearchClearBtn = document.getElementById('scripts-search-clear-btn');
+        const scriptsTypeFilters = document.getElementById('scripts-type-filters');
+        const scriptsRows = Array.from(document.querySelectorAll('#scripts-list .script-row'));
+        const scriptsInstallBtn = document.getElementById('scripts-install-btn');
+        const scriptsFeedback = document.getElementById('scripts-feedback');
+        const scriptCheckboxes = Array.from(document.querySelectorAll('.mock-script-checkbox'));
+        const guideButtons = Array.from(document.querySelectorAll('.script-guide-btn'));
+        const guideModal = document.getElementById('scripts-guide-modal');
+        const guideTitle = document.getElementById('scripts-guide-title');
+        const guideBody = document.getElementById('scripts-guide-body');
+        const guideClose = document.getElementById('scripts-guide-close');
+        const guideOpenPage = document.getElementById('scripts-guide-open-page');
+        let selectedScriptType = 'all';
+        let guideUrl = '';
+
+        const applyScriptFilters = () => {
+            const query = scriptsSearchInput.value.toLowerCase().trim();
+            scriptsRows.forEach((row) => {
+                const rowType = row.dataset.scriptType || 'ct';
+                const text = row.textContent.toLowerCase();
+                const typeMatch = selectedScriptType === 'all' || rowType === selectedScriptType;
+                const textMatch = !query || text.includes(query);
+                row.classList.toggle('hidden', !(typeMatch && textMatch));
+            });
+        };
+
+        const updateScriptsSearchClearState = () => {
+            scriptsSearchClearBtn.classList.toggle('hidden', !scriptsSearchInput.value.trim());
+        };
+
+        const resetScriptsSearch = () => {
+            if (!scriptsSearchInput.value) return;
+            scriptsSearchInput.value = '';
+            updateScriptsSearchClearState();
+            applyScriptFilters();
+            scriptsSearchInput.focus();
+        };
 
         const updateSearchClearState = () => {
             searchClearBtn.classList.toggle('hidden', !searchInput.value.trim());
@@ -456,7 +620,205 @@
             filterToggleBtn.classList.toggle('active', !collapsibleFilters.classList.contains('collapsed'));
         });
 
+        scriptsToggleBtn.addEventListener('click', () => {
+            const hidden = scriptsBody.classList.toggle('hidden');
+            scriptsToggleBtn.textContent = hidden ? 'Show' : 'Hide';
+        });
+
+        scriptsSearchInput.addEventListener('input', () => {
+            updateScriptsSearchClearState();
+            applyScriptFilters();
+        });
+        scriptsSearchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                resetScriptsSearch();
+            }
+        });
+        scriptsSearchClearBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            resetScriptsSearch();
+        });
+
+        scriptsTypeFilters.addEventListener('click', (event) => {
+            const button = event.target.closest('.scripts-type-pill');
+            if (!button) return;
+            selectedScriptType = button.dataset.scriptType || 'all';
+            scriptsTypeFilters.querySelectorAll('.scripts-type-pill').forEach((pill) => {
+                pill.classList.toggle('active', pill === button);
+            });
+            applyScriptFilters();
+        });
+
+        scriptCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    scriptCheckboxes.forEach((other) => {
+                        if (other !== checkbox) other.checked = false;
+                    });
+                }
+            });
+        });
+
+        scriptsInstallBtn.addEventListener('click', () => {
+            const selected = scriptCheckboxes.filter(cb => cb.checked).length;
+            scriptsFeedback.textContent = selected ? 'Commands copied. Opening shell...' : 'Please select at least one script.';
+        });
+
+        const mockGuides = {
+            docker: {
+                title: 'Docker',
+                about: 'Docker helper script for container runtime setup.',
+                notes: 'Can be used on existing Debian-based containers.',
+                install: 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/docker.sh)"',
+                details: {
+                    version: '1.2.0',
+                    category: 'Developer Tools',
+                    runsIn: 'pve',
+                    updated: 'Mar 12, 2026'
+                },
+                methods: [
+                    { name: 'default', os: 'Debian 13', cpu: '2', ram: '2048', hdd: '8' },
+                    { name: 'advanced', os: 'Debian 13', cpu: '4', ram: '4096', hdd: '16' }
+                ]
+            },
+            'ubuntu-vm': {
+                title: 'Ubuntu VM',
+                about: 'Ubuntu VM template helper script.',
+                notes: 'Designed for VM provisioning workflows.',
+                install: 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/vm/ubuntu-vm.sh)"',
+                details: {
+                    version: '0.9.1',
+                    category: 'VM',
+                    runsIn: 'pve',
+                    updated: 'Mar 10, 2026'
+                },
+                methods: [
+                    { name: 'default', os: 'Debian 13', cpu: '2', ram: '4096', hdd: '20' }
+                ]
+            },
+            'alpine-adguard': {
+                title: 'Alpine AdGuard',
+                about: 'AdGuard Home helper script for Alpine containers.',
+                notes: 'Optimized for lightweight Alpine-based LXC workloads.',
+                install: 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/alpine-adguard.sh)"',
+                details: {
+                    version: '1.0.0',
+                    category: 'Alpine',
+                    runsIn: 'pve',
+                    updated: 'Mar 15, 2026'
+                },
+                methods: [
+                    { name: 'default', os: 'Alpine 3.23', cpu: '1', ram: '256', hdd: '1' }
+                ]
+            },
+            'usb-mount-helper': {
+                title: 'USB Mount Helper',
+                about: 'Utility helper script for mounting external storage.',
+                notes: 'Review notes before running in production.',
+                install: 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/tools/addon/usb-mount-helper.sh)"',
+                details: {
+                    version: '1.0.0',
+                    category: 'Addon',
+                    runsIn: 'pve',
+                    updated: 'Mar 11, 2026'
+                },
+                methods: [
+                    { name: 'default', os: 'Debian 13', cpu: '1', ram: '1024', hdd: '4' }
+                ]
+            },
+            'pve-kernel-cleanup': {
+                title: 'PVE Kernel Cleanup',
+                about: 'Cleanup helper for unused kernels on Proxmox VE hosts.',
+                notes: 'Review notes before running in production.',
+                install: 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/tools/pve/pve-kernel-cleanup.sh)"',
+                details: {
+                    version: '2.1.0',
+                    category: 'PVE',
+                    runsIn: 'pve',
+                    updated: 'Mar 9, 2026'
+                },
+                methods: [
+                    { name: 'default', os: 'Debian 13', cpu: '1', ram: '1024', hdd: '2' }
+                ]
+            },
+            'copy-data-migrate': {
+                title: 'Copy Data Migrate',
+                about: 'Copy and migrate helper for data transfer workflows.',
+                notes: 'Review notes before running in production.',
+                install: 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/tools/copy-data/copy-data-migrate.sh)"',
+                details: {
+                    version: '1.4.3',
+                    category: 'Copy Data',
+                    runsIn: 'pve',
+                    updated: 'Mar 8, 2026'
+                },
+                methods: [
+                    { name: 'default', os: 'Debian 13', cpu: '1', ram: '1024', hdd: '6' }
+                ]
+            }
+        };
+
+        guideButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const slug = button.dataset.scriptSlug;
+                const guide = mockGuides[slug];
+                if (!guide) return;
+                const detailsEntries = Object.entries(guide.details || {});
+                const detailLabel = (key) => {
+                    const labels = {
+                        version: 'Version',
+                        category: 'Category',
+                        website: 'Website',
+                        docs: 'Docs',
+                        config: 'Config',
+                        port: 'Port',
+                        runsIn: 'Runs in',
+                        updated: 'Updated'
+                    };
+                    return labels[key] || key;
+                };
+                const detailsHtml = detailsEntries.length
+                    ? `<section class="scripts-guide-section"><h4>Details</h4><ul class="guide-details-list">${detailsEntries.map(([key, value]) => `<li class="guide-details-item"><span>${detailLabel(key)}</span><strong>${value}</strong></li>`).join('')}</ul></section>`
+                    : '';
+                const methods = Array.isArray(guide.methods) ? guide.methods : [];
+                const methodsHtml = methods.length
+                    ? `<section class="scripts-guide-section"><h4>Install Methods</h4><div class="guide-methods">${methods.map((method) => `<article class="guide-method-card"><h5>${method.name}</h5><div class="guide-method-meta"><span>${method.os}</span><span>CPU ${method.cpu}</span><span>RAM ${method.ram}</span><span>HDD ${method.hdd}</span></div></article>`).join('')}</div></section>`
+                    : '';
+                guideTitle.textContent = guide.title;
+                guideBody.innerHTML = `
+                    <section class="scripts-guide-section"><h4>About</h4><p>${guide.about}</p></section>
+                    <section class="scripts-guide-section"><h4>Notes</h4><p>${guide.notes}</p></section>
+                    <section class="scripts-guide-section"><h4>Install</h4><p>${guide.install}</p></section>
+                    ${detailsHtml}
+                    ${methodsHtml}
+                `;
+                guideUrl = `https://community-scripts.org/scripts/${encodeURIComponent(slug)}`;
+                guideModal.classList.remove('hidden');
+            });
+        });
+
+        guideClose.addEventListener('click', () => {
+            guideModal.classList.add('hidden');
+        });
+
+        guideModal.addEventListener('click', (event) => {
+            if (event.target === guideModal) {
+                guideModal.classList.add('hidden');
+            }
+        });
+
+        guideOpenPage.addEventListener('click', () => {
+            if (!guideUrl) return;
+            scriptsFeedback.textContent = `Opening ${guideUrl}`;
+        });
+
         updateSearchClearState();
+        updateScriptsSearchClearState();
+        applyScriptFilters();
     </script>
 </body>
 </html>

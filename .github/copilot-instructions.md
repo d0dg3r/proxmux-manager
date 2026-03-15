@@ -28,7 +28,7 @@ PROXMUX-Manager/
 ├── docs/
 │   ├── architecture.md
 │   └── roadmap.md
-├── icons/                      # Extension logo (proxmux_logo.png)
+├── store/                      # Store assets and extension logo (proxmux_logo.png)
 ├── lib/
 │   └── proxmox-api.js          # Core Proxmox API client (~221 lines)
 ├── options/                    # Settings page

@@ -12,7 +12,7 @@
     <div class="top-bar">
         <header>
             <div class="logo-container">
-                <img src="../icons/proxmux_logo.png" alt="Logo" class="logo">
+                <img src="../store/proxmux_logo.png" alt="Logo" class="logo">
                 <h1 class="branded-title">
                     <span class="prox">PROX</span><span class="mux">MUX</span>
                 </h1>
@@ -115,6 +115,53 @@
                 <div class="header-alert-actions">
                     <button id="login-btn" class="compact-btn primary" data-i18n="loginNow">Log in</button>
                     <button id="close-session-error" class="compact-btn" data-i18n="close">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="scripts-panel">
+            <div class="scripts-header">
+                <h2 data-i18n="communityScriptsTitle">Proxmox VE Scripts</h2>
+                <div class="scripts-header-actions">
+                    <button id="scripts-refresh-btn" class="scripts-btn ghost" data-i18n="scriptsRefresh">Refresh</button>
+                    <button id="scripts-toggle-btn" class="scripts-btn ghost" data-i18n="scriptsToggle">Hide</button>
+                </div>
+            </div>
+            <div id="scripts-body">
+                <p class="scripts-hint" data-i18n="scriptsHint">Select one script, then copy install commands and open the node shell.</p>
+                <div class="scripts-controls">
+                    <div class="scripts-search-wrapper">
+                        <input id="scripts-search-input" type="text" data-i18n-placeholder="scriptsSearchPlaceholder" placeholder="Search scripts...">
+                        <button id="scripts-search-clear-btn" class="search-clear-btn hidden" title="Clear scripts search" aria-label="Clear scripts search">
+                            <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M18.3,5.71L12,12L5.71,5.71L4.29,7.12L10.59,13.41L4.29,19.71L5.71,21.12L12,14.83L18.3,21.12L19.71,19.71L13.41,13.41L19.71,7.12L18.3,5.71Z"/></svg>
+                        </button>
+                    </div>
+                    <select id="scripts-node-select"></select>
+                </div>
+                <div id="scripts-type-filters" class="scripts-type-filters">
+                    <button class="scripts-type-pill active" data-script-type="all" data-i18n="scriptsTypeAll">ALL</button>
+                    <button class="scripts-type-pill" data-script-type="ct" data-i18n="scriptsTypeCt">CT</button>
+                    <button class="scripts-type-pill" data-script-type="alpine" data-i18n="scriptsTypeAlpine">ALPINE</button>
+                    <button class="scripts-type-pill" data-script-type="vm" data-i18n="scriptsTypeVm">VM</button>
+                    <button class="scripts-type-pill" data-script-type="turnkey" data-i18n="scriptsTypeTurnkey">TURNKEY</button>
+                </div>
+                <div id="scripts-list" class="scripts-list"></div>
+                <div class="scripts-footer">
+                    <button id="scripts-install-btn" class="scripts-btn primary" data-i18n="scriptsInstallAction">Copy commands + open shell</button>
+                    <div id="scripts-feedback" class="scripts-feedback" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+
+        <div id="scripts-guide-modal" class="scripts-guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="scripts-guide-title">
+            <div class="scripts-guide-modal-content">
+                <div class="scripts-guide-modal-header">
+                    <h3 id="scripts-guide-title">Script Guide</h3>
+                    <button id="scripts-guide-close" class="scripts-btn ghost" data-i18n="scriptsGuideClose">Close</button>
+                </div>
+                <div id="scripts-guide-body" class="scripts-guide-body"></div>
+                <div class="scripts-guide-modal-footer">
+                    <button id="scripts-guide-open-page" class="scripts-btn ghost" data-i18n="scriptsGuideOpenFullPage">Open full page</button>
                 </div>
             </div>
         </div>

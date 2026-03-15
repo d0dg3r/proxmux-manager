@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closeBtn = document.getElementById('close-settings-btn');
     const status = document.getElementById('status');
     const toggleSecretBtn = document.getElementById('toggle-secret');
+    const scriptsCacheTtlInput = document.getElementById('scripts-cache-ttl');
+    const defaultScriptNodeInput = document.getElementById('default-script-node');
 
     // i18n Initialization
     function initI18n() {
@@ -131,11 +133,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Load saved settings
-    chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret', 'theme', 'consoleTabMode'], (items) => {
+    chrome.storage.local.get(['proxmoxUrl', 'apiUser', 'apiTokenId', 'apiSecret', 'theme', 'consoleTabMode', 'communityScriptsCacheTtlHours', 'defaultScriptNode'], (items) => {
         if (items.proxmoxUrl) proxmoxUrlInput.value = items.proxmoxUrl;
         if (items.apiUser) apiUserInput.value = items.apiUser;
         if (items.apiTokenId) apiTokenIdInput.value = items.apiTokenId;
         if (items.apiSecret) apiSecretInput.value = items.apiSecret;
+        scriptsCacheTtlInput.value = Number(items.communityScriptsCacheTtlHours || 12);
+        defaultScriptNodeInput.value = items.defaultScriptNode || '';
         if (items.theme) {
             themeSelect.value = items.theme;
             applyTheme(items.theme);
@@ -165,6 +169,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tokenId = apiTokenIdInput.value.trim();
         const secret = apiSecretInput.value.trim();
         const theme = themeSelect.value;
+        const communityScriptsCacheTtlHours = Math.max(1, Math.min(168, Number(scriptsCacheTtlInput.value || 12)));
+        const defaultScriptNode = defaultScriptNodeInput.value.trim();
 
         if (!normalized.ok || !user || !tokenId || !secret) {
             status.textContent = normalized.ok ? 'Please fill in all fields.' : normalized.error;
@@ -182,7 +188,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             apiSecret: secret,
             apiToken: fullToken,
             theme: theme,
-            consoleTabMode: document.getElementById('tab-mode-select').value
+            consoleTabMode: document.getElementById('tab-mode-select').value,
+            communityScriptsCacheTtlHours,
+            defaultScriptNode
         });
 
         status.textContent = 'Settings saved successfully!';

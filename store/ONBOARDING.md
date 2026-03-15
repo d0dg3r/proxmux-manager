@@ -104,7 +104,7 @@ Use English as the canonical release-source text, then keep the German section s
 ---
 
 ## 5. Visual Assets Checklist
-- **Icon**: 128x128 pixels (provided in `icons/proxmux_logo.png`).
+- **Icon**: 128x128 pixels (provided in `store/proxmux_logo.png`).
 - **Screenshots (Primary Store Set)**: 1280x800 PNG (`store/screenshot_dark.png`, `store/screenshot_light.png`).
 - **Screenshots (Compact Variant)**: 640x400 PNG (`store/screenshot_dark_640x400.png`, `store/screenshot_light_640x400.png`).
 - **Marquee/Tile**: 440x280 pixels.

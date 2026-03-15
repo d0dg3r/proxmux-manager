@@ -97,4 +97,135 @@ test.describe('PROXMUX Popup (Mock Environment)', () => {
     expect(bgColorLight).toMatch(/^rgb/i);
     expect(bgColorLight).not.toBe(bgColor);
   });
+
+  test('should filter community scripts list', async ({ page }) => {
+    const search = page.locator('#scripts-search-input');
+    const rows = page.locator('#scripts-list .script-row');
+
+    await expect(rows).toHaveCount(6);
+    await search.fill('ubuntu');
+
+    await expect(rows.nth(0)).toHaveClass(/hidden/);
+    await expect(rows.nth(1)).not.toHaveClass(/hidden/);
+    await expect(rows.nth(2)).toHaveClass(/hidden/);
+    await expect(rows.nth(3)).toHaveClass(/hidden/);
+    await expect(rows.nth(4)).toHaveClass(/hidden/);
+    await expect(rows.nth(5)).toHaveClass(/hidden/);
+  });
+
+  test('should show script type badges and filter by type', async ({ page }) => {
+    const badges = page.locator('#scripts-list .script-type-badge');
+    const alpineFilter = page.locator('.scripts-type-pill[data-script-type="alpine"]');
+    await expect(badges).toHaveCount(3);
+    await expect(badges.nth(0)).toHaveText('CT');
+    await expect(badges.nth(1)).toHaveText('VM');
+    await expect(badges.nth(2)).toHaveText('CT');
+
+    await expect(page.locator('.scripts-type-pill[data-script-type="other"]')).toHaveCount(0);
+    await expect(page.locator('.scripts-type-pill[data-script-type="tools"]')).toHaveCount(0);
+    await expect(alpineFilter).toHaveCount(1);
+
+    const vmFilter = page.locator('.scripts-type-pill[data-script-type="vm"]');
+    const rows = page.locator('#scripts-list .script-row');
+    await vmFilter.click();
+
+    await expect(rows.nth(0)).toHaveClass(/hidden/);
+    await expect(rows.nth(1)).not.toHaveClass(/hidden/);
+    await expect(rows.nth(2)).toHaveClass(/hidden/);
+    await expect(rows.nth(3)).toHaveClass(/hidden/);
+    await expect(rows.nth(4)).toHaveClass(/hidden/);
+    await expect(rows.nth(5)).toHaveClass(/hidden/);
+
+    await alpineFilter.click();
+    await expect(rows.nth(0)).toHaveClass(/hidden/);
+    await expect(rows.nth(1)).toHaveClass(/hidden/);
+    await expect(rows.nth(2)).not.toHaveClass(/hidden/);
+    await expect(rows.nth(3)).toHaveClass(/hidden/);
+    await expect(rows.nth(4)).toHaveClass(/hidden/);
+    await expect(rows.nth(5)).toHaveClass(/hidden/);
+  });
+
+  test('should show Alpine-LXC and only whitelisted tools groups', async ({ page }) => {
+    const headers = page.locator('#scripts-list .scripts-group-header');
+    await expect(headers).toHaveCount(4);
+    await expect(headers.nth(0)).toHaveText('Alpine-LXC');
+    await expect(headers.nth(1)).toHaveText('TOOLS / ADDON');
+    await expect(headers.nth(2)).toHaveText('TOOLS / PVE');
+    await expect(headers.nth(3)).toHaveText('TOOLS / COPY-DATA');
+    await expect(page.locator('#scripts-list .scripts-group-header', { hasText: 'TOOLS / MEDIA' })).toHaveCount(0);
+  });
+
+  test('should render script rows with title only', async ({ page }) => {
+    const metaRows = page.locator('#scripts-list .script-meta');
+    await expect(metaRows).toHaveCount(0);
+  });
+
+  test('should open script guide modal from list row', async ({ page }) => {
+    const guideButton = page.locator('.script-guide-btn').first();
+    const guideModal = page.locator('#scripts-guide-modal');
+    const guideBody = page.locator('#scripts-guide-body');
+
+    await guideButton.click();
+    await expect(guideModal).not.toHaveClass(/hidden/);
+    await expect(guideBody).toContainText('About');
+    await expect(guideBody).toContainText('Install');
+    await expect(guideBody).toContainText('Details');
+    await expect(guideBody).toContainText('Install Methods');
+    await expect(guideBody).toContainText('Version');
+    await expect(guideBody).toContainText('default');
+
+    await page.locator('#scripts-guide-close').click();
+    await expect(guideModal).toHaveClass(/hidden/);
+  });
+
+  test('should keep selection feedback hidden and show install feedback', async ({ page }) => {
+    const firstCheckbox = page.locator('.mock-script-checkbox').first();
+    const secondCheckbox = page.locator('.mock-script-checkbox').nth(1);
+    const feedback = page.locator('#scripts-feedback');
+    const installBtn = page.locator('#scripts-install-btn');
+
+    await firstCheckbox.check();
+    await expect(feedback).toHaveText('');
+    await expect(firstCheckbox).toBeChecked();
+
+    await secondCheckbox.check();
+    await expect(firstCheckbox).not.toBeChecked();
+    await expect(secondCheckbox).toBeChecked();
+    await expect(feedback).toHaveText('');
+
+    await installBtn.click();
+    await expect(feedback).toContainText('Commands copied. Opening shell...');
+  });
+
+  test('should clear scripts search with clear button', async ({ page }) => {
+    const searchInput = page.locator('#scripts-search-input');
+    const clearBtn = page.locator('#scripts-search-clear-btn');
+    const rows = page.locator('#scripts-list .script-row');
+
+    await expect(clearBtn).toHaveClass(/hidden/);
+    await searchInput.fill('ubuntu');
+    await expect(clearBtn).not.toHaveClass(/hidden/);
+    await expect(rows.nth(1)).not.toHaveClass(/hidden/);
+
+    await clearBtn.click();
+    await expect(searchInput).toHaveValue('');
+    await expect(clearBtn).toHaveClass(/hidden/);
+    await expect(rows.nth(0)).not.toHaveClass(/hidden/);
+    await expect(rows.nth(1)).not.toHaveClass(/hidden/);
+  });
+
+  test('should keep scripts clear button positioned inside input', async ({ page }) => {
+    const searchInput = page.locator('#scripts-search-input');
+    const clearBtn = page.locator('#scripts-search-clear-btn');
+
+    await searchInput.fill('alp');
+    await expect(clearBtn).not.toHaveClass(/hidden/);
+
+    const inputBox = await searchInput.boundingBox();
+    const clearBox = await clearBtn.boundingBox();
+    expect(inputBox).toBeTruthy();
+    expect(clearBox).toBeTruthy();
+    expect(clearBox.y).toBeGreaterThanOrEqual(inputBox.y);
+    expect(clearBox.y + clearBox.height).toBeLessThanOrEqual(inputBox.y + inputBox.height);
+  });
 });

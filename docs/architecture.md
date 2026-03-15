@@ -10,10 +10,12 @@ PROXMUX Manager is a Chrome Extension (Manifest V3) designed to manage Proxmox V
 ```mermaid
 graph TD
     UI[Popup / Side Panel] --> API[ProxmoxAPI Library]
+    UI --> CS[CommunityScripts Provider]
     API --> PVE[Proxmox VE API]
     UI --> Storage[chrome.storage.local]
     API --> Cookies[chrome.cookies API]
     UI --> Tabs[chrome.tabs API]
+    CS --> CSWebsite[community-scripts.org]
 ```
 
 ## 3. Core Components
@@ -35,6 +37,7 @@ Uses `chrome.storage.local` to store:
 - API Credentials (URL, Token, Secret).
 - Failover Node URLs (discovered dynamically).
 - User preferences (theme, display settings).
+- Community Scripts catalog/details cache and cache TTL settings.
 
 Uses `localStorage` for popup session UX state:
 - Last search query.
@@ -74,6 +77,13 @@ The popup top-bar search pipeline is designed for fast iterative filtering:
 3. Search reset works via clear button and `Escape`, then re-renders the full filtered list.
 4. Filter group visibility is controlled by a collapsible toggle with an explicit active/collapsed visual state.
 5. Search, filters, and expanded row state are restored when the popup opens again.
+
+### 4.5 Community Scripts Assisted Install Flow
+1. Popup loads Community Scripts catalog via hybrid source strategy (API/JSON first, website fallback).
+2. User searches and selects one or more scripts.
+3. Extension fetches detail data on demand (About text + install URL).
+4. Extension builds trusted install commands and copies them to clipboard.
+5. Extension opens target node shell tab; user pastes and executes manually.
 
 ## 5. Security Model
 - **Token Security**: API Tokens are stored locally in the browser's profile and are never transmitted to any third-party.

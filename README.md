@@ -16,6 +16,7 @@ A dedicated Chrome Extension for Proxmox VE cluster management, providing instan
 - **Enhanced Filters**: Quick-access pills to isolate Nodes, VMs, LXCs, and power status.
 - **Improved Monitoring**: See VM/LXC status, OS types, and IP addresses at a glance.
 - **Intelligent Consoles**: Support for noVNC, SPICE (remote-viewer), and Node Shells.
+- **Community Scripts Assist**: Select scripts, copy install commands, and jump directly into host shell.
 - **Tabbed Settings UI**: Organized "General", "Help", and "About" sections for easier configuration.
 - **Theme Selection**: Manually toggle between **Dark**, **Light**, or **System** themes.
 - **Stability and Performance**: Automated node discovery with seamless failover and expired session detection.
@@ -58,6 +59,13 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 
 - Proxmox VE 6.x or newer.
 - API Token with appropriate permissions (VM.Console and Sys.Audit for node discovery).
+
+## Community Scripts Integration
+
+- Catalog source strategy: API/JSON first, website fallback.
+- Script descriptions are loaded from Community Scripts metadata/page content.
+- Install flow is safe assisted: copy command + open shell; no automatic remote execution.
+- Integration details: `docs/community-scripts-integration.md`.
 
 ## What's New in v1.1.4 🚀
 

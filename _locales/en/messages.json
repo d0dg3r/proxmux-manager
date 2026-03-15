@@ -134,6 +134,129 @@
     "finalizing": {
         "message": "Finalizing..."
     },
+    "communityScriptsTitle": {
+        "message": "Proxmox VE Scripts"
+    },
+    "scriptsHint": {
+        "message": "Select one script, then copy install commands and open the node shell."
+    },
+    "scriptsSearchPlaceholder": {
+        "message": "Search scripts..."
+    },
+    "scriptsRefresh": {
+        "message": "Refresh"
+    },
+    "scriptsToggle": {
+        "message": "Hide"
+    },
+    "scriptsShow": {
+        "message": "Show"
+    },
+    "scriptsInstallAction": {
+        "message": "Copy commands + open shell"
+    },
+    "scriptsLoading": {
+        "message": "Loading script catalog..."
+    },
+    "scriptsLoadedGithubSuffix": {
+        "message": "scripts loaded from GitHub"
+    },
+    "scriptsLoadedCacheSuffix": {
+        "message": "scripts loaded from cache"
+    },
+    "scriptsLoadedCacheFallbackSuffix": {
+        "message": "scripts loaded from cache (GitHub currently unreachable)"
+    },
+    "scriptsSelectedSuffix": {
+        "message": "selected"
+    },
+    "scriptsLoadFailed": {
+        "message": "Could not load scripts catalog."
+    },
+    "scriptsLoadActionHint": {
+        "message": "Could not load scripts catalog. Check internet access to api.github.com/raw.githubusercontent.com and click Refresh."
+    },
+    "scriptsNoResults": {
+        "message": "No matching scripts."
+    },
+    "scriptsNoDescription": {
+        "message": "No description available."
+    },
+    "scriptsSelectFirst": {
+        "message": "Please select at least one script."
+    },
+    "scriptsNoInstallUrl": {
+        "message": "No install URLs found for selected scripts."
+    },
+    "scriptsNoNode": {
+        "message": "No node available for shell opening."
+    },
+    "scriptsCopiedOpening": {
+        "message": "Commands copied. Opening shell..."
+    },
+    "scriptsActionFailed": {
+        "message": "Script action failed."
+    },
+    "scriptsNodeAuto": {
+        "message": "Auto node"
+    },
+    "scriptsTypeAll": {
+        "message": "ALL"
+    },
+    "scriptsTypeCt": {
+        "message": "CT"
+    },
+    "scriptsTypeAlpine": {
+        "message": "ALPINE"
+    },
+    "scriptsTypeVm": {
+        "message": "VM"
+    },
+    "scriptsTypeTurnkey": {
+        "message": "TURNKEY"
+    },
+    "scriptsGuideOpen": {
+        "message": "Guide"
+    },
+    "scriptsGuideClose": {
+        "message": "Close"
+    },
+    "scriptsGuideLoading": {
+        "message": "Loading guide..."
+    },
+    "scriptsGuideFailed": {
+        "message": "Guide content is currently unavailable. You can open the full page."
+    },
+    "scriptsGuideOpenFullPage": {
+        "message": "Open full page"
+    },
+    "scriptsGuideAboutLabel": {
+        "message": "About"
+    },
+    "scriptsGuideNotesLabel": {
+        "message": "Notes"
+    },
+    "scriptsGuideInstallLabel": {
+        "message": "Install"
+    },
+    "scriptsGuideDetailsLabel": {
+        "message": "Details"
+    },
+    "scriptsGuideInstallMethodsLabel": {
+        "message": "Install Methods"
+    },
+    "scriptsGuideTitleFallback": {
+        "message": "Script Guide"
+    },
+    "scriptsCacheHours": {
+        "message": "Catalog cache duration (hours)"
+    },
+    "scriptsDefaultNode": {
+        "message": "Default shell node (optional)"
+    },
+    "scriptsSettingsHelp": {
+        "message": "GitHub catalog is preferred. Cached scripts are used automatically when GitHub is unavailable."
+    },
     "tabManagement": {
         "message": "Tab Management"
     },
