@@ -121,13 +121,14 @@ Use the interactive helper:
 bash scripts/setup_proxmox_token.sh
 ```
 
-### Run directly from GitHub (fresh script on Proxmox host)
+### Run directly from GitHub (pinned version on Proxmox host)
 
 ```bash
-curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
+# Update v1.1.4 to the PROXMUX Manager version you are using
+curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/v1.1.4/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
 ```
 
-This command is zsh-safe (URL is single-quoted) and always pulls the latest script from GitHub.
+This command is zsh-safe (URL is single-quoted) and pins the script to a specific version; you can optionally open `/tmp/setup_proxmox_token.sh` to review it before running, and adjust the tag when you upgrade PROXMUX Manager.
 
 The script can:
 
