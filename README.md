@@ -62,10 +62,10 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - Root token setup is available as a fallback for lab/test environments.
 - Full guide: [docs/proxmox-token-setup.md](docs/proxmox-token-setup.md)
 - Interactive helper script (run on Proxmox host): `bash scripts/setup_proxmox_token.sh`
-- Or run the latest script directly from GitHub:
+- Or run a version-pinned script directly from GitHub (update `v1.1.4` to the latest release tag as needed):
 
 ```bash
-curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
+curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/v1.1.4/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
 ```
 - The helper asks whether to store the token in a uniquely named local file with restrictive permissions (`600`), default `Yes`.
 - Import the token into your password manager immediately, then delete the local token file (`shred -u` preferred, otherwise `rm`).
