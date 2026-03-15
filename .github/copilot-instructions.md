@@ -28,7 +28,7 @@ PROXMUX-Manager/
 ├── docs/
 │   ├── architecture.md
 │   └── roadmap.md
-├── icons/                      # Extension icons (16x16, 48x48, 128x128 PNG)
+├── icons/                      # Extension logo (proxmux_logo.png)
 ├── lib/
 │   └── proxmox-api.js          # Core Proxmox API client (~221 lines)
 ├── options/                    # Settings page
