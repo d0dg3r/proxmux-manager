@@ -6,7 +6,7 @@
 
 - **Type:** Chrome Extension (Manifest V3), zero-build project (no transpilation or bundling)
 - **Primary Language:** JavaScript (ES6 modules)
-- **Current Version:** 1.1.3
+- **Current Version:** 1.1.4
 - **License:** MIT
 
 ---
