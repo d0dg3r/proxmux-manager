@@ -356,6 +356,9 @@
     "helpTab": {
         "message": "Help"
     },
+    "extrasTab": {
+        "message": "Extras"
+    },
     "aboutMadeFor": {
         "message": "Made for DevOps & Sysadmins"
     },
@@ -406,5 +409,35 @@
     },
     "popupHelpSshAgent": {
         "message": "SSH shells need a detected IP; for VMs ensure QEMU Guest Agent is enabled and installed."
+    },
+    "popupHelpSshExport": {
+        "message": "SSH Config Export is in the Extras tab and supports global user defaults, per-host user overrides, and OpenSSH directive defaults."
+    },
+    "sshConfigExportTitle": {
+        "message": "SSH Config Export"
+    },
+    "sshDefaultUserLabel": {
+        "message": "Default SSH user (optional)"
+    },
+    "sshDefaultUserHelp": {
+        "message": "Used when no per-host override is configured."
+    },
+    "sshUserOverridesLabel": {
+        "message": "Per-host user overrides"
+    },
+    "sshUserOverridesHelp": {
+        "message": "One mapping per line: alias: username (or alias=username)."
+    },
+    "sshHostDefaultsLabel": {
+        "message": "SSH host defaults (OpenSSH directives)"
+    },
+    "sshHostDefaultsHelp": {
+        "message": "Use one OpenSSH directive per line. Empty lines and # comments are allowed."
+    },
+    "sshExportDownloadBtn": {
+        "message": "Download SSH Config"
+    },
+    "sshExportCopyBtn": {
+        "message": "Copy SSH Config"
     }
 }

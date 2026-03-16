@@ -48,6 +48,7 @@ Uses `chrome.storage.local` to store:
 - API Credentials legacy fallback keys (kept synchronized for compatibility).
 - Failover Node URLs (discovered dynamically).
 - User preferences (theme, display settings, toolbar click mode).
+- SSH export preferences (global default SSH user, per-host user override map, and shared host defaults).
 - Community Scripts catalog/details cache and cache TTL settings.
 
 Uses `localStorage` for popup session UX state:
@@ -120,6 +121,16 @@ The popup top-bar search pipeline is designed for fast iterative filtering:
 2. Shared reset service creates one default cluster skeleton and removes previous cluster state.
 3. Global defaults are restored (theme/tab mode/display/scripts defaults), legacy credential keys are cleared.
 4. UI runtime state is rehydrated to no-config state and list/tabs are refreshed.
+
+### 4.10 SSH Config Export Flow
+1. User opens Settings (options page or inline settings) and configures export options in the `Extras` tab.
+2. Extension reads all enabled clusters with valid API credentials.
+3. For each cluster, extension fetches `/cluster/resources` and resolves host details (IP + OS hints).
+4. Linux-capable resources (nodes, LXCs, Linux VMs) are normalized into lowercase aliases based on visible list names.
+5. If duplicate aliases occur, a cluster suffix is appended only for colliding entries.
+6. User mapping precedence is applied: per-host override first, then global default user.
+7. Shared OpenSSH directive defaults are emitted once in a top `Host *` block.
+8. Extension generates minimal per-host OpenSSH blocks and outputs them via download or clipboard.
 
 ## 5. Security Model
 - **Token Security**: API Tokens are stored locally in the browser's profile and are never transmitted to any third-party.

@@ -19,6 +19,18 @@ import {
     saveClustersState
 } from '../lib/cluster-store.js';
 import { FACTORY_DEFAULT_DISPLAY_SETTINGS, resetToFactoryDefaults } from '../lib/settings-reset.js';
+import {
+    buildSshConfigFilename,
+    buildSshConfigText,
+    collectSshExportTargets,
+    normalizeSshHostDefaults,
+    normalizeSshUser,
+    normalizeSshUserOverrides,
+    parseSshHostDefaultsText,
+    parseSshUserOverridesText,
+    stringifySshHostDefaults,
+    stringifySshUserOverrides
+} from '../lib/ssh-config-export.js';
 
 const LAST_BROWSER_WINDOW_ID_KEY = 'lastBrowserWindowId';
 const FAVORITES_TAB_ID = '__favorites__';
@@ -61,6 +73,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inlineThemeSelect = document.getElementById('inline-theme-select');
     const inlineTabModeSelect = document.getElementById('inline-tab-mode-select');
     const inlineDefaultActionClickModeSelect = document.getElementById('inline-default-action-click-mode');
+    const inlineSshDefaultUserInput = document.getElementById('inline-ssh-default-user');
+    const inlineSshUserOverridesInput = document.getElementById('inline-ssh-user-overrides');
+    const inlineSshHostDefaultsInput = document.getElementById('inline-ssh-host-defaults');
+    const inlineExportSshConfigBtn = document.getElementById('inline-export-ssh-config-btn');
+    const inlineCopySshConfigBtn = document.getElementById('inline-copy-ssh-config-btn');
     const inlineToggleSecretBtn = document.getElementById('inline-toggle-secret');
     const inlineEyeIcon = document.getElementById('inline-eye-icon');
     const inlineSaveSettingsBtn = document.getElementById('inline-save-settings-btn');
@@ -210,6 +227,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         apiTokenId: 'full-access',
         theme: 'auto',
         consoleTabMode: 'duplicate',
+        sshDefaultUser: '',
+        sshUserOverrides: {},
+        sshHostDefaults: {
+            ServerAliveInterval: '30',
+            ServerAliveCountMax: '3'
+        },
         defaultActionClickMode: 'sidepanel'
     };
     
@@ -240,6 +263,58 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             inlineSettingsStatus.style.color = 'var(--text-secondary)';
         }
+    }
+
+    function getInlineSshSettingsFromInputs() {
+        const sshDefaultUser = normalizeSshUser(inlineSshDefaultUserInput?.value || '');
+        const sshUserOverrides = normalizeSshUserOverrides(
+            parseSshUserOverridesText(inlineSshUserOverridesInput?.value || '')
+        );
+        const sshHostDefaults = normalizeSshHostDefaults(
+            parseSshHostDefaultsText(inlineSshHostDefaultsInput?.value || '')
+        );
+        return { sshDefaultUser, sshUserOverrides, sshHostDefaults };
+    }
+
+    async function downloadTextFile(content, filename) {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        try {
+            await new Promise((resolve, reject) => {
+                chrome.downloads.download(
+                    { url, filename, saveAs: true, conflictAction: 'uniquify' },
+                    (downloadId) => {
+                        if (chrome.runtime.lastError) {
+                            reject(new Error(chrome.runtime.lastError.message));
+                            return;
+                        }
+                        if (!downloadId) {
+                            reject(new Error('Download failed.'));
+                            return;
+                        }
+                        resolve(downloadId);
+                    }
+                );
+            });
+        } finally {
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+    }
+
+    async function buildInlineSshConfig() {
+        const { targets, errors } = await collectSshExportTargets(clusters, (cluster) => (
+            new ProxmoxAPI(cluster.proxmoxUrl, cluster.apiToken, cluster.failoverUrls || [])
+        ));
+        if (!targets.length) {
+            throw new Error('No Linux hosts with detected IP were found for SSH export.');
+        }
+        const sshSettings = getInlineSshSettingsFromInputs();
+        const text = buildSshConfigText(targets, {
+            defaultUser: sshSettings.sshDefaultUser,
+            userOverrides: sshSettings.sshUserOverrides,
+            hostDefaults: sshSettings.sshHostDefaults
+        });
+        return { text, targetCount: targets.length, errorCount: errors.length, ...sshSettings };
     }
 
     function attachClearButtonsToInputs(inputIds) {
@@ -281,6 +356,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'inline-proxmox-url',
         'inline-api-user',
         'inline-api-tokenid',
+        'inline-ssh-default-user',
+        'inline-ssh-host-defaults',
         'inline-export-password',
         'inline-export-password-confirm',
         'inline-import-password'
@@ -305,7 +382,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function setActiveInlineSettingsSubtab(tab) {
-        const targetTab = ['cluster', 'backup', 'help', 'about'].includes(tab) ? tab : 'cluster';
+        const targetTab = ['cluster', 'backup', 'extras', 'help', 'about'].includes(tab) ? tab : 'cluster';
         inlineSettingsSubtabButtons.forEach((btn) => {
             btn.classList.toggle('active', btn.dataset.inlineSettingsSubtab === targetTab);
         });
@@ -509,6 +586,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         inlineApiSecretInput.value = editableCluster?.apiSecret || '';
         inlineThemeSelect.value = settings.theme || 'auto';
         inlineTabModeSelect.value = settings.consoleTabMode || 'duplicate';
+        inlineSshDefaultUserInput.value = normalizeSshUser(settings.sshDefaultUser || DEFAULT_SETTINGS.sshDefaultUser);
+        inlineSshUserOverridesInput.value = stringifySshUserOverrides(settings.sshUserOverrides || DEFAULT_SETTINGS.sshUserOverrides);
+        inlineSshHostDefaultsInput.value = stringifySshHostDefaults(settings.sshHostDefaults || DEFAULT_SETTINGS.sshHostDefaults);
         inlineDefaultActionClickModeSelect.value = ['sidepanel', 'floating'].includes(settings.defaultActionClickMode)
             ? settings.defaultActionClickMode
             : 'sidepanel';
@@ -525,7 +605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         resetAboutEasterEgg();
         populateInlineSettingsFields();
         setActiveInlineSettingsSubtab(
-            options.targetSubtab === 'backup' || options.targetSubtab === 'help' || options.targetSubtab === 'about'
+            options.targetSubtab === 'backup' || options.targetSubtab === 'extras' || options.targetSubtab === 'help' || options.targetSubtab === 'about'
                 ? options.targetSubtab
                 : 'cluster'
         );
@@ -760,6 +840,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    inlineExportSshConfigBtn?.addEventListener('click', async () => {
+        resetInlineResetConfirmation();
+        setInlineSettingsStatus('Building SSH config...', 'info');
+        try {
+            const { text, targetCount, errorCount, sshDefaultUser, sshUserOverrides, sshHostDefaults } = await buildInlineSshConfig();
+            await chrome.storage.local.set({ sshDefaultUser, sshUserOverrides, sshHostDefaults });
+            settings = { ...settings, sshDefaultUser, sshUserOverrides, sshHostDefaults };
+            await downloadTextFile(text, buildSshConfigFilename());
+            setInlineSettingsStatus(
+                errorCount > 0
+                    ? `SSH config downloaded (${targetCount} hosts, ${errorCount} cluster errors).`
+                    : `SSH config downloaded (${targetCount} hosts).`,
+                'success'
+            );
+        } catch (error) {
+            setInlineSettingsStatus(`SSH export failed: ${error.message || 'Unknown error.'}`, 'error');
+        }
+    });
+
+    inlineCopySshConfigBtn?.addEventListener('click', async () => {
+        resetInlineResetConfirmation();
+        setInlineSettingsStatus('Building SSH config...', 'info');
+        try {
+            const { text, targetCount, errorCount, sshDefaultUser, sshUserOverrides, sshHostDefaults } = await buildInlineSshConfig();
+            await chrome.storage.local.set({ sshDefaultUser, sshUserOverrides, sshHostDefaults });
+            settings = { ...settings, sshDefaultUser, sshUserOverrides, sshHostDefaults };
+            await navigator.clipboard.writeText(text);
+            setInlineSettingsStatus(
+                errorCount > 0
+                    ? `SSH config copied (${targetCount} hosts, ${errorCount} cluster errors).`
+                    : `SSH config copied (${targetCount} hosts).`,
+                'success'
+            );
+        } catch (error) {
+            setInlineSettingsStatus(`SSH copy failed: ${error.message || 'Unknown error.'}`, 'error');
+        }
+    });
+
     async function runInlineImportSettings() {
         if (isInlineImportingSettings) return;
         resetInlineResetConfirmation();
@@ -914,6 +1032,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             apiToken: payload.apiToken,
             theme: payload.theme,
             consoleTabMode: payload.consoleTabMode,
+            sshDefaultUser: payload.sshDefaultUser,
+            sshUserOverrides: payload.sshUserOverrides,
+            sshHostDefaults: payload.sshHostDefaults,
             defaultActionClickMode: payload.defaultActionClickMode
         });
         syncClusterApiClients();
@@ -930,6 +1051,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const secret = inlineApiSecretInput.value.trim();
         const previousUrl = settings?.proxmoxUrl || null;
         const previousToken = settings?.apiToken || null;
+        let sshDefaultUser = '';
+        let sshUserOverrides = {};
+        let sshHostDefaults = {};
+
+        try {
+            const sshSettings = getInlineSshSettingsFromInputs();
+            sshDefaultUser = sshSettings.sshDefaultUser;
+            sshUserOverrides = sshSettings.sshUserOverrides;
+            sshHostDefaults = sshSettings.sshHostDefaults;
+        } catch (error) {
+            setInlineSettingsStatus(`SSH settings error: ${error.message || 'Invalid SSH settings.'}`, 'error');
+            return;
+        }
 
         if (!normalized.ok || !user || !tokenId || !secret) {
             setInlineSettingsStatus(normalized.ok ? 'Please fill in all fields.' : normalized.error, 'error');
@@ -944,6 +1078,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             apiToken: `${user}!${tokenId}=${secret}`,
             theme: inlineThemeSelect.value,
             consoleTabMode: inlineTabModeSelect.value,
+            sshDefaultUser,
+            sshUserOverrides,
+            sshHostDefaults,
             defaultActionClickMode: inlineDefaultActionClickModeSelect.value === 'floating' ? 'floating' : 'sidepanel'
         };
 
@@ -973,6 +1110,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const user = inlineApiUserInput.value.trim();
         const tokenId = inlineApiTokenIdInput.value.trim();
         const secret = inlineApiSecretInput.value.trim();
+        let sshDefaultUser = '';
+        let sshUserOverrides = {};
+        let sshHostDefaults = {};
+
+        try {
+            const sshSettings = getInlineSshSettingsFromInputs();
+            sshDefaultUser = sshSettings.sshDefaultUser;
+            sshUserOverrides = sshSettings.sshUserOverrides;
+            sshHostDefaults = sshSettings.sshHostDefaults;
+        } catch (error) {
+            setInlineSettingsStatus(`SSH settings error: ${error.message || 'Invalid SSH settings.'}`, 'error');
+            return;
+        }
 
         if (!normalized.ok || !user || !tokenId || !secret) {
             setInlineSettingsStatus(normalized.ok ? 'Please fill in all fields to test.' : normalized.error, 'error');
@@ -995,6 +1145,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 apiToken: `${user}!${tokenId}=${secret}`,
                 theme: inlineThemeSelect.value,
                 consoleTabMode: inlineTabModeSelect.value,
+                sshDefaultUser,
+                sshUserOverrides,
+                sshHostDefaults,
                 defaultActionClickMode: inlineDefaultActionClickModeSelect.value === 'floating' ? 'floating' : 'sidepanel'
             };
             await persistActiveClusterPayload(payload);
@@ -1039,6 +1192,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             defaultActionClickMode: resetResult.storagePayload.defaultActionClickMode,
             communityScriptsCacheTtlHours: resetResult.storagePayload.communityScriptsCacheTtlHours,
             defaultScriptNode: resetResult.storagePayload.defaultScriptNode,
+            sshDefaultUser: resetResult.storagePayload.sshDefaultUser,
+            sshUserOverrides: resetResult.storagePayload.sshUserOverrides,
+            sshHostDefaults: resetResult.storagePayload.sshHostDefaults,
             scriptsPanelCollapsed: resetResult.storagePayload.scriptsPanelCollapsed,
             expandDetailsByDefault: resetResult.storagePayload.expandDetailsByDefault,
             favoriteResourceIds: resetResult.storagePayload.favoriteResourceIds
@@ -1510,12 +1666,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const savedFavoriteResourceIds = Array.isArray(stored.favoriteResourceIds)
             ? stored.favoriteResourceIds.filter((id) => typeof id === 'string' && id.trim())
             : [];
+        const sshDefaultUser = normalizeSshUser(stored.sshDefaultUser || DEFAULT_SETTINGS.sshDefaultUser);
+        const sshUserOverrides = normalizeSshUserOverrides(stored.sshUserOverrides || DEFAULT_SETTINGS.sshUserOverrides);
+        const sshHostDefaults = normalizeSshHostDefaults(stored.sshHostDefaults || DEFAULT_SETTINGS.sshHostDefaults);
         favoriteResourceIds = new Set(savedFavoriteResourceIds);
         expandDetailsByDefault = Boolean(stored.expandDetailsByDefault);
         settings = {
             ...stored,
             theme: stored.theme || DEFAULT_SETTINGS.theme,
             consoleTabMode: stored.consoleTabMode || DEFAULT_SETTINGS.consoleTabMode,
+            sshDefaultUser,
+            sshUserOverrides,
+            sshHostDefaults,
             defaultActionClickMode: stored.defaultActionClickMode || DEFAULT_SETTINGS.defaultActionClickMode,
             favoriteResourceIds: savedFavoriteResourceIds,
             expandDetailsByDefault
@@ -1649,6 +1811,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         'consoleTabMode',
         'communityScriptsCacheTtlHours',
         'defaultScriptNode',
+        'sshDefaultUser',
+        'sshUserOverrides',
+        'sshHostDefaults',
         'defaultActionClickMode',
         'scriptsPanelCollapsed',
         'expandDetailsByDefault',

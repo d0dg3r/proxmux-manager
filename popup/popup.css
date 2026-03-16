@@ -551,6 +551,13 @@ body.settings-view-active #main-view-content {
     font-weight: 600;
 }
 
+.inline-settings-form-group small {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
 .inline-settings-form-group input,
 .inline-form-control {
     width: 100%;
@@ -616,6 +623,12 @@ body.settings-view-active #main-view-content {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px hsla(180, 70%, 50%, 0.1);
+}
+
+textarea.inline-form-control {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.4;
 }
 
 .inline-settings-form-row {

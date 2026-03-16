@@ -338,6 +338,14 @@ input.has-clear-control {
     text-align: center;
 }
 
+#extras-status {
+    margin-top: 12px;
+    min-height: 16px;
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
 /* Tabs Styling */
 .tabs {
     display: flex;
@@ -583,5 +591,12 @@ input.has-clear-control {
     box-sizing: border-box;
     font-size: 0.9rem;
     cursor: pointer;
+}
+
+textarea.form-control {
+    cursor: text;
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.45;
 }
 

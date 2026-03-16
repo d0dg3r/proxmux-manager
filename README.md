@@ -21,6 +21,7 @@ A dedicated Chrome Extension for Proxmox VE cluster management, providing instan
 - **Guided No-Config Onboarding**: Start with `Configure` or directly use `Import Settings` for restore-first setup.
 - **Inline Advanced Settings**: Open and edit settings directly inside the current extension view, including Help and About sections.
 - **Community Scripts Assist**: Select scripts, copy install commands, and jump directly into host shell.
+- **SSH Config Export (Extras Tab)**: Export Linux host entries as OpenSSH config, with global default user, per-host user overrides, and reusable OpenSSH directive defaults.
 - **Theme Selection**: Manually toggle between **Dark**, **Light**, or **System** themes.
 - **Stability and Performance**: Automated node discovery with seamless failover and expired session detection.
 - **Secure**: Uses Proxmox API Tokens for authentication; all credentials stay local.
@@ -64,6 +65,16 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
     - **API Secret**: the token secret value.
 4. Click **Save Settings** and grant host permissions.
 5. **High Availability**: Once configured, the extension will automatically discover other cluster nodes and store them for failover.
+
+### SSH Config Export
+
+- Open **Settings** and switch to the **Extras** tab.
+- Set an optional global **Default SSH user** (for example `root` or `ubuntu`).
+- Add optional per-host overrides (`alias: username`) when specific machines require a different user.
+- Define shared host defaults with OpenSSH directives (for example `Port 22`, `IdentityFile ~/.ssh/id_ed25519`, `ProxyJump bastion.example.com`).
+- Use **Download SSH Config** or **Copy SSH Config** to export all detected Linux hosts with IP addresses.
+- Exported `Host` aliases use the visible machine names in lowercase; only collisions get a cluster suffix.
+- Add the output to your `~/.ssh/config`.
 
 ## Proxmox API Token Setup
 

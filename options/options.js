@@ -15,6 +15,18 @@ import {
     saveClustersState
 } from '../lib/cluster-store.js';
 import { resetToFactoryDefaults } from '../lib/settings-reset.js';
+import {
+    buildSshConfigFilename,
+    buildSshConfigText,
+    collectSshExportTargets,
+    normalizeSshHostDefaults,
+    normalizeSshUser,
+    normalizeSshUserOverrides,
+    parseSshHostDefaultsText,
+    parseSshUserOverridesText,
+    stringifySshHostDefaults,
+    stringifySshUserOverrides
+} from '../lib/ssh-config-export.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const proxmoxUrlInput = document.getElementById('proxmox-url');
@@ -27,9 +39,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resetBtn = document.getElementById('reset-settings-btn');
     const closeBtn = document.getElementById('close-settings-btn');
     const status = document.getElementById('status');
+    const extrasStatus = document.getElementById('extras-status');
     const toggleSecretBtn = document.getElementById('toggle-secret');
     const scriptsCacheTtlInput = document.getElementById('scripts-cache-ttl');
     const defaultScriptNodeInput = document.getElementById('default-script-node');
+    const sshDefaultUserInput = document.getElementById('ssh-default-user');
+    const sshUserOverridesInput = document.getElementById('ssh-user-overrides');
+    const sshHostDefaultsInput = document.getElementById('ssh-host-defaults');
+    const exportSshConfigBtn = document.getElementById('export-ssh-config-btn');
+    const copySshConfigBtn = document.getElementById('copy-ssh-config-btn');
     const defaultActionClickModeSelect = document.getElementById('default-action-click-mode');
     const expandDetailsDefaultCheckbox = document.getElementById('expand-details-default');
     const openFloatingWindowBtn = document.getElementById('open-floating-window-btn');
@@ -57,6 +75,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         consoleTabMode: 'duplicate',
         communityScriptsCacheTtlHours: 12,
         defaultScriptNode: '',
+        sshDefaultUser: '',
+        sshUserOverrides: {},
+        sshHostDefaults: {
+            ServerAliveInterval: '30',
+            ServerAliveCountMax: '3'
+        },
         defaultActionClickMode: 'sidepanel',
         expandDetailsByDefault: false
     };
@@ -112,10 +136,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         'api-user',
         'api-tokenid',
         'default-script-node',
+        'ssh-default-user',
+        'ssh-host-defaults',
         'export-password',
         'export-password-confirm',
         'import-password'
     ]);
+
+    function getSshSettingsFromInputs() {
+        const sshDefaultUser = normalizeSshUser(sshDefaultUserInput?.value || '');
+        const sshUserOverrides = normalizeSshUserOverrides(
+            parseSshUserOverridesText(sshUserOverridesInput?.value || '')
+        );
+        const sshHostDefaults = normalizeSshHostDefaults(
+            parseSshHostDefaultsText(sshHostDefaultsInput?.value || '')
+        );
+        return { sshDefaultUser, sshUserOverrides, sshHostDefaults };
+    }
+
+    async function persistSshSettingsFromInputs() {
+        const { sshDefaultUser, sshUserOverrides, sshHostDefaults } = getSshSettingsFromInputs();
+        await chrome.storage.local.set({ sshDefaultUser, sshUserOverrides, sshHostDefaults });
+        return { sshDefaultUser, sshUserOverrides, sshHostDefaults };
+    }
+
+    async function buildSshConfigForExport() {
+        const { sshDefaultUser, sshUserOverrides, sshHostDefaults } = await persistSshSettingsFromInputs();
+        const { targets, errors } = await collectSshExportTargets(clusters, (cluster) => (
+            new ProxmoxAPI(cluster.proxmoxUrl, cluster.apiToken, cluster.failoverUrls || [])
+        ));
+        if (!targets.length) {
+            throw new Error('No Linux hosts with detected IP were found for SSH export.');
+        }
+        const text = buildSshConfigText(targets, {
+            defaultUser: sshDefaultUser,
+            userOverrides: sshUserOverrides,
+            hostDefaults: sshHostDefaults
+        });
+        return { text, targetCount: targets.length, errorCount: errors.length };
+    }
+
+    async function downloadTextFile(content, filename) {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        try {
+            await new Promise((resolve, reject) => {
+                chrome.downloads.download(
+                    { url, filename, saveAs: true, conflictAction: 'uniquify' },
+                    (downloadId) => {
+                        if (chrome.runtime.lastError) {
+                            reject(new Error(chrome.runtime.lastError.message));
+                            return;
+                        }
+                        if (!downloadId) {
+                            reject(new Error('Download failed.'));
+                            return;
+                        }
+                        resolve(downloadId);
+                    }
+                );
+            });
+        } finally {
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+    }
 
     function normalizeAndValidateHttpsUrl(input) {
         const raw = (input || '').trim();
@@ -319,6 +403,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             'consoleTabMode',
             'communityScriptsCacheTtlHours',
             'defaultScriptNode',
+            'sshDefaultUser',
+            'sshUserOverrides',
+            'sshHostDefaults',
             'defaultActionClickMode',
             'expandDetailsByDefault'
         ]);
@@ -335,6 +422,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         fillClusterForm();
         scriptsCacheTtlInput.value = Number(items.communityScriptsCacheTtlHours || 12);
         defaultScriptNodeInput.value = items.defaultScriptNode || '';
+        sshDefaultUserInput.value = normalizeSshUser(items.sshDefaultUser || DEFAULT_SETTINGS.sshDefaultUser);
+        sshUserOverridesInput.value = stringifySshUserOverrides(items.sshUserOverrides || DEFAULT_SETTINGS.sshUserOverrides);
+        sshHostDefaultsInput.value = stringifySshHostDefaults(items.sshHostDefaults || DEFAULT_SETTINGS.sshHostDefaults);
         defaultActionClickModeSelect.value = ['sidepanel', 'floating'].includes(items.defaultActionClickMode)
             ? items.defaultActionClickMode
             : 'sidepanel';
@@ -467,6 +557,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const theme = themeSelect.value;
         const communityScriptsCacheTtlHours = Math.max(1, Math.min(168, Number(scriptsCacheTtlInput.value || 12)));
         const defaultScriptNode = defaultScriptNodeInput.value.trim();
+        let sshDefaultUser = '';
+        let sshUserOverrides = {};
+        let sshHostDefaults = {};
+        try {
+            const sshSettings = getSshSettingsFromInputs();
+            sshDefaultUser = sshSettings.sshDefaultUser;
+            sshUserOverrides = sshSettings.sshUserOverrides;
+            sshHostDefaults = sshSettings.sshHostDefaults;
+        } catch (error) {
+            status.textContent = `SSH settings error: ${error.message || 'Invalid SSH settings.'}`;
+            status.style.color = 'var(--error)';
+            return;
+        }
         const defaultActionClickMode = defaultActionClickModeSelect.value === 'floating' ? 'floating' : 'sidepanel';
         const expandDetailsByDefault = Boolean(expandDetailsDefaultCheckbox?.checked);
 
@@ -484,6 +587,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             consoleTabMode: document.getElementById('tab-mode-select').value,
             communityScriptsCacheTtlHours,
             defaultScriptNode,
+            sshDefaultUser,
+            sshUserOverrides,
+            sshHostDefaults,
             defaultActionClickMode,
             expandDetailsByDefault
         });
@@ -563,6 +669,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             status.textContent = `Export failed: ${error.message || 'Unknown error.'}`;
             status.style.color = 'var(--error)';
+        }
+    });
+
+    exportSshConfigBtn?.addEventListener('click', async () => {
+        resetOptionsResetConfirmation();
+        if (extrasStatus) {
+            extrasStatus.textContent = 'Building SSH config...';
+            extrasStatus.style.color = 'var(--text-secondary)';
+        }
+        try {
+            await persistClusterFromForm();
+            const { text, targetCount, errorCount } = await buildSshConfigForExport();
+            await downloadTextFile(text, buildSshConfigFilename());
+            const message = errorCount > 0
+                ? `SSH config downloaded (${targetCount} hosts, ${errorCount} cluster errors).`
+                : `SSH config downloaded (${targetCount} hosts).`;
+            if (extrasStatus) {
+                extrasStatus.textContent = message;
+                extrasStatus.style.color = 'var(--success)';
+            }
+        } catch (error) {
+            if (extrasStatus) {
+                extrasStatus.textContent = `SSH export failed: ${error.message || 'Unknown error.'}`;
+                extrasStatus.style.color = 'var(--error)';
+            }
+        }
+    });
+
+    copySshConfigBtn?.addEventListener('click', async () => {
+        resetOptionsResetConfirmation();
+        if (extrasStatus) {
+            extrasStatus.textContent = 'Building SSH config...';
+            extrasStatus.style.color = 'var(--text-secondary)';
+        }
+        try {
+            await persistClusterFromForm();
+            const { text, targetCount, errorCount } = await buildSshConfigForExport();
+            await navigator.clipboard.writeText(text);
+            const message = errorCount > 0
+                ? `SSH config copied (${targetCount} hosts, ${errorCount} cluster errors).`
+                : `SSH config copied (${targetCount} hosts).`;
+            if (extrasStatus) {
+                extrasStatus.textContent = message;
+                extrasStatus.style.color = 'var(--success)';
+            }
+        } catch (error) {
+            if (extrasStatus) {
+                extrasStatus.textContent = `SSH copy failed: ${error.message || 'Unknown error.'}`;
+                extrasStatus.style.color = 'var(--error)';
+            }
         }
     });
 

@@ -192,6 +192,7 @@
                 <div class="inline-settings-subtabs" role="tablist" aria-label="Settings Sections">
                     <button type="button" class="inline-settings-subtab-btn active" data-inline-settings-subtab="cluster">Cluster</button>
                     <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="backup">Backup & Restore</button>
+                    <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="extras" data-i18n="extrasTab">Extras</button>
                     <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="help" data-i18n="helpTab">Help</button>
                     <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="about" data-i18n="aboutTab">About</button>
                 </div>
@@ -263,6 +264,7 @@
                         <option value="floating" data-i18n="clickModeFloating">Open floating window</option>
                     </select>
                 </div>
+
                 </div>
 
                 <div class="inline-settings-subtab-panel" data-inline-settings-panel="backup">
@@ -296,6 +298,31 @@
                     <div class="inline-settings-cluster-actions">
                         <button id="inline-import-settings-btn" type="button" class="inline-action-btn secondary">Import Encrypted Settings</button>
                     </div>
+                </div>
+                </div>
+
+                <div class="inline-settings-subtab-panel" data-inline-settings-panel="extras">
+                <div class="inline-settings-form-group">
+                    <label for="inline-ssh-default-user" data-i18n="sshDefaultUserLabel">Default SSH user (optional)</label>
+                    <input type="text" id="inline-ssh-default-user" placeholder="root">
+                    <small data-i18n="sshDefaultUserHelp">Used when no per-host override is configured.</small>
+                </div>
+
+                <div class="inline-settings-form-group">
+                    <label for="inline-ssh-user-overrides" data-i18n="sshUserOverridesLabel">Per-host user overrides</label>
+                    <textarea id="inline-ssh-user-overrides" class="inline-form-control" rows="4" placeholder="web-01: ubuntu&#10;pve01: root"></textarea>
+                    <small data-i18n="sshUserOverridesHelp">One mapping per line: alias: username (or alias=username).</small>
+                </div>
+
+                <div class="inline-settings-form-group">
+                    <label for="inline-ssh-host-defaults" data-i18n="sshHostDefaultsLabel">SSH host defaults (OpenSSH directives)</label>
+                    <textarea id="inline-ssh-host-defaults" class="inline-form-control" rows="5" placeholder="# Applied to every exported host&#10;Port 22&#10;IdentityFile ~/.ssh/id_ed25519&#10;ProxyJump bastion.example.com"></textarea>
+                    <small data-i18n="sshHostDefaultsHelp">Use one OpenSSH directive per line. Empty lines and # comments are allowed.</small>
+                </div>
+
+                <div class="inline-settings-cluster-actions">
+                    <button id="inline-export-ssh-config-btn" type="button" class="inline-action-btn secondary" data-i18n="sshExportDownloadBtn">Download SSH Config</button>
+                    <button id="inline-copy-ssh-config-btn" type="button" class="inline-action-btn secondary" data-i18n="sshExportCopyBtn">Copy SSH Config</button>
                 </div>
                 </div>
 
@@ -341,6 +368,7 @@
                             <li data-i18n="popupHelpRequiredPermissions">Required permissions: VM.Console and Sys.Audit (for SPICE also VM.Config.Options or PVEVMAdmin).</li>
                             <li data-i18n="popupHelpSelfSigned">Self-signed certificates: open your Proxmox URL in a browser tab once and trust the certificate.</li>
                             <li data-i18n="popupHelpSshAgent">SSH shells need a detected IP; for VMs ensure QEMU Guest Agent is enabled and installed.</li>
+                            <li data-i18n="popupHelpSshExport">SSH Config Export supports a global default user, per-host user overrides, and OpenSSH directive defaults.</li>
                         </ul>
                     </div>
 
