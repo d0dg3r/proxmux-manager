@@ -38,6 +38,7 @@ Perfect for DevOps engineers and home-server enthusiasts who need a fast, profes
 ```
 
 Use the English section above as the canonical source text. If localized storefront text is needed (for example German), derive it from the English block during store submission prep.
+For convenience during store submission, the current German storefront draft is maintained in `store/CWS_DESCRIPTION_DE.txt`.
 
 ---
 
@@ -55,13 +56,16 @@ Use the English section above as the canonical source text. If localized storefr
 3. **`tabs`**:
    - *Justification*: Required to programmatically open and manage new browser tabs for Proxmox console interfaces (noVNC, SPICE, and Shell).
 
-3. **`downloads` & `downloads.open`**:
+4. **`scripting`**:
+   - *Justification*: Required to run limited in-page scripts for assisted console workflows, such as best-effort command insertion in trusted Proxmox console tabs initiated by the user.
+
+5. **`downloads` & `downloads.open`**:
    - *Justification*: Necessary to generate and automatically launch SPICE configuration files (.vv) for external viewer applications like remote-viewer.
 
-4. **`cookies`**:
+6. **`cookies`**:
    - *Justification*: Required to verify if the user has an active Proxmox Web UI session cookie. This prevents 401 errors when opening interactive consoles, ensuring a seamless user experience.
 
-5. **Host Permissions (`https://*/*`)**:
+7. **Host Permissions (`https://*/*`)**:
    - *Justification*: Needed to communicate with self-hosted Proxmox VE API endpoints. The extension only sends requests to URLs explicitly configured by the user.
 
 ### User Data Policy:
