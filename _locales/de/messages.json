@@ -29,6 +29,24 @@
     "saveSettings": {
         "message": "Einstellungen speichern"
     },
+    "resetSettings": {
+        "message": "Einstellungen zurücksetzen"
+    },
+    "resetSettingsConfirm": {
+        "message": "Alle Einstellungen auf Standardwerte zurücksetzen?"
+    },
+    "resetSettingsSuccess": {
+        "message": "Einstellungen wurden auf Standardwerte zurückgesetzt."
+    },
+    "resetSettingsCancelled": {
+        "message": "Zurücksetzen abgebrochen."
+    },
+    "resetSettingsConfirmAgainLabel": {
+        "message": "Zum Zurücksetzen erneut klicken"
+    },
+    "resetSettingsConfirmAgainHint": {
+        "message": "Klicke erneut auf \"Einstellungen zurücksetzen\", um alle Einstellungen zurückzusetzen."
+    },
     "proxmoxUrl": {
         "message": "Proxmox URL"
     },
@@ -304,5 +322,89 @@
     },
     "openFloatingWindowNow": {
         "message": "Floating-Fenster jetzt öffnen"
+    },
+    "aboutTab": {
+        "message": "Über"
+    },
+    "aboutProjectCredit": {
+        "message": "Created 2026 by d0dg3r (Joe Mild)."
+    },
+    "aboutProjectHomage": {
+        "message": "Dieses Projekt ist eine Hommage an Proxmox VE 0.9, erstmals veroeffentlicht am 15. April 2008 — und ein kleines Augenzwinkern an grosse Meilensteine der Computergeschichte: Linux, Git und Proxmox ;)"
+    },
+    "aboutLicenseLabel": {
+        "message": "License:"
+    },
+    "aboutLicenseMitLink": {
+        "message": "MIT"
+    },
+    "aboutSupportTitle": {
+        "message": "Support & Community"
+    },
+    "aboutSupportRepo": {
+        "message": "Repository"
+    },
+    "aboutSupportIssues": {
+        "message": "Issues"
+    },
+    "aboutSupportAuthor": {
+        "message": "Autor-Profil"
+    },
+    "aboutSupportSponsor": {
+        "message": "Sponsor"
+    },
+    "helpTab": {
+        "message": "Hilfe"
+    },
+    "aboutMadeFor": {
+        "message": "Gemacht für DevOps & Sysadmins"
+    },
+    "aboutRevealEasterEgg": {
+        "message": "Klassische UI (2008) anzeigen"
+    },
+    "aboutHideEasterEgg": {
+        "message": "Klassische UI (2008) ausblenden"
+    },
+    "aboutClassicCaption": {
+        "message": "Klassische UI (2008)"
+    },
+    "helpTokenSetupTitle": {
+        "message": "Proxmox API-Token Setup"
+    },
+    "helpTokenSetupPointDedicated": {
+        "message": "Empfehlung: Einen dedizierten API-Benutzer erstellen und ACLs explizit zuweisen."
+    },
+    "helpTokenSetupPointRootFallback": {
+        "message": "Ein Root-Token-Setup ist als Fallback für Labor/Test-Umgebungen möglich."
+    },
+    "helpTokenSetupPointStorage": {
+        "message": "Der Helper kann das Token in einer eindeutig benannten lokalen Datei mit restriktiven Rechten (600) speichern."
+    },
+    "helpTokenSetupPointCleanup": {
+        "message": "Token sofort in den Passwortmanager übernehmen und die lokale Token-Datei danach löschen (bevorzugt mit shred -u)."
+    },
+    "helpTokenSetupGuideLabel": {
+        "message": "Vollständiger Leitfaden:"
+    },
+    "helpTokenSetupHelperLabel": {
+        "message": "Interaktiven Helper direkt auf einem Proxmox-Host ausführen:"
+    },
+    "helpTokenSetupZshLabel": {
+        "message": "zsh-sicheres curl-Beispiel (Anführungszeichen sind wichtig):"
+    },
+    "helpSupportTitle": {
+        "message": "Support & Community"
+    },
+    "popupTroubleshootingTitle": {
+        "message": "Fehlerbehebung"
+    },
+    "popupHelpRequiredPermissions": {
+        "message": "Erforderliche Berechtigungen: VM.Console und Sys.Audit (für SPICE zusätzlich VM.Config.Options oder PVEVMAdmin)."
+    },
+    "popupHelpSelfSigned": {
+        "message": "Self-signed Zertifikate: Proxmox-URL einmal im Browser öffnen und das Zertifikat vertrauen."
+    },
+    "popupHelpSshAgent": {
+        "message": "SSH-Shells benötigen eine erkannte IP; bei VMs sicherstellen, dass der QEMU Guest Agent aktiviert und installiert ist."
     }
 }

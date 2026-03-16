@@ -25,13 +25,16 @@ A dedicated Chrome Extension for Proxmox VE cluster management, providing instan
 
 ## UI & Themes
 
-| Dark Mode (Default) | Light Mode |
-| :---: | :---: |
-| ![Dark Mode](store/screenshot_dark.png) | ![Light Mode](store/screenshot_light.png) |
-
-Additional compact variants for store and docs:
-- `store/screenshot_dark_640x400.png`
-- `store/screenshot_light_640x400.png`
+- **Multi-Cluster Command Center (Light + Dark)**  
+  ![Multi Cluster Combined](store/screenshot_01_multi_cluster_1280x800.png)
+- **Live Machine Drill-Down (Light + Dark)**  
+  ![Expanded Resource Combined](store/screenshot_02_resource_expanded_1280x800.png)
+- **No-Config Guided Start (Light + Dark)**  
+  ![Onboarding Combined](store/screenshot_03_onboarding_1280x800.png)
+- **Settings > Cluster (Light + Dark)**  
+  ![Settings Cluster Combined](store/screenshot_04_settings_cluster_1280x800.png)
+- **Settings > Backup & Restore (Light + Dark)**  
+  ![Settings Backup Combined](store/screenshot_05_settings_backup_1280x800.png)
 
 ## Installation
 
@@ -61,11 +64,11 @@ You can install PROXMUX Manager directly from the [Chrome Web Store](https://chr
 - Default recommendation: create a dedicated API user and assign ACLs explicitly.
 - Root token setup is available as a fallback for lab/test environments.
 - Full guide: [docs/proxmox-token-setup.md](docs/proxmox-token-setup.md)
-- Interactive helper script (run on Proxmox host): `bash scripts/setup_proxmox_token.sh`
-- Or run a version-pinned script directly from GitHub (update `v1.1.4` to the latest release tag as needed):
+- Run the interactive helper directly on a Proxmox host:
 
 ```bash
-curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/v1.1.4/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
+curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/refs/heads/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' &&
+bash '/tmp/setup_proxmox_token.sh'
 ```
 - The helper asks whether to store the token in a uniquely named local file with restrictive permissions (`600`), default `Yes`.
 - Import the token into your password manager immediately, then delete the local token file (`shred -u` preferred, otherwise `rm`).
@@ -93,15 +96,20 @@ If PROXMUX only shows nodes but not VMs/LXCs, validate token rights first (`Sys.
 
 - Screenshot assets are maintained in the release branch/PR as part of release preparation.
 - Regenerate with `node store/generate_screenshots_ci.js` when UI changes.
-- Commit updated `store/screenshot_*.png` files in the same release branch.
+- Commit updated combined assets:
+  - `store/screenshot_01_multi_cluster_1280x800.png`
+  - `store/screenshot_02_resource_expanded_1280x800.png`
+  - `store/screenshot_03_onboarding_1280x800.png`
+  - `store/screenshot_04_settings_cluster_1280x800.png`
+  - `store/screenshot_05_settings_backup_1280x800.png`
 
-## What's New in v1.2.0-beta.2
+## What's New in v1.2.0-beta.3
 
-- **New Action Behavior**: Toolbar click behavior is now configurable (Side Panel or Floating Window).
-- **In-View Settings Workflow**: Advanced settings open inline inside side panel/floating view, with quick toggle and consistent styling.
-- **Display UX Refresh**: Display toggles are now compact chips directly below filters for better scanability.
-- **Visual Polish**: Better light-mode contrast and consistent console action coloring in both themes.
-- **Layout Improvements**: Filter/view chip sizing is unified; `Shell` now appears before `SSH`.
+- **Multi-Cluster Factory Reset**: `Reset Settings` now resets all clusters to one default cluster and restores global defaults in both popup and options.
+- **No-Config Entry Improvements**: Users can choose `Configure` or `Import Settings` directly from the no-config banner.
+- **Import-First Onboarding**: In no-config import mode, backup export and Save/Test actions are hidden to keep restore flow focused.
+- **In-Addon Confirmations Only**: Removed native browser confirm/alert dialogs; reset and SPICE error messaging now stays fully inside the extension UI.
+- **Store Screenshot Refresh**: Added a 5-scene marketing storyboard that combines Light + Dark views into unified 1280x800 assets.
 
 ## Version 1.1.3 Release Notes
 - **Reliable Power State Sync**: Improved status refresh flow after start/stop/shutdown/reboot actions to avoid stale status rollbacks.

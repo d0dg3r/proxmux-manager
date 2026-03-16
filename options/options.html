@@ -25,20 +25,40 @@
         <!-- General Tab -->
         <div id="general" class="tab-content active">
             <div class="card">
+                <div class="settings-subtabs" role="tablist" aria-label="Settings Sections">
+                    <button type="button" class="settings-subtab-btn active" data-settings-subtab="cluster">Cluster</button>
+                    <button type="button" class="settings-subtab-btn" data-settings-subtab="backup">Backup & Restore</button>
+                </div>
+
+                <div class="settings-subtab-panel active" data-settings-panel="cluster">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cluster-select">Active Cluster</label>
+                        <select id="cluster-select" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cluster-name">Cluster Name</label>
+                        <input type="text" id="cluster-name" placeholder="Production Cluster">
+                    </div>
+                </div>
+                <div class="cluster-controls-row">
+                    <button id="add-cluster-btn" class="secondary-btn">Add Cluster</button>
+                    <button id="remove-cluster-btn" class="secondary-btn">Remove Cluster</button>
+                </div>
                 <div class="form-group">
                     <label for="proxmox-url" data-i18n="proxmoxUrl">Proxmox URL</label>
-                    <input type="text" id="proxmox-url" placeholder="https://192.168.1.100:8006">
+                    <input type="text" id="proxmox-url" placeholder="https://proxmox.example.com:8006">
                     <small>The primary URL of your Proxmox cluster.</small>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="api-user" data-i18n="apiUser">User & Realm</label>
-                        <input type="text" id="api-user" placeholder="root@pam">
+                        <input type="text" id="api-user" placeholder="api-admin@pve">
                     </div>
                     <div class="form-group">
                         <label for="api-tokenid" data-i18n="apiTokenId">Token ID</label>
-                        <input type="text" id="api-tokenid" placeholder="automation">
+                        <input type="text" id="api-tokenid" placeholder="full-access">
                     </div>
                 </div>
 
@@ -108,9 +128,44 @@
                 </div>
                 <small data-i18n="scriptsSettingsHelp">API/JSON is preferred and website fallback is used automatically if needed.</small>
 
+                </div>
+
+                <div class="settings-subtab-panel" data-settings-panel="backup">
+                <div class="form-group separator">
+                    <h3>Backup & Restore</h3>
+                </div>
+                <div class="backup-grid">
+                    <div class="form-group">
+                        <label for="export-password">Export Password</label>
+                        <input type="password" id="export-password" placeholder="Enter export password">
+                    </div>
+                    <div class="form-group">
+                        <label for="export-password-confirm">Confirm Password</label>
+                        <input type="password" id="export-password-confirm" placeholder="Re-enter export password">
+                    </div>
+                </div>
+                <div class="backup-actions-row">
+                    <button id="export-settings-btn" class="secondary-btn">Export Encrypted Settings</button>
+                </div>
+                <div class="backup-grid">
+                    <div class="form-group">
+                        <label for="import-file">Import Backup File</label>
+                        <input type="file" id="import-file" accept=".json,.secure.json,application/json">
+                    </div>
+                    <div class="form-group">
+                        <label for="import-password">Import Password</label>
+                        <input type="password" id="import-password" placeholder="Enter import password">
+                    </div>
+                </div>
+                <div class="backup-actions-row">
+                    <button id="import-settings-btn" class="secondary-btn">Import Encrypted Settings</button>
+                </div>
+                </div>
+
                 <div class="button-group">
                     <button id="save-settings-btn" class="primary-btn" data-i18n="saveSettings">Save Settings</button>
                     <button id="test-connection-btn" class="secondary-btn">Test Connection</button>
+                    <button id="reset-settings-btn" class="reset-btn" data-i18n="resetSettings">Reset Settings</button>
                     <button id="close-settings-btn" class="secondary-btn close-btn" data-i18n="close">Close</button>
                 </div>
                 <div id="status"></div>
@@ -141,9 +196,40 @@
                 <div class="help-item">
                     <h4>Required Permissions</h4>
                     <p>Your API Token needs <code>VM.Console</code> and <code>Sys.Audit</code> permissions. For SPICE, <code>VM.Config.Options</code> or <code>PVEVMAdmin</code> is required to fetch the configuration.</p>
-                    <p>For a complete setup flow (best-practice dedicated API user, root fallback, and zsh-safe curl validation), see <code>docs/proxmox-token-setup.md</code>.</p>
-                    <p>On a Proxmox host you can use the interactive helper:</p>
-                    <p><code>bash scripts/setup_proxmox_token.sh</code></p>
+                    <p>For a complete setup flow (best-practice dedicated API user, root fallback, and zsh-safe curl validation), see <a href="https://github.com/d0dg3r/PROXMUX-Manager/blob/main/docs/proxmox-token-setup.md" target="_blank" rel="noreferrer">docs/proxmox-token-setup.md</a>.</p>
+                    <p>On a Proxmox host you can run the interactive helper directly:</p>
+                    <p><code>curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/refs/heads/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'</code></p>
+                </div>
+
+                <div class="help-item">
+                    <h4 data-i18n="helpTokenSetupTitle">Proxmox API Token Setup</h4>
+                    <ul class="help-list">
+                        <li data-i18n="helpTokenSetupPointDedicated">Default recommendation: create a dedicated API user and assign ACLs explicitly.</li>
+                        <li data-i18n="helpTokenSetupPointRootFallback">Root token setup is available as a fallback for lab/test environments.</li>
+                        <li data-i18n="helpTokenSetupPointStorage">The helper can store the token in a uniquely named local file with restrictive permissions (600).</li>
+                        <li data-i18n="helpTokenSetupPointCleanup">Import the token into your password manager immediately, then delete the local token file (shred -u preferred).</li>
+                    </ul>
+                    <p>
+                        <span data-i18n="helpTokenSetupGuideLabel">Full guide:</span>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/blob/main/docs/proxmox-token-setup.md" target="_blank" rel="noreferrer">docs/proxmox-token-setup.md</a>
+                    </p>
+                    <p data-i18n="helpTokenSetupHelperLabel">Run the interactive helper directly on a Proxmox host:</p>
+                    <p><code>curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/refs/heads/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'</code></p>
+                    <p data-i18n="helpTokenSetupZshLabel">zsh-safe curl sample (quotes are important):</p>
+                    <p><code>curl -k -s -H 'Authorization: PVEAPIToken=USER_REALM!TOKEN_ID=TOKEN_SECRET' 'https://YOUR_HOST:8006/api2/json/cluster/resources?type=vm'</code></p>
+                </div>
+
+                <div class="help-item">
+                    <h4 data-i18n="helpSupportTitle">Support & Community</h4>
+                    <div class="help-links">
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportRepo">Repository</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportIssues">Issues</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/d0dg3r" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportAuthor">Author Profile</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/sponsors/d0dg3r" target="_blank" rel="noreferrer" class="sponsor-link" data-i18n="aboutSupportSponsor">Sponsor</a>
+                    </div>
                 </div>
 
                 <div class="help-item">
@@ -174,18 +260,26 @@
             <div class="card about-card">
                 <img src="../store/proxmux_logo.png" alt="Logo" class="about-logo">
                 <h2>PROXMUX Manager</h2>
-                <p class="version">Version 1.2.0</p>
-                <p>A premium extension for managing your Proxmox VE cluster with ease.</p>
+                <p class="version">Version 1.2.0-beta.3</p>
+                <p data-i18n="aboutProjectCredit">Created 2026 by d0dg3r (Joe Mild).</p>
+                <p data-i18n="aboutProjectHomage">This project is a tribute to Proxmox VE 0.9, first released on April 15, 2008 — and a small nod to the great milestones in computer history: Linux, Git, and Proxmox ;)</p>
+                <p>
+                    <span data-i18n="aboutLicenseLabel">License:</span>
+                    <a href="https://github.com/d0dg3r/PROXMUX-Manager/blob/main/LICENSE" target="_blank" rel="noreferrer" class="license-link" data-i18n="aboutLicenseMitLink">MIT</a>
+                </p>
                 <div class="about-footer">
+                    <p class="about-support-title" data-i18n="aboutSupportTitle">Support & Community</p>
                     <div class="about-links">
-                        <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" class="link-btn">GitHub</a>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportRepo">Repository</a>
                         <span class="dot">·</span>
-                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" class="link-btn">Issues</a>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportIssues">Issues</a>
                         <span class="dot">·</span>
-                        <a href="https://github.com/sponsors/d0dg3r" target="_blank" class="sponsor-link">Sponsor</a>
+                        <a href="https://github.com/d0dg3r" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportAuthor">Author Profile</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/sponsors/d0dg3r" target="_blank" rel="noreferrer" class="sponsor-link" data-i18n="aboutSupportSponsor">Sponsor</a>
                     </div>
                     <div class="credits">
-                        Made for DevOps & Sysadmins
+                        <span data-i18n="aboutMadeFor">Made for DevOps & Sysadmins</span>
                     </div>
                 </div>
             </div>

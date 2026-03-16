@@ -218,7 +218,80 @@
             </div>
         </div>
 
-        <main>
+        <div id="header-alerts">
+            <div id="no-auth" class="header-alert hidden">
+                <p>Please configure your API credentials.</p>
+                <div class="header-alert-actions">
+                    <button id="open-settings-overlay" class="compact-btn primary">Configure</button>
+                    <button id="open-import-overlay" class="compact-btn">Import Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="inline-settings-view" class="hidden">
+            <div class="inline-settings-container">
+                <div class="inline-settings-subtabs" role="tablist" aria-label="Settings Sections">
+                    <button type="button" class="inline-settings-subtab-btn active" data-inline-settings-subtab="cluster">Cluster</button>
+                    <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="backup">Backup & Restore</button>
+                </div>
+
+                <div class="inline-settings-subtab-panel active" data-inline-settings-panel="cluster">
+                    <div class="inline-settings-form-row">
+                        <div class="inline-settings-form-group">
+                            <label>Active Cluster</label>
+                            <input type="text" value="Production Cluster">
+                        </div>
+                        <div class="inline-settings-form-group">
+                            <label>Cluster Name</label>
+                            <input type="text" value="Production Cluster">
+                        </div>
+                    </div>
+                    <div class="inline-settings-form-group">
+                        <label>Proxmox URL</label>
+                        <input type="text" value="https://proxmox.example.com:8006">
+                    </div>
+                    <div class="inline-settings-form-row">
+                        <div class="inline-settings-form-group">
+                            <label>User & Realm</label>
+                            <input type="text" value="api-admin@pve">
+                        </div>
+                        <div class="inline-settings-form-group">
+                            <label>Token ID</label>
+                            <input type="text" value="full-access">
+                        </div>
+                    </div>
+                    <div class="inline-settings-form-group">
+                        <label>API Secret</label>
+                        <input type="password" value="••••••••••••••••">
+                    </div>
+                </div>
+
+                <div class="inline-settings-subtab-panel" data-inline-settings-panel="backup">
+                    <div class="inline-settings-form-group">
+                        <label>Import Backup File</label>
+                        <input type="file">
+                    </div>
+                    <div class="inline-settings-form-group">
+                        <label>Import Password</label>
+                        <input type="password" value="">
+                    </div>
+                </div>
+
+                <div class="inline-settings-actions">
+                    <button id="inline-save-settings-btn" class="inline-action-btn primary">Save Settings</button>
+                    <button id="inline-test-connection-btn" class="inline-action-btn secondary">Test Connection</button>
+                    <button id="inline-reset-settings-btn" class="inline-action-btn reset">Reset Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <main id="main-view-content">
+            <div id="mock-cluster-tabs" class="mock-cluster-tabs hidden">
+                <button class="cluster-tab active">All Clusters</button>
+                <button class="cluster-tab">Prod West</button>
+                <button class="cluster-tab">Prod East</button>
+                <button class="cluster-tab">Lab</button>
+            </div>
             <div id="resource-list" class="list">
                 <div class="resource-item">
                     <div class="status-indicator status-running"></div>
@@ -226,6 +299,7 @@
                         <span class="name">pve-node-01</span>
                         <div class="resource-subtitle">
                             <span class="node">NODE @ pve-node-01</span>
+                            <span class="cluster-resource-badge hidden">Prod West</span>
                             <span class="uptime">152d 4h</span>
                         </div>
                         <div class="meta-tags"><span class="tag os">PVE 10.0.1</span><span class="tag ip">10.1.1.10</span></div>
@@ -238,6 +312,7 @@
                         <span class="name">pve-node-02</span>
                         <div class="resource-subtitle">
                             <span class="node">NODE @ pve-node-02</span>
+                            <span class="cluster-resource-badge hidden">Prod East</span>
                             <span class="uptime">129d 8h</span>
                         </div>
                         <div class="meta-tags"><span class="tag os">PVE 9.1.0</span><span class="tag ip">10.1.1.11</span></div>
@@ -250,6 +325,7 @@
                         <span class="name">audiobookshelf</span>
                         <div class="resource-subtitle">
                             <span class="node">LXC @ px01 (ID 105)</span>
+                            <span class="cluster-resource-badge hidden">Prod West</span>
                             <span class="uptime">29d 10h 40m</span>
                         </div>
                         <div class="meta-tags">
@@ -268,6 +344,7 @@
                         <span class="name">windows-lab</span>
                         <div class="resource-subtitle">
                             <span class="node">QEMU @ pve-node-01 (ID 202)</span>
+                            <span class="cluster-resource-badge hidden">Lab</span>
                             <span class="uptime">3d 11h</span>
                         </div>
                         <div class="meta-tags">
@@ -280,7 +357,7 @@
                     </div>
                     <div class="actions"><button class="action-btn novnc">noVNC</button><button class="action-btn spice">SPICE</button></div>
                 </div>
-                <div class="resource-details-preview">
+                <div class="resource-details-preview hidden">
                     <div class="details-grid">
                         <div class="details-row">
                             <span class="details-label">CPU</span>

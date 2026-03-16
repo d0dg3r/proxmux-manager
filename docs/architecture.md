@@ -34,6 +34,8 @@ The heart of the extension. It encapsulates all communication with the Proxmox V
 The extension uses a shared UI for Side Panel and Floating Window contexts.
 - **`popup.html`**: Defines the searchable resource list and filter system.
 - **`popup.js`**: Handles state management, filtering, inline settings view toggling, and event delegation. It interacts with `ProxmoxAPI` to fetch data and launch consoles.
+- **Multi-Cluster Tabs**: Supports per-cluster context tabs plus an `All Clusters` aggregation mode, including scoped UI state persistence.
+- **No-Config Guided Entry**: Provides direct CTA routing to either `Cluster` configuration or `Backup & Restore` import-first onboarding.
 - **i18n**: Fully localized using `chrome.i18n` for English and German.
 
 ### 3.3 Action Routing Layer (`background.js`, `lib/window-launcher.js`)
@@ -42,7 +44,8 @@ The extension uses a shared UI for Side Panel and Floating Window contexts.
 
 ### 3.4 Data Storage
 Uses `chrome.storage.local` to store:
-- API Credentials (URL, Token, Secret).
+- Cluster map (`clusters`) with per-cluster credentials and active cluster context (`activeClusterId`, `activeClusterTabId`).
+- API Credentials legacy fallback keys (kept synchronized for compatibility).
 - Failover Node URLs (discovered dynamically).
 - User preferences (theme, display settings, toolbar click mode).
 - Community Scripts catalog/details cache and cache TTL settings.
@@ -106,6 +109,18 @@ The popup top-bar search pipeline is designed for fast iterative filtering:
 3. Save/Test actions run in place and write to `chrome.storage.local`.
 4. Gear click or `Escape` toggles back to the main resource list while preserving header controls.
 
+### 4.8 Encrypted Backup / Restore Flow
+1. Export collects selected settings keys from `chrome.storage.local`.
+2. Payload is encrypted via Web Crypto (PBKDF2 + AES-GCM) and downloaded as a JSON backup.
+3. Import decrypts and validates payload, then rewrites storage keys and re-syncs active cluster context.
+4. In no-config mode, import-first UX can hide non-essential actions to keep onboarding focused.
+
+### 4.9 Factory Reset Flow (Multi-Cluster)
+1. Reset confirmation is performed in-extension with a two-step click model (no native browser dialog).
+2. Shared reset service creates one default cluster skeleton and removes previous cluster state.
+3. Global defaults are restored (theme/tab mode/display/scripts defaults), legacy credential keys are cleared.
+4. UI runtime state is rehydrated to no-config state and list/tabs are refreshed.
+
 ## 5. Security Model
 - **Token Security**: API Tokens are stored locally in the browser's profile and are never transmitted to any third-party.
 - **Least Privilege**: The extension requests only necessary permissions (`storage`, `tabs`, `downloads`, `sidePanel`, `cookies`).
@@ -113,5 +128,6 @@ The popup top-bar search pipeline is designed for fast iterative filtering:
 
 ## 6. Quality and Release Verification
 - **E2E Testing**: Playwright test suite validates popup behavior in a controlled mock environment, including search reset and filter toggle interactions.
-- **Visual Asset Pipeline**: Store screenshots are generated from a deterministic mock UI (`store/mock/`) to keep dark/light captures consistent with released UX.
+- **Visual Asset Pipeline**: Store screenshots are generated from deterministic mock scenes (`store/mock/`) for cluster overview, connection onboarding, and settings view.
+- **Screenshot Output Format**: Release screenshots are generated as paired Light+Dark captures (`640x800` each) and combined into a single `1280x800` asset per scene.
 - **Release Discipline**: Version bumps, docs updates, screenshot refresh, and local test validation are treated as mandatory release gates.

@@ -1,14 +1,62 @@
 const { test, expect } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 const { pathToFileURL } = require('url');
 
 test.describe('PROXMUX Popup (Mock Environment)', () => {
+  let staticServer;
+  let staticBaseUrl;
   const mockPath = pathToFileURL(
     path.resolve(__dirname, '../store/mock/mock.html')
   ).href;
   const installCommandFilePath = path.resolve(__dirname, '../lib/install-command.js');
   const manifestFilePath = path.resolve(__dirname, '../manifest.json');
+  const projectRoot = path.resolve(__dirname, '..');
+
+  test.beforeAll(async () => {
+    staticServer = http.createServer((req, res) => {
+      const urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
+      const safePath = path.normalize(urlPath).replace(/^(\.\.[/\\])+/, '');
+      let filePath = path.resolve(projectRoot, `.${safePath}`);
+      if (!filePath.startsWith(projectRoot)) {
+        res.writeHead(403);
+        res.end('Forbidden');
+        return;
+      }
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+        filePath = path.join(filePath, 'index.html');
+      }
+      if (!fs.existsSync(filePath)) {
+        res.writeHead(404);
+        res.end('Not Found');
+        return;
+      }
+
+      const ext = path.extname(filePath).toLowerCase();
+      const mime = {
+        '.html': 'text/html; charset=utf-8',
+        '.js': 'text/javascript; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
+        '.json': 'application/json; charset=utf-8',
+        '.png': 'image/png',
+        '.svg': 'image/svg+xml',
+      }[ext] || 'application/octet-stream';
+
+      res.writeHead(200, { 'Content-Type': mime });
+      res.end(fs.readFileSync(filePath));
+    });
+
+    await new Promise((resolve) => {
+      staticServer.listen(0, '127.0.0.1', () => resolve());
+    });
+    staticBaseUrl = `http://127.0.0.1:${staticServer.address().port}`;
+  });
+
+  test.afterAll(async () => {
+    if (!staticServer) return;
+    await new Promise((resolve) => staticServer.close(() => resolve()));
+  });
 
   test.beforeEach(async ({ page }) => {
     await page.goto(mockPath);
@@ -49,6 +97,156 @@ test.describe('PROXMUX Popup (Mock Environment)', () => {
     expect(popupSource).toContain("method: 'best_effort_existing_tab_input_injected'");
     expect(popupSource).toContain('if (wasNewTab) {');
     expect(popupSource).toContain('waitForTabComplete(tabId, tabReadyTimeout)');
+  });
+
+  test('should keep cluster tabs hidden while settings view is active', async () => {
+    const popupSource = fs.readFileSync(path.resolve(__dirname, '../popup/popup.js'), 'utf8');
+    const popupCssSource = fs.readFileSync(path.resolve(__dirname, '../popup/popup.css'), 'utf8');
+
+    expect(popupSource).toContain('function updateClusterTabsVisibility()');
+    expect(popupSource).toContain("const isSettingsActive = document.body.classList.contains('settings-view-active');");
+    expect(popupSource).toContain("clusterTabs.classList.toggle('hidden', !hasClusters || isSettingsActive);");
+    expect(popupSource).toContain('setInlineViewMode(true);');
+    expect(popupSource).toContain('setInlineViewMode(false);');
+    expect(popupCssSource).toContain('body.settings-view-active #cluster-tabs');
+  });
+
+  test('should hide cluster tabs when settings opens and show again on close', async ({ page }) => {
+    await page.addInitScript(() => {
+      const storage = {
+        theme: 'dark',
+        displaySettings: { uptime: true, ip: true, os: true, vmid: true, tags: true },
+        scriptsPanelCollapsed: true,
+        activeClusterTabId: '__all__',
+        activeClusterId: 'production',
+        clusters: {
+          production: {
+            id: 'production',
+            name: 'Production',
+            proxmoxUrl: 'https://pve-prod-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'prod-secret',
+            apiToken: 'api-admin@pve!full-access=prod-secret',
+            failoverUrls: [],
+            isEnabled: true
+          },
+          staging: {
+            id: 'staging',
+            name: 'Staging',
+            proxmoxUrl: 'https://pve-staging-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'staging-secret',
+            apiToken: 'api-admin@pve!full-access=staging-secret',
+            failoverUrls: [],
+            isEnabled: true
+          }
+        },
+        communityScriptsCatalogCacheV1: {
+          source: 'fixture',
+          updatedAt: Date.now(),
+          schemaVersion: 2,
+          scripts: []
+        }
+      };
+
+      const resolveGet = (keys) => {
+        if (!keys) return { ...storage };
+        if (Array.isArray(keys)) return keys.reduce((acc, key) => ({ ...acc, [key]: storage[key] }), {});
+        if (typeof keys === 'string') return { [keys]: storage[keys] };
+        return Object.keys(keys).reduce((acc, key) => ({ ...acc, [key]: storage[key] ?? keys[key] }), {});
+      };
+
+      const chromeMock = {
+        runtime: { lastError: null, getURL: (relative = '') => `${window.location.origin}/${relative.replace(/^\/+/, '')}` },
+        i18n: { getMessage: () => '' },
+        storage: {
+          local: {
+            get: async (keys) => resolveGet(keys),
+            set: async (values) => Object.assign(storage, values || {}),
+            remove: async (keys) => {
+              const list = Array.isArray(keys) ? keys : [keys];
+              list.forEach((key) => delete storage[key]);
+            }
+          }
+        },
+        permissions: {
+          contains: (_permissions, cb) => cb(true),
+          request: (_permissions, cb) => cb(true)
+        },
+        windows: {
+          getCurrent: async () => ({ id: 1, type: 'normal' }),
+          get: async (id) => ({ id, type: 'normal', tabs: [] }),
+          update: async (id, info) => ({ id, ...info }),
+          create: async () => ({ id: 2, type: 'popup' })
+        },
+        sidePanel: { open: async () => {} },
+        tabs: {
+          create: async () => ({ id: 10 }),
+          update: async () => ({ id: 10 }),
+          query: async () => [],
+          get: async () => ({ id: 10, status: 'complete' }),
+          onUpdated: { addListener: () => {}, removeListener: () => {} }
+        },
+        scripting: { executeScript: async () => [{ result: true }] },
+        downloads: {
+          download: (_options, cb) => cb?.(1),
+          open: async () => {},
+          onChanged: { addListener: () => {}, removeListener: () => {} }
+        },
+        cookies: { get: async () => null }
+      };
+
+      const realFetch = window.fetch.bind(window);
+      window.fetch = async (input, init = {}) => {
+        const requestUrl = typeof input === 'string' ? input : input?.url;
+        if (!requestUrl) return realFetch(input, init);
+        if (requestUrl.includes('/api2/json/cluster/resources')) {
+          return new Response(JSON.stringify({
+            data: [
+              { type: 'node', node: 'pve-prod-01', status: 'online', cpu: 0.12, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 },
+              { type: 'qemu', vmid: 201, name: 'prod-web-01', node: 'pve-prod-01', status: 'running', cpu: 0.2, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 }
+            ]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('/api2/json/')) {
+          return new Response(JSON.stringify({ data: {} }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('api.github.com/repos/community-scripts/ProxmoxVE/git/trees/main')) {
+          return new Response(JSON.stringify({ tree: [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return realFetch(input, init);
+      };
+
+      window.chrome = chromeMock;
+      globalThis.chrome = chromeMock;
+    });
+
+    await page.goto(`${staticBaseUrl}/popup/popup.html`);
+    await expect(page.locator('#cluster-tabs')).toBeVisible();
+
+    await page.click('#display-settings-btn');
+    await expect(page.locator('body')).toHaveClass(/settings-view-active/);
+    await expect(page.locator('#cluster-tabs')).toBeHidden();
+    await expect(page.locator('.inline-settings-actions')).toBeVisible();
+
+    await page.click('[data-inline-settings-subtab="backup"]');
+    await expect(page.locator('.inline-settings-actions')).toBeHidden();
+
+    await page.click('[data-inline-settings-subtab="help"]');
+    await expect(page.locator('.inline-settings-actions')).toBeHidden();
+
+    await page.click('[data-inline-settings-subtab="about"]');
+    await expect(page.locator('.inline-settings-actions')).toBeHidden();
+    await expect(page.locator('#inline-about-legacy-wrap')).toBeVisible();
+
+    await page.click('[data-inline-settings-subtab="cluster"]');
+    await expect(page.locator('.inline-settings-actions')).toBeVisible();
+
+    await page.click('#display-settings-btn');
+    await expect(page.locator('body')).not.toHaveClass(/settings-view-active/);
+    await expect(page.locator('#cluster-tabs')).toBeVisible();
   });
 
   test('should show resource items from mock data', async ({ page }) => {

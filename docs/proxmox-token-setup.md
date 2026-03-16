@@ -115,20 +115,13 @@ Use these values in PROXMUX settings:
 
 ## Optional Helper Script
 
-Use the interactive helper:
+Run directly from GitHub on a Proxmox host:
 
 ```bash
-bash scripts/setup_proxmox_token.sh
+curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/refs/heads/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
 ```
 
-### Run directly from GitHub (pinned version on Proxmox host)
-
-```bash
-# Update v1.1.4 to the PROXMUX Manager version you are using
-curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/v1.1.4/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'
-```
-
-This command is zsh-safe (URL is single-quoted) and pins the script to a specific version; you can optionally open `/tmp/setup_proxmox_token.sh` to review it before running, and adjust the tag when you upgrade PROXMUX Manager.
+This command is zsh-safe (URL is single-quoted). You can optionally open `/tmp/setup_proxmox_token.sh` to review it before running.
 
 The script can:
 

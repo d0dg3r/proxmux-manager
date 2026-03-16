@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0-beta.3] - 2026-03-15
+
+### Added
+- **No-Config Import Entry Flow**: The no-config banner now offers separate `Configure` and `Import Settings` entry points, with direct subtab routing.
+- **Encrypted Backup UX Refinement**: In no-config import mode, backup export and Save/Test actions are hidden to keep focus on restore-first onboarding.
+- **Factory Reset Helper**: Added a shared reset service that resets all clusters to a single default cluster and restores global defaults consistently.
+
+### Changed
+- **Multi-Cluster Reset Semantics**: `Reset Settings` now performs a true factory-style reset across all clusters instead of resetting only the active cluster.
+- **Screenshot Pipeline**: Store screenshot generation now builds dedicated cluster/connection/settings scenes and exports combined Light+Dark 1280x800 assets.
+- **Store Visual Assets**: Replaced old split dark/light screenshot references with new combined release-ready store images.
+
+### Fixed
+- **Native Browser Dialog Removal**: Removed remaining `window.confirm`/`alert` usage in reset and SPICE error flows; replaced with in-extension confirmation/status UX.
+- **Reset Confirmation Consistency**: Added consistent in-addon two-step reset confirmations in popup and options views, including proper state reset on interaction changes.
+
 ## [1.2.0-beta.2] - 2026-03-15
 
 ### Added
@@ -130,6 +146,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Side Panel support for persistent cluster management.
 - Proxmox API integration for resource monitoring.
 
+[1.2.0-beta.3]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.2.0-beta.2...v1.2.0-beta.3
 [1.2.0-beta.2]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.2.0-beta.1...v1.2.0-beta.2
 [1.2.0-beta.1]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.1.4...v1.2.0-beta.1
 [1.1.4]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.1.3...v1.1.4
