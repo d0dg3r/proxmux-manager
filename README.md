@@ -29,12 +29,12 @@ A dedicated Chrome Extension for Proxmox VE cluster management, providing instan
 
 Primary screenshot:
 
-![Multi Cluster Combined](store/screenshot_01_multi_cluster_1280x800.png)
+![Expanded Resource Combined](store/screenshot_02_resource_expanded_1280x800.png)
 
 Additional screenshots:
 
 <p>
-  <img src="store/screenshot_02_resource_expanded_1280x800.png" alt="Expanded Resource Combined" width="24%">
+  <img src="store/screenshot_01_multi_cluster_1280x800.png" alt="Multi Cluster Combined" width="24%">
   <img src="store/screenshot_03_onboarding_1280x800.png" alt="Onboarding Combined" width="24%">
   <img src="store/screenshot_04_settings_cluster_1280x800.png" alt="Settings Cluster Combined" width="24%">
   <img src="store/screenshot_05_settings_backup_1280x800.png" alt="Settings Backup Combined" width="24%">

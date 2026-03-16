@@ -537,12 +537,32 @@ async function applySceneState(page, sceneId) {
   }
 
   if (sceneId === 'resource_expanded') {
-    await page.waitForSelector('[data-id="vm-production-201"] .item-main');
-    await page.click('[data-id="vm-production-201"] .item-main');
-    await page.waitForSelector('[data-id="vm-production-201"].expanded');
+    const targetItemSelector = '[data-id="vm-production-201"]';
+    const targetMainSelector = `${targetItemSelector} .item-main`;
+    await page.waitForSelector(targetMainSelector, { state: 'visible' });
+    await page.waitForFunction((selector) => {
+      const list = document.getElementById('resource-list');
+      const items = Array.from((list || document).querySelectorAll('.resource-item'));
+      return items.length >= 3 && items.some((item) => item.matches(selector));
+    }, targetItemSelector);
+    await page.evaluate((selector) => {
+      const target = document.querySelector(selector);
+      target?.scrollIntoView({ block: 'center', inline: 'nearest' });
+    }, targetItemSelector);
+    await page.click(targetMainSelector);
+    await page.waitForSelector(`${targetItemSelector}.expanded`);
+    await page.waitForFunction((selector) => {
+      const item = document.querySelector(selector);
+      if (!item || !item.classList.contains('expanded')) return false;
+      const drawer = item.querySelector('.details-drawer');
+      if (!drawer) return false;
+      const styles = window.getComputedStyle(drawer);
+      const rect = drawer.getBoundingClientRect();
+      return styles.visibility !== 'hidden' && Number(styles.opacity) > 0.95 && rect.height > 24;
+    }, targetItemSelector);
     await page.evaluate(() => {
       const list = document.getElementById('main-view-content');
-      if (list) list.scrollTop = 36;
+      if (list) list.scrollTop = Math.max(list.scrollTop - 20, 0);
       const scripts = document.querySelector('.scripts-panel');
       scripts?.classList.add('hidden');
     });
