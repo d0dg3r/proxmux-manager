@@ -103,7 +103,7 @@ If PROXMUX only shows nodes but not VMs/LXCs, validate token rights first (`Sys.
   - `store/screenshot_04_settings_cluster_1280x800.png`
   - `store/screenshot_05_settings_backup_1280x800.png`
 
-## What's New in v1.2.0-beta.3
+## What's New in v1.2.0
 
 - **Multi-Cluster Factory Reset**: `Reset Settings` now resets all clusters to one default cluster and restores global defaults in both popup and options.
 - **No-Config Entry Improvements**: Users can choose `Configure` or `Import Settings` directly from the no-config banner.

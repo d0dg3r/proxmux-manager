@@ -2,7 +2,7 @@
 
 This document contains all the text, metadata, and justifications required to submit PROXMUX Manager to the Chrome Web Store.
 
-Current release prep target: `v1.2.0-beta.3` (align with `CHANGELOG.md` top entry before submission).
+Current release prep target: `v1.2.0` (align with `CHANGELOG.md` top entry before submission).
 
 ## 1. Store Metadata
 
@@ -37,25 +37,7 @@ Key Features:
 Perfect for DevOps engineers and home-server enthusiasts who need a fast, professional, and secure way to manage their Proxmox infrastructure.
 ```
 
-### German (Germany)
-```text
-PROXMUX Manager ist die professionelle Chrome-Erweiterung für Proxmox VE Administratoren. Greifen Sie sofort auf Ihren Virtualisierungs-Cluster zu, um Nodes, VMs und Container zu überwachen, ohne Ihren aktuellen Tab zu verlassen.
-
-Hauptfunktionen:
-- **Interaktive Tags**: Entdecken und klicken Sie Cluster-weite Tags für eine sofortige kategorische Filterung.
-- **Uptime-Anzeige**: Echtzeit-Uptime in lesbarer Form (z. B. 2d 5h) für alle laufenden Ressourcen.
-- **Verbessertes Monitoring**: Sehen Sie VM/LXC-Status, OS-Typen und IP-Adressen auf einen Blick.
-- **Flexible Startmodi**: Öffnen Sie die Erweiterung im Side Panel (Standard) oder als dauerhaftes Floating Window.
-- **Inline-Advanced-Settings**: Einstellungen direkt in der aktiven Erweiterungsansicht öffnen und bearbeiten.
-- **Intelligente Konsolen**: Unterstützung für noVNC, SPICE (remote-viewer) und Node-Shells.
-- **Modernes Design**: Auswahl zwischen Dark, Light oder System-Theme.
-- **Hochverfügbarkeit**: Automatische Node-Erkennung im Cluster und nahtloses Failover.
-- **Sicher**: API-Token werden lokal gespeichert und verlassen niemals Ihren Browser.
-
-Perfekt für DevOps Engineers und Home-Server-Enthusiasten, die eine schnelle, professionelle und sichere Lösung zur Verwaltung ihrer Proxmox-Infrastruktur benötigen.
-```
-
-Use English as the canonical release-source text, then keep the German section synchronized for storefront localization.
+Use the English section above as the canonical source text. If localized storefront text is needed (for example German), derive it from the English block during store submission prep.
 
 ---
 
