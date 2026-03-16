@@ -95,6 +95,10 @@
                                     <input type="checkbox" id="show-tags" checked>
                                     <span class="setting-chip-label filter-pill" data-i18n="showTags">Tags</span>
                                 </label>
+                                <label class="setting-chip" for="expand-details-default">
+                                    <input type="checkbox" id="expand-details-default">
+                                    <span class="setting-chip-label filter-pill">Expand details by default</span>
+                                </label>
                         </div>
                     </div>
                     <hr class="filters-row-divider" aria-hidden="true">
@@ -117,6 +121,7 @@
                 <p data-i18n="noAuthDesc">Please configure your API credentials.</p>
                 <div class="header-alert-actions">
                     <button id="open-settings-overlay" class="compact-btn primary">Configure</button>
+                    <button id="open-token-help-overlay" class="compact-btn">Token Setup Guide</button>
                     <button id="open-import-overlay" class="compact-btn">Import Settings</button>
                 </div>
             </div>
@@ -297,6 +302,20 @@
                 <div class="inline-settings-subtab-panel" data-inline-settings-panel="help">
                 <div class="inline-help-card">
                     <h3 data-i18n="helpTab">Help</h3>
+
+                    <div id="inline-no-config-quickstart" class="inline-help-section hidden">
+                        <h4>Quick Setup</h4>
+                        <p class="inline-help-text">No cluster is configured yet. Use this quick flow to get started in under two minutes.</p>
+                        <ul class="inline-help-list">
+                            <li>Generate or copy your Proxmox API token.</li>
+                            <li>Go to Cluster settings and add URL, user, token ID, and secret.</li>
+                            <li>Or import an existing encrypted backup file.</li>
+                        </ul>
+                        <div class="inline-help-links">
+                            <button id="inline-help-open-cluster-settings" type="button" class="inline-help-link">Open Cluster Settings</button>
+                            <button id="inline-help-open-backup-settings" type="button" class="inline-help-link">Open Backup & Import</button>
+                        </div>
+                    </div>
 
                     <div class="inline-help-section">
                         <h4 data-i18n="helpTokenSetupTitle">Proxmox API Token Setup</h4>

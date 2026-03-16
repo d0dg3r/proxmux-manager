@@ -183,8 +183,10 @@ header {
 .cluster-tabs {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
     padding: 0 18px 10px 18px;
-    overflow-x: auto;
+    overflow: visible;
     border-bottom: 1px solid var(--border);
 }
 
@@ -216,6 +218,10 @@ header {
     border-style: dashed;
 }
 
+.cluster-tab.favorites-tab {
+    border-color: hsla(45, 95%, 55%, 0.45);
+}
+
 .cluster-status-dot {
     width: 7px;
     height: 7px;
@@ -225,10 +231,16 @@ header {
 }
 
 .cluster-tab-icon {
-    font-size: 0.66rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    opacity: 0.78;
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.82;
+}
+
+.cluster-tab-icon svg {
+    display: block;
 }
 
 .search-wrapper {
@@ -718,6 +730,11 @@ body.settings-view-active #main-view-content {
     transition: all 0.2s ease;
 }
 
+button.inline-help-link {
+    font-family: inherit;
+    cursor: pointer;
+}
+
 .inline-help-link:hover {
     color: var(--text-primary);
     border-color: var(--accent);
@@ -1176,7 +1193,18 @@ body.settings-view-active [data-inline-settings-panel="about"].active ~ .inline-
     background: transparent;
 }
 
+#open-token-help-overlay.compact-btn {
+    border-color: var(--border);
+    color: var(--text-secondary);
+    background: transparent;
+}
+
 #open-import-overlay.compact-btn:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+#open-token-help-overlay.compact-btn:hover {
     border-color: var(--text-secondary);
     color: var(--text-primary);
 }
@@ -1898,6 +1926,27 @@ body.light-theme .details-drawer {
     color: #fff;
     border-color: var(--brand-mux);
     box-shadow: 0 4px 12px hsla(25, 80%, 50%, 0.34);
+}
+
+.favorite-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    line-height: 1;
+    color: var(--text-secondary);
+}
+
+.favorite-toggle.active {
+    color: hsl(45, 95%, 60%);
+    border-color: hsla(45, 95%, 55%, 0.45);
+    background-color: hsla(45, 95%, 55%, 0.12);
 }
 
 .primary-btn {

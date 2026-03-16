@@ -4,7 +4,8 @@ import { buildInstallCommandForScripts } from '../lib/install-command.js';
 import {
     createEncryptedSettingsBackup,
     downloadEncryptedBackupFile,
-    importEncryptedSettingsFromText
+    importEncryptedSettingsFromText,
+    filterFavoriteIdsByExistingResources
 } from '../lib/settings-backup.js';
 import { openOrFocusFloatingWindow } from '../lib/window-launcher.js';
 import {
@@ -20,6 +21,7 @@ import {
 import { FACTORY_DEFAULT_DISPLAY_SETTINGS, resetToFactoryDefaults } from '../lib/settings-reset.js';
 
 const LAST_BROWSER_WINDOW_ID_KEY = 'lastBrowserWindowId';
+const FAVORITES_TAB_ID = '__favorites__';
 
 // Safely escape text for insertion into innerHTML to prevent XSS.
 function escapeHtml(str) {
@@ -42,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const themeIcon = document.getElementById('theme-icon');
     const openSettingsOverlayBtn = document.getElementById('open-settings-overlay');
+    const openTokenHelpOverlayBtn = document.getElementById('open-token-help-overlay');
     const openImportOverlayBtn = document.getElementById('open-import-overlay');
     const mainViewContent = document.getElementById('main-view-content');
     const inlineSettingsView = document.getElementById('inline-settings-view');
@@ -76,6 +79,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inlineSettingsStatus = document.getElementById('inline-settings-status');
     const inlineAboutEasterEggBtn = document.getElementById('inline-about-easter-egg-btn');
     const inlineAboutLegacyWrap = document.getElementById('inline-about-legacy-wrap');
+    const inlineNoConfigQuickstart = document.getElementById('inline-no-config-quickstart');
+    const inlineHelpOpenClusterSettingsBtn = document.getElementById('inline-help-open-cluster-settings');
+    const inlineHelpOpenBackupSettingsBtn = document.getElementById('inline-help-open-backup-settings');
     const template = document.getElementById('resource-item-template');
     const currentView = new URLSearchParams(window.location.search).get('view') || 'none';
     let startupWindowType = 'unknown';
@@ -166,6 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const displaySettingsBtn = document.getElementById('display-settings-btn');
     const collapsibleFilters = document.getElementById('collapsible-filters');
     const displaySettingsMenu = document.getElementById('display-settings-menu');
+    const expandDetailsDefaultCheckbox = document.getElementById('expand-details-default');
     const scriptsPanel = document.querySelector('.scripts-panel');
     const scriptsBody = document.getElementById('scripts-body');
     const scriptsToggleBtn = document.getElementById('scripts-toggle-btn');
@@ -207,6 +214,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     
     let currentExpandedId = null;
+    let expandDetailsByDefault = false;
+    let favoriteResourceIds = new Set();
     let scriptsCatalog = [];
     let selectedScriptSlugs = new Set();
     let scriptDetailsCache = new Map();
@@ -216,6 +225,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentGuidePageUrl = '';
     const activePasteFlows = new Set();
     let inlineImportOnlyNoConfigMode = false;
+    let inlineNoConfigHelpMode = false;
+    let isInlineImportingSettings = false;
     const AUTO_PASTE_TIMEOUT_MS = 1500;
     const NEW_TAB_READY_TIMEOUT_MS = 650;
     const NEW_TAB_SETTLE_DELAY_MS = 250;
@@ -288,8 +299,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateClusterTabsVisibility() {
         if (!clusterTabs) return;
         const hasClusters = getEnabledClusters().length > 0;
+        const hasConfigured = hasConfiguredCluster();
         const isSettingsActive = document.body.classList.contains('settings-view-active');
-        clusterTabs.classList.toggle('hidden', !hasClusters || isSettingsActive);
+        clusterTabs.classList.toggle('hidden', !hasClusters || !hasConfigured || isSettingsActive);
     }
 
     function setActiveInlineSettingsSubtab(tab) {
@@ -301,6 +313,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             panel.classList.toggle('active', panel.dataset.inlineSettingsPanel === targetTab);
         });
         inlineSettingsActions?.classList.toggle('hidden', targetTab !== 'cluster');
+        const showQuickstart = Boolean(
+            inlineNoConfigQuickstart &&
+            targetTab === 'help' &&
+            inlineNoConfigHelpMode &&
+            !hasConfiguredCluster()
+        );
+        inlineNoConfigQuickstart?.classList.toggle('hidden', !showQuickstart);
     }
 
     function resetAboutEasterEgg() {
@@ -404,6 +423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getCurrentScopeId() {
         if (activeClusterTabId === ALL_CLUSTERS_TAB_ID) return ALL_CLUSTERS_TAB_ID;
+        if (activeClusterTabId === FAVORITES_TAB_ID) return FAVORITES_TAB_ID;
         return activeClusterTabId || activeClusterId || 'none';
     }
 
@@ -501,6 +521,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const scriptsPanel = document.querySelector('.scripts-panel');
         const scriptsInsideMain = Boolean(scriptsPanel && mainViewContent && mainViewContent.contains(scriptsPanel));
         inlineImportOnlyNoConfigMode = Boolean(options.importOnlyWhenNoConfig && options.targetSubtab === 'backup');
+        inlineNoConfigHelpMode = Boolean(options.onboardingNoConfigHelp && options.targetSubtab === 'help');
         resetAboutEasterEgg();
         populateInlineSettingsFields();
         setActiveInlineSettingsSubtab(
@@ -514,6 +535,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function closeInlineSettingsView() {
         inlineImportOnlyNoConfigMode = false;
+        inlineNoConfigHelpMode = false;
         updateInlineImportOnlyVisibility();
         resetAboutEasterEgg();
         resetInlineResetConfirmation();
@@ -624,9 +646,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         resetInlineResetConfirmation();
         openInlineSettingsView('overlay_settings_button', { targetSubtab: 'cluster' });
     });
+    openTokenHelpOverlayBtn?.addEventListener('click', () => {
+        resetInlineResetConfirmation();
+        openInlineSettingsView('overlay_token_help_button', { targetSubtab: 'help', onboardingNoConfigHelp: true });
+    });
     openImportOverlayBtn?.addEventListener('click', () => {
         resetInlineResetConfirmation();
         openInlineSettingsView('overlay_import_button', { targetSubtab: 'backup', importOnlyWhenNoConfig: true });
+    });
+    inlineHelpOpenClusterSettingsBtn?.addEventListener('click', () => {
+        setActiveInlineSettingsSubtab('cluster');
+        inlineProxmoxUrlInput?.focus();
+    });
+    inlineHelpOpenBackupSettingsBtn?.addEventListener('click', () => {
+        setActiveInlineSettingsSubtab('backup');
     });
     refreshBtn.addEventListener('click', () => {
         removeScopedUiValue('lastActiveResource');
@@ -727,7 +760,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    inlineImportSettingsBtn?.addEventListener('click', async () => {
+    async function runInlineImportSettings() {
+        if (isInlineImportingSettings) return;
         resetInlineResetConfirmation();
         const selectedFile = inlineImportFileInput.files?.[0];
         if (!selectedFile) {
@@ -735,6 +769,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        isInlineImportingSettings = true;
+        if (inlineImportSettingsBtn) inlineImportSettingsBtn.disabled = true;
         try {
             const rawText = await selectedFile.text();
             await importEncryptedSettingsFromText(rawText, inlineImportPasswordInput.value || '');
@@ -747,7 +783,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.reload();
         } catch (error) {
             setInlineSettingsStatus(`Import failed: ${error.message || 'Unknown error.'}`, 'error');
+        } finally {
+            isInlineImportingSettings = false;
+            if (inlineImportSettingsBtn) inlineImportSettingsBtn.disabled = false;
         }
+    }
+
+    inlineImportSettingsBtn?.addEventListener('click', async () => {
+        await runInlineImportSettings();
+    });
+
+    inlineImportPasswordInput?.addEventListener('keydown', async (event) => {
+        if (event.key !== 'Enter') return;
+        if (!inlineImportFileInput.files?.[0]) return;
+        event.preventDefault();
+        await runInlineImportSettings();
     });
 
     inlineClusterSelect?.addEventListener('change', async () => {
@@ -989,9 +1039,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             defaultActionClickMode: resetResult.storagePayload.defaultActionClickMode,
             communityScriptsCacheTtlHours: resetResult.storagePayload.communityScriptsCacheTtlHours,
             defaultScriptNode: resetResult.storagePayload.defaultScriptNode,
-            scriptsPanelCollapsed: resetResult.storagePayload.scriptsPanelCollapsed
+            scriptsPanelCollapsed: resetResult.storagePayload.scriptsPanelCollapsed,
+            expandDetailsByDefault: resetResult.storagePayload.expandDetailsByDefault,
+            favoriteResourceIds: resetResult.storagePayload.favoriteResourceIds
         };
         displaySettings = { ...FACTORY_DEFAULT_DISPLAY_SETTINGS };
+        expandDetailsByDefault = Boolean(resetResult.storagePayload.expandDetailsByDefault);
+        favoriteResourceIds = new Set(resetResult.storagePayload.favoriteResourceIds || []);
         activeFilters = { type: 'all', status: 'all', tag: null };
         currentExpandedId = null;
         allResources = [];
@@ -1038,6 +1092,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         await chrome.storage.local.set({ displaySettings });
     }
 
+    async function persistExpandDetailsByDefault() {
+        await chrome.storage.local.set({ expandDetailsByDefault });
+    }
+
     function syncDisplaySettingsCheckboxes() {
         DISPLAY_SETTING_KEYS.forEach((setting) => {
             const checkbox = displaySettingCheckboxes[setting];
@@ -1045,6 +1103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 checkbox.checked = Boolean(displaySettings[setting]);
             }
         });
+        if (expandDetailsDefaultCheckbox) {
+            expandDetailsDefaultCheckbox.checked = expandDetailsByDefault;
+        }
     }
 
     // Handle Display Settings Changes
@@ -1056,6 +1117,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             applyDisplaySettings();
             await persistDisplaySettings();
         });
+    });
+
+    expandDetailsDefaultCheckbox?.addEventListener('change', async () => {
+        expandDetailsByDefault = Boolean(expandDetailsDefaultCheckbox.checked);
+        settings.expandDetailsByDefault = expandDetailsByDefault;
+        await persistExpandDetailsByDefault();
+        filterAndRender();
     });
 
     function applyDisplaySettings() {
@@ -1439,11 +1507,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function setGlobalSettingsFromStore(stored) {
+        const savedFavoriteResourceIds = Array.isArray(stored.favoriteResourceIds)
+            ? stored.favoriteResourceIds.filter((id) => typeof id === 'string' && id.trim())
+            : [];
+        favoriteResourceIds = new Set(savedFavoriteResourceIds);
+        expandDetailsByDefault = Boolean(stored.expandDetailsByDefault);
         settings = {
             ...stored,
             theme: stored.theme || DEFAULT_SETTINGS.theme,
             consoleTabMode: stored.consoleTabMode || DEFAULT_SETTINGS.consoleTabMode,
-            defaultActionClickMode: stored.defaultActionClickMode || DEFAULT_SETTINGS.defaultActionClickMode
+            defaultActionClickMode: stored.defaultActionClickMode || DEFAULT_SETTINGS.defaultActionClickMode,
+            favoriteResourceIds: savedFavoriteResourceIds,
+            expandDetailsByDefault
         };
     }
 
@@ -1481,11 +1556,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        const favoritesTab = document.createElement('button');
+        favoritesTab.type = 'button';
+        favoritesTab.className = `cluster-tab favorites-tab ${activeClusterTabId === FAVORITES_TAB_ID ? 'active' : ''}`;
+        favoritesTab.dataset.clusterTab = FAVORITES_TAB_ID;
+        favoritesTab.innerHTML = `
+            <span class="cluster-tab-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" focusable="false">
+                    <path fill="currentColor" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+            </span>
+            <span>Favorites</span>
+        `;
+        clusterTabs.appendChild(favoritesTab);
+
         const allTab = document.createElement('button');
         allTab.type = 'button';
         allTab.className = `cluster-tab ${activeClusterTabId === ALL_CLUSTERS_TAB_ID ? 'active' : ''} all-clusters`;
         allTab.dataset.clusterTab = ALL_CLUSTERS_TAB_ID;
-        allTab.innerHTML = '<span class="cluster-tab-icon">stack</span><span>All Clusters</span>';
+        allTab.innerHTML = `
+            <span class="cluster-tab-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" focusable="false">
+                    <path fill="currentColor" d="M12,2L2,7L12,12L22,7L12,2M2,17L12,22L22,17V12L12,17L2,12V17Z"/>
+                </svg>
+            </span>
+            <span>All Clusters</span>
+        `;
         clusterTabs.appendChild(allTab);
 
         enabledClusters.forEach((cluster) => {
@@ -1502,11 +1598,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function setActiveClusterTab(nextTabId) {
         const enabledClusterIds = new Set(getEnabledClusters().map((cluster) => cluster.id));
-        if (nextTabId !== ALL_CLUSTERS_TAB_ID && !enabledClusterIds.has(nextTabId)) {
+        const isSpecialTab = nextTabId === ALL_CLUSTERS_TAB_ID || nextTabId === FAVORITES_TAB_ID;
+        if (!isSpecialTab && !enabledClusterIds.has(nextTabId)) {
             nextTabId = activeClusterId || ALL_CLUSTERS_TAB_ID;
         }
         activeClusterTabId = nextTabId || ALL_CLUSTERS_TAB_ID;
-        if (activeClusterTabId !== ALL_CLUSTERS_TAB_ID) {
+        if (activeClusterTabId !== ALL_CLUSTERS_TAB_ID && activeClusterTabId !== FAVORITES_TAB_ID) {
             activeClusterId = activeClusterTabId;
         }
         setActiveClusterContext(activeClusterId);
@@ -1554,6 +1651,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'defaultScriptNode',
         'defaultActionClickMode',
         'scriptsPanelCollapsed',
+        'expandDetailsByDefault',
+        'favoriteResourceIds',
         'activeClusterTabId'
     ]);
     setGlobalSettingsFromStore(stored);
@@ -1606,6 +1705,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const clusterKey = res.__clusterId || activeClusterId || 'single';
         return res.vmid ? `${clusterKey}/${res.node}/${res.type}/${res.vmid}` : `${clusterKey}/node/${res.node}`;
     };
+
+    const getFavoriteResourceId = (res) => {
+        const clusterSegment = res.__clusterId || activeClusterId || 'cluster';
+        return res.vmid ? `vm-${clusterSegment}-${res.vmid}` : `node-${clusterSegment}-${res.node}`;
+    };
+
+    const isFavoriteResource = (res) => favoriteResourceIds.has(getFavoriteResourceId(res));
+
+    async function persistFavoriteResourceIds() {
+        await chrome.storage.local.set({
+            favoriteResourceIds: Array.from(favoriteResourceIds)
+        });
+    }
+
+    async function pruneFavoriteResourceIds(resources) {
+        const existingIds = resources.map((resource) => getFavoriteResourceId(resource));
+        const nextFavoriteIds = filterFavoriteIdsByExistingResources(Array.from(favoriteResourceIds), existingIds);
+        if (nextFavoriteIds.length === favoriteResourceIds.size) return;
+        favoriteResourceIds = new Set(nextFavoriteIds);
+        settings.favoriteResourceIds = nextFavoriteIds;
+        await persistFavoriteResourceIds();
+    }
 
     scriptsSearchInput.addEventListener('input', () => {
         updateScriptsSearchClearState();
@@ -1718,7 +1839,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const enabledClusters = getEnabledClusters();
             resourcesByClusterId.clear();
-            if (activeClusterTabId === ALL_CLUSTERS_TAB_ID) {
+            if (activeClusterTabId === ALL_CLUSTERS_TAB_ID || activeClusterTabId === FAVORITES_TAB_ID) {
                 const results = await Promise.all(enabledClusters.map(async (cluster) => {
                     const client = apiClients.get(cluster.id);
                     if (!client) return [];
@@ -1761,8 +1882,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     resource.status = expectedStatus;
                 }
             });
+            // Only prune stale favorites when we have a full cross-cluster dataset.
+            // On single-cluster tabs, pruning would incorrectly drop favorites from other clusters.
+            if (activeClusterTabId === ALL_CLUSTERS_TAB_ID || activeClusterTabId === FAVORITES_TAB_ID) {
+                await pruneFavoriteResourceIds(allResources);
+            }
 
-            renderTagFilters(allResources);
+            const tagFilterSource = activeClusterTabId === FAVORITES_TAB_ID
+                ? allResources.filter((resource) => isFavoriteResource(resource))
+                : allResources;
+            renderTagFilters(tagFilterSource);
             filterAndRender();
             renderScriptNodeOptions(allResources);
         } catch (error) {
@@ -1824,8 +1953,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const item = clone.querySelector('.resource-item');
             
             // Set unique ID for persistence
-            const clusterSegment = res.__clusterId || activeClusterId || 'cluster';
-            const resId = res.vmid ? `vm-${clusterSegment}-${res.vmid}` : `node-${clusterSegment}-${res.node}`;
+            const resId = getFavoriteResourceId(res);
             item.setAttribute('data-id', resId);
 
             const itemMain = clone.querySelector('.item-main');
@@ -1841,6 +1969,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sshBtn = clone.querySelector('.ssh');
             const shellBtn = clone.querySelector('.shell');
             const userTags = clone.querySelector('.user-tags');
+            const actionsEl = clone.querySelector('.actions');
 
             // Resource Details Elements
             const cpuBar = clone.querySelector('.cpu-bar');
@@ -1870,7 +1999,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             indicator.classList.add((res.status === 'running' || res.status === 'online') ? 'status-running' : (res.status === 'stopped' ? 'status-stopped' : 'status-unknown'));
 
-            if (currentExpandedId === resId) {
+            if (expandDetailsByDefault || currentExpandedId === resId) {
                 item.classList.add('expanded');
             }
             itemMain.addEventListener('click', () => {
@@ -1887,6 +2016,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                     removeScopedUiValue('lastActiveResource');
                 }
             });
+
+            const favoriteBtn = document.createElement('button');
+            favoriteBtn.type = 'button';
+            favoriteBtn.className = `action-btn favorite-toggle ${favoriteResourceIds.has(resId) ? 'active' : ''}`;
+            favoriteBtn.title = favoriteResourceIds.has(resId) ? 'Remove favorite' : 'Add favorite';
+            favoriteBtn.textContent = '★';
+            favoriteBtn.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                if (favoriteResourceIds.has(resId)) {
+                    favoriteResourceIds.delete(resId);
+                } else {
+                    favoriteResourceIds.add(resId);
+                }
+                settings.favoriteResourceIds = Array.from(favoriteResourceIds);
+                await persistFavoriteResourceIds();
+                const active = favoriteResourceIds.has(resId);
+                favoriteBtn.classList.toggle('active', active);
+                favoriteBtn.title = active ? 'Remove favorite' : 'Add favorite';
+                if (activeClusterTabId === FAVORITES_TAB_ID && !active) {
+                    filterAndRender();
+                }
+            });
+            actionsEl?.append(favoriteBtn);
 
             // Usage Stats (Initial from cluster/resources)
             updateUsageStats(clone, res);
@@ -2522,6 +2674,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const query = searchInput.value.toLowerCase().trim();
         
         const filtered = allResources.filter(res => {
+            if (activeClusterTabId === FAVORITES_TAB_ID && !isFavoriteResource(res)) return false;
             // 1. Type filter
             if (activeFilters.type !== 'all' && res.type !== activeFilters.type) return false;
 

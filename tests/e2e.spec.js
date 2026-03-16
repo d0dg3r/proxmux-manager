@@ -101,14 +101,29 @@ test.describe('PROXMUX Popup (Mock Environment)', () => {
 
   test('should keep cluster tabs hidden while settings view is active', async () => {
     const popupSource = fs.readFileSync(path.resolve(__dirname, '../popup/popup.js'), 'utf8');
+    const popupHtmlSource = fs.readFileSync(path.resolve(__dirname, '../popup/popup.html'), 'utf8');
     const popupCssSource = fs.readFileSync(path.resolve(__dirname, '../popup/popup.css'), 'utf8');
+    const optionsSource = fs.readFileSync(path.resolve(__dirname, '../options/options.js'), 'utf8');
 
     expect(popupSource).toContain('function updateClusterTabsVisibility()');
     expect(popupSource).toContain("const isSettingsActive = document.body.classList.contains('settings-view-active');");
-    expect(popupSource).toContain("clusterTabs.classList.toggle('hidden', !hasClusters || isSettingsActive);");
+    expect(popupSource).toContain('const hasConfigured = hasConfiguredCluster();');
+    expect(popupSource).toContain("clusterTabs.classList.toggle('hidden', !hasClusters || !hasConfigured || isSettingsActive);");
     expect(popupSource).toContain('setInlineViewMode(true);');
     expect(popupSource).toContain('setInlineViewMode(false);');
+    expect(popupHtmlSource).toContain('id="open-token-help-overlay"');
+    expect(popupHtmlSource).toContain('id="inline-no-config-quickstart"');
+    expect(popupSource).toContain("openInlineSettingsView('overlay_token_help_button', { targetSubtab: 'help', onboardingNoConfigHelp: true });");
     expect(popupCssSource).toContain('body.settings-view-active #cluster-tabs');
+    expect(popupCssSource).toContain('flex-wrap: wrap;');
+    expect(popupCssSource).toContain('overflow: visible;');
+    expect(optionsSource).toContain('async function runImportSettings()');
+    expect(optionsSource).toContain("importPasswordInput?.addEventListener('keydown'");
+    expect(optionsSource).toContain("if (event.key !== 'Enter') return;");
+    expect(optionsSource).toContain('let isImportingSettings = false;');
+    expect(popupSource).toContain('async function runInlineImportSettings()');
+    expect(popupSource).toContain("inlineImportPasswordInput?.addEventListener('keydown'");
+    expect(popupSource).toContain('let isInlineImportingSettings = false;');
   });
 
   test('should hide cluster tabs when settings opens and show again on close', async ({ page }) => {
@@ -585,5 +600,479 @@ test.describe('PROXMUX Popup (Mock Environment)', () => {
     expect(clearBox).toBeTruthy();
     expect(clearBox.y).toBeGreaterThanOrEqual(inputBox.y);
     expect(clearBox.y + clearBox.height).toBeLessThanOrEqual(inputBox.y + inputBox.height);
+  });
+
+  test('should include favorites in backup keys and stale-filter helper', async () => {
+    const backupSource = fs.readFileSync(path.resolve(__dirname, '../lib/settings-backup.js'), 'utf8');
+    expect(backupSource).toContain("'favoriteResourceIds'");
+    expect(backupSource).toContain('filterFavoriteIdsByExistingResources');
+    expect(backupSource).toContain('normalizeFavoriteResourceIds');
+  });
+
+  test('should render Favorites tab before cluster tabs', async ({ page }) => {
+    await page.addInitScript(() => {
+      const storage = {
+        theme: 'dark',
+        displaySettings: { uptime: true, ip: true, os: true, vmid: true, tags: true },
+        scriptsPanelCollapsed: true,
+        activeClusterTabId: '__favorites__',
+        activeClusterId: 'production',
+        clusters: {
+          production: {
+            id: 'production',
+            name: 'Production',
+            proxmoxUrl: 'https://pve-prod-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'prod-secret',
+            apiToken: 'api-admin@pve!full-access=prod-secret',
+            failoverUrls: [],
+            isEnabled: true
+          },
+          staging: {
+            id: 'staging',
+            name: 'Staging',
+            proxmoxUrl: 'https://pve-staging-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'staging-secret',
+            apiToken: 'api-admin@pve!full-access=staging-secret',
+            failoverUrls: [],
+            isEnabled: true
+          }
+        },
+        communityScriptsCatalogCacheV1: {
+          source: 'fixture',
+          updatedAt: Date.now(),
+          schemaVersion: 2,
+          scripts: []
+        }
+      };
+
+      const resolveGet = (keys) => {
+        if (!keys) return { ...storage };
+        if (Array.isArray(keys)) return keys.reduce((acc, key) => ({ ...acc, [key]: storage[key] }), {});
+        if (typeof keys === 'string') return { [keys]: storage[keys] };
+        return Object.keys(keys).reduce((acc, key) => ({ ...acc, [key]: storage[key] ?? keys[key] }), {});
+      };
+
+      const chromeMock = {
+        runtime: { lastError: null, getURL: (relative = '') => `${window.location.origin}/${relative.replace(/^\/+/, '')}` },
+        i18n: { getMessage: () => '' },
+        storage: {
+          local: {
+            get: async (keys) => resolveGet(keys),
+            set: async (values) => Object.assign(storage, values || {}),
+            remove: async (keys) => {
+              const list = Array.isArray(keys) ? keys : [keys];
+              list.forEach((key) => delete storage[key]);
+            }
+          }
+        },
+        permissions: {
+          contains: (_permissions, cb) => cb(true),
+          request: (_permissions, cb) => cb(true)
+        },
+        windows: {
+          getCurrent: async () => ({ id: 1, type: 'normal' }),
+          get: async (id) => ({ id, type: 'normal', tabs: [] }),
+          update: async (id, info) => ({ id, ...info }),
+          create: async () => ({ id: 2, type: 'popup' })
+        },
+        sidePanel: { open: async () => {} },
+        tabs: {
+          create: async () => ({ id: 10 }),
+          update: async () => ({ id: 10 }),
+          query: async () => [],
+          get: async () => ({ id: 10, status: 'complete' }),
+          onUpdated: { addListener: () => {}, removeListener: () => {} }
+        },
+        scripting: { executeScript: async () => [{ result: true }] },
+        downloads: {
+          download: (_options, cb) => cb?.(1),
+          open: async () => {},
+          onChanged: { addListener: () => {}, removeListener: () => {} }
+        },
+        cookies: { get: async () => null }
+      };
+
+      const realFetch = window.fetch.bind(window);
+      window.fetch = async (input, init = {}) => {
+        const requestUrl = typeof input === 'string' ? input : input?.url;
+        if (!requestUrl) return realFetch(input, init);
+        if (requestUrl.includes('/api2/json/cluster/resources')) {
+          return new Response(JSON.stringify({
+            data: [
+              { type: 'qemu', vmid: 201, name: 'prod-web-01', node: 'pve-prod-01', status: 'running', cpu: 0.2, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 }
+            ]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('/api2/json/')) {
+          return new Response(JSON.stringify({ data: {} }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('api.github.com/repos/community-scripts/ProxmoxVE/git/trees/main')) {
+          return new Response(JSON.stringify({ tree: [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return realFetch(input, init);
+      };
+
+      window.chrome = chromeMock;
+      globalThis.chrome = chromeMock;
+    });
+
+    await page.goto(`${staticBaseUrl}/popup/popup.html`);
+    const tabLabels = await page.locator('#cluster-tabs .cluster-tab span:last-child').allTextContents();
+    expect(tabLabels.slice(0, 3)).toEqual(['Favorites', 'All Clusters', 'Production']);
+  });
+
+  test('should allow favoriting and show item in Favorites tab', async ({ page }) => {
+    await page.addInitScript(() => {
+      const storage = {
+        theme: 'dark',
+        displaySettings: { uptime: true, ip: true, os: true, vmid: true, tags: true },
+        scriptsPanelCollapsed: true,
+        activeClusterTabId: '__all__',
+        activeClusterId: 'production',
+        favoriteResourceIds: [],
+        clusters: {
+          production: {
+            id: 'production',
+            name: 'Production',
+            proxmoxUrl: 'https://pve-prod-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'prod-secret',
+            apiToken: 'api-admin@pve!full-access=prod-secret',
+            failoverUrls: [],
+            isEnabled: true
+          }
+        },
+        communityScriptsCatalogCacheV1: {
+          source: 'fixture',
+          updatedAt: Date.now(),
+          schemaVersion: 2,
+          scripts: []
+        }
+      };
+
+      const resolveGet = (keys) => {
+        if (!keys) return { ...storage };
+        if (Array.isArray(keys)) return keys.reduce((acc, key) => ({ ...acc, [key]: storage[key] }), {});
+        if (typeof keys === 'string') return { [keys]: storage[keys] };
+        return Object.keys(keys).reduce((acc, key) => ({ ...acc, [key]: storage[key] ?? keys[key] }), {});
+      };
+
+      const chromeMock = {
+        runtime: { lastError: null, getURL: (relative = '') => `${window.location.origin}/${relative.replace(/^\/+/, '')}` },
+        i18n: { getMessage: () => '' },
+        storage: {
+          local: {
+            get: async (keys) => resolveGet(keys),
+            set: async (values) => Object.assign(storage, values || {}),
+            remove: async (keys) => {
+              const list = Array.isArray(keys) ? keys : [keys];
+              list.forEach((key) => delete storage[key]);
+            }
+          }
+        },
+        permissions: {
+          contains: (_permissions, cb) => cb(true),
+          request: (_permissions, cb) => cb(true)
+        },
+        windows: {
+          getCurrent: async () => ({ id: 1, type: 'normal' }),
+          get: async (id) => ({ id, type: 'normal', tabs: [] }),
+          update: async (id, info) => ({ id, ...info }),
+          create: async () => ({ id: 2, type: 'popup' })
+        },
+        sidePanel: { open: async () => {} },
+        tabs: {
+          create: async () => ({ id: 10 }),
+          update: async () => ({ id: 10 }),
+          query: async () => [],
+          get: async () => ({ id: 10, status: 'complete' }),
+          onUpdated: { addListener: () => {}, removeListener: () => {} }
+        },
+        scripting: { executeScript: async () => [{ result: true }] },
+        downloads: {
+          download: (_options, cb) => cb?.(1),
+          open: async () => {},
+          onChanged: { addListener: () => {}, removeListener: () => {} }
+        },
+        cookies: { get: async () => null }
+      };
+
+      const realFetch = window.fetch.bind(window);
+      window.fetch = async (input, init = {}) => {
+        const requestUrl = typeof input === 'string' ? input : input?.url;
+        if (!requestUrl) return realFetch(input, init);
+        if (requestUrl.includes('/api2/json/cluster/resources')) {
+          return new Response(JSON.stringify({
+            data: [
+              { type: 'qemu', vmid: 201, name: 'prod-web-01', node: 'pve-prod-01', status: 'running', cpu: 0.2, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 },
+              { type: 'qemu', vmid: 202, name: 'prod-web-02', node: 'pve-prod-01', status: 'running', cpu: 0.2, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 }
+            ]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('/api2/json/')) {
+          return new Response(JSON.stringify({ data: {} }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('api.github.com/repos/community-scripts/ProxmoxVE/git/trees/main')) {
+          return new Response(JSON.stringify({ tree: [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return realFetch(input, init);
+      };
+
+      window.chrome = chromeMock;
+      globalThis.chrome = chromeMock;
+    });
+
+    await page.goto(`${staticBaseUrl}/popup/popup.html`);
+    const actionButtons = page.locator('[data-id="vm-production-201"] .actions .action-btn');
+    await expect(actionButtons.last()).toHaveClass(/favorite-toggle/);
+    const favoriteBtn = page.locator('[data-id="vm-production-201"] .favorite-toggle');
+    const favoriteBox = await favoriteBtn.boundingBox();
+    expect(favoriteBox).toBeTruthy();
+    expect(Math.round(favoriteBox.height)).toBe(28);
+    await favoriteBtn.click();
+    await page.locator('#cluster-tabs .cluster-tab', { hasText: 'Favorites' }).click();
+    await expect(page.locator('[data-id="vm-production-201"]')).toBeVisible();
+    await expect(page.locator('[data-id="vm-production-202"]')).toHaveCount(0);
+  });
+
+  test('should keep cross-cluster favorites when switching single cluster tabs', async ({ page }) => {
+    await page.addInitScript(() => {
+      const storage = {
+        theme: 'dark',
+        displaySettings: { uptime: true, ip: true, os: true, vmid: true, tags: true },
+        scriptsPanelCollapsed: true,
+        activeClusterTabId: 'production',
+        activeClusterId: 'production',
+        favoriteResourceIds: [],
+        clusters: {
+          production: {
+            id: 'production',
+            name: 'Production',
+            proxmoxUrl: 'https://pve-prod-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'prod-secret',
+            apiToken: 'api-admin@pve!full-access=prod-secret',
+            failoverUrls: [],
+            isEnabled: true
+          },
+          staging: {
+            id: 'staging',
+            name: 'Staging',
+            proxmoxUrl: 'https://pve-staging-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'staging-secret',
+            apiToken: 'api-admin@pve!full-access=staging-secret',
+            failoverUrls: [],
+            isEnabled: true
+          }
+        },
+        communityScriptsCatalogCacheV1: {
+          source: 'fixture',
+          updatedAt: Date.now(),
+          schemaVersion: 2,
+          scripts: []
+        }
+      };
+
+      const resolveGet = (keys) => {
+        if (!keys) return { ...storage };
+        if (Array.isArray(keys)) return keys.reduce((acc, key) => ({ ...acc, [key]: storage[key] }), {});
+        if (typeof keys === 'string') return { [keys]: storage[keys] };
+        return Object.keys(keys).reduce((acc, key) => ({ ...acc, [key]: storage[key] ?? keys[key] }), {});
+      };
+
+      const chromeMock = {
+        runtime: { lastError: null, getURL: (relative = '') => `${window.location.origin}/${relative.replace(/^\/+/, '')}` },
+        i18n: { getMessage: () => '' },
+        storage: {
+          local: {
+            get: async (keys) => resolveGet(keys),
+            set: async (values) => Object.assign(storage, values || {}),
+            remove: async (keys) => {
+              const list = Array.isArray(keys) ? keys : [keys];
+              list.forEach((key) => delete storage[key]);
+            }
+          }
+        },
+        permissions: {
+          contains: (_permissions, cb) => cb(true),
+          request: (_permissions, cb) => cb(true)
+        },
+        windows: {
+          getCurrent: async () => ({ id: 1, type: 'normal' }),
+          get: async (id) => ({ id, type: 'normal', tabs: [] }),
+          update: async (id, info) => ({ id, ...info }),
+          create: async () => ({ id: 2, type: 'popup' })
+        },
+        sidePanel: { open: async () => {} },
+        tabs: {
+          create: async () => ({ id: 10 }),
+          update: async () => ({ id: 10 }),
+          query: async () => [],
+          get: async () => ({ id: 10, status: 'complete' }),
+          onUpdated: { addListener: () => {}, removeListener: () => {} }
+        },
+        scripting: { executeScript: async () => [{ result: true }] },
+        downloads: {
+          download: (_options, cb) => cb?.(1),
+          open: async () => {},
+          onChanged: { addListener: () => {}, removeListener: () => {} }
+        },
+        cookies: { get: async () => null }
+      };
+
+      const realFetch = window.fetch.bind(window);
+      window.fetch = async (input, init = {}) => {
+        const requestUrl = typeof input === 'string' ? input : input?.url;
+        if (!requestUrl) return realFetch(input, init);
+        if (requestUrl.includes('pve-prod-01') && requestUrl.includes('/api2/json/cluster/resources')) {
+          return new Response(JSON.stringify({
+            data: [
+              { type: 'qemu', vmid: 201, name: 'prod-web-01', node: 'pve-prod-01', status: 'running', cpu: 0.2, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 }
+            ]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('pve-staging-01') && requestUrl.includes('/api2/json/cluster/resources')) {
+          return new Response(JSON.stringify({
+            data: [
+              { type: 'qemu', vmid: 301, name: 'stg-web-01', node: 'pve-stg-01', status: 'running', cpu: 0.2, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 }
+            ]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('/api2/json/')) {
+          return new Response(JSON.stringify({ data: {} }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('api.github.com/repos/community-scripts/ProxmoxVE/git/trees/main')) {
+          return new Response(JSON.stringify({ tree: [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return realFetch(input, init);
+      };
+
+      window.chrome = chromeMock;
+      globalThis.chrome = chromeMock;
+    });
+
+    await page.goto(`${staticBaseUrl}/popup/popup.html`);
+    const prodFav = page.locator('[data-id="vm-production-201"] .favorite-toggle');
+    await prodFav.click();
+    await expect(prodFav).toHaveClass(/active/);
+
+    await page.locator('#cluster-tabs .cluster-tab', { hasText: 'Staging' }).click();
+    await expect(page.locator('[data-id="vm-staging-301"]')).toBeVisible();
+
+    await page.locator('#cluster-tabs .cluster-tab', { hasText: 'Production' }).click();
+    await expect(page.locator('[data-id="vm-production-201"] .favorite-toggle')).toHaveClass(/active/);
+  });
+
+  test('should auto-expand VM details when default expand setting is enabled', async ({ page }) => {
+    await page.addInitScript(() => {
+      const storage = {
+        theme: 'dark',
+        displaySettings: { uptime: true, ip: true, os: true, vmid: true, tags: true },
+        expandDetailsByDefault: true,
+        scriptsPanelCollapsed: true,
+        activeClusterTabId: '__all__',
+        activeClusterId: 'production',
+        clusters: {
+          production: {
+            id: 'production',
+            name: 'Production',
+            proxmoxUrl: 'https://pve-prod-01.lan:8006',
+            apiUser: 'api-admin@pve',
+            apiTokenId: 'full-access',
+            apiSecret: 'prod-secret',
+            apiToken: 'api-admin@pve!full-access=prod-secret',
+            failoverUrls: [],
+            isEnabled: true
+          }
+        },
+        communityScriptsCatalogCacheV1: {
+          source: 'fixture',
+          updatedAt: Date.now(),
+          schemaVersion: 2,
+          scripts: []
+        }
+      };
+
+      const resolveGet = (keys) => {
+        if (!keys) return { ...storage };
+        if (Array.isArray(keys)) return keys.reduce((acc, key) => ({ ...acc, [key]: storage[key] }), {});
+        if (typeof keys === 'string') return { [keys]: storage[keys] };
+        return Object.keys(keys).reduce((acc, key) => ({ ...acc, [key]: storage[key] ?? keys[key] }), {});
+      };
+
+      const chromeMock = {
+        runtime: { lastError: null, getURL: (relative = '') => `${window.location.origin}/${relative.replace(/^\/+/, '')}` },
+        i18n: { getMessage: () => '' },
+        storage: {
+          local: {
+            get: async (keys) => resolveGet(keys),
+            set: async (values) => Object.assign(storage, values || {}),
+            remove: async (keys) => {
+              const list = Array.isArray(keys) ? keys : [keys];
+              list.forEach((key) => delete storage[key]);
+            }
+          }
+        },
+        permissions: {
+          contains: (_permissions, cb) => cb(true),
+          request: (_permissions, cb) => cb(true)
+        },
+        windows: {
+          getCurrent: async () => ({ id: 1, type: 'normal' }),
+          get: async (id) => ({ id, type: 'normal', tabs: [] }),
+          update: async (id, info) => ({ id, ...info }),
+          create: async () => ({ id: 2, type: 'popup' })
+        },
+        sidePanel: { open: async () => {} },
+        tabs: {
+          create: async () => ({ id: 10 }),
+          update: async () => ({ id: 10 }),
+          query: async () => [],
+          get: async () => ({ id: 10, status: 'complete' }),
+          onUpdated: { addListener: () => {}, removeListener: () => {} }
+        },
+        scripting: { executeScript: async () => [{ result: true }] },
+        downloads: {
+          download: (_options, cb) => cb?.(1),
+          open: async () => {},
+          onChanged: { addListener: () => {}, removeListener: () => {} }
+        },
+        cookies: { get: async () => null }
+      };
+
+      const realFetch = window.fetch.bind(window);
+      window.fetch = async (input, init = {}) => {
+        const requestUrl = typeof input === 'string' ? input : input?.url;
+        if (!requestUrl) return realFetch(input, init);
+        if (requestUrl.includes('/api2/json/cluster/resources')) {
+          return new Response(JSON.stringify({
+            data: [
+              { type: 'qemu', vmid: 201, name: 'prod-web-01', node: 'pve-prod-01', status: 'running', cpu: 0.2, mem: 1, maxmem: 2, disk: 1, maxdisk: 2 }
+            ]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('/api2/json/')) {
+          return new Response(JSON.stringify({ data: {} }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (requestUrl.includes('api.github.com/repos/community-scripts/ProxmoxVE/git/trees/main')) {
+          return new Response(JSON.stringify({ tree: [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return realFetch(input, init);
+      };
+
+      window.chrome = chromeMock;
+      globalThis.chrome = chromeMock;
+    });
+
+    await page.goto(`${staticBaseUrl}/popup/popup.html`);
+    await expect(page.locator('[data-id="vm-production-201"]')).toHaveClass(/expanded/);
   });
 });

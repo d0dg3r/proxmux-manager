@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const scriptsCacheTtlInput = document.getElementById('scripts-cache-ttl');
     const defaultScriptNodeInput = document.getElementById('default-script-node');
     const defaultActionClickModeSelect = document.getElementById('default-action-click-mode');
+    const expandDetailsDefaultCheckbox = document.getElementById('expand-details-default');
     const openFloatingWindowBtn = document.getElementById('open-floating-window-btn');
     const clusterSelect = document.getElementById('cluster-select');
     const clusterNameInput = document.getElementById('cluster-name');
@@ -48,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let activeClusterId = null;
     let pendingOptionsClusterRemovalId = null;
     let pendingOptionsResetConfirmation = false;
+    let isImportingSettings = false;
     const DEFAULT_SETTINGS = {
         apiUser: 'api-admin@pve',
         apiTokenId: 'full-access',
@@ -55,7 +57,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         consoleTabMode: 'duplicate',
         communityScriptsCacheTtlHours: 12,
         defaultScriptNode: '',
-        defaultActionClickMode: 'sidepanel'
+        defaultActionClickMode: 'sidepanel',
+        expandDetailsByDefault: false
     };
 
     // i18n Initialization
@@ -316,7 +319,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             'consoleTabMode',
             'communityScriptsCacheTtlHours',
             'defaultScriptNode',
-            'defaultActionClickMode'
+            'defaultActionClickMode',
+            'expandDetailsByDefault'
         ]);
         const clusterState = await getClustersState();
         clusters = clusterState.clusters;
@@ -334,6 +338,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         defaultActionClickModeSelect.value = ['sidepanel', 'floating'].includes(items.defaultActionClickMode)
             ? items.defaultActionClickMode
             : 'sidepanel';
+        if (expandDetailsDefaultCheckbox) {
+            expandDetailsDefaultCheckbox.checked = Boolean(items.expandDetailsByDefault);
+        }
         if (items.theme) {
             themeSelect.value = items.theme;
             applyTheme(items.theme);
@@ -461,6 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const communityScriptsCacheTtlHours = Math.max(1, Math.min(168, Number(scriptsCacheTtlInput.value || 12)));
         const defaultScriptNode = defaultScriptNodeInput.value.trim();
         const defaultActionClickMode = defaultActionClickModeSelect.value === 'floating' ? 'floating' : 'sidepanel';
+        const expandDetailsByDefault = Boolean(expandDetailsDefaultCheckbox?.checked);
 
         if (!normalized.ok || !user || !tokenId || !secret) {
             status.textContent = normalized.ok ? 'Please fill in all fields.' : normalized.error;
@@ -476,7 +484,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             consoleTabMode: document.getElementById('tab-mode-select').value,
             communityScriptsCacheTtlHours,
             defaultScriptNode,
-            defaultActionClickMode
+            defaultActionClickMode,
+            expandDetailsByDefault
         });
 
         status.textContent = 'Settings saved successfully!';
@@ -557,7 +566,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    importSettingsBtn?.addEventListener('click', async () => {
+    async function runImportSettings() {
+        if (isImportingSettings) return;
         resetOptionsResetConfirmation();
         const selectedFile = importFileInput.files?.[0];
         if (!selectedFile) {
@@ -566,6 +576,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        isImportingSettings = true;
+        if (importSettingsBtn) importSettingsBtn.disabled = true;
         try {
             const rawText = await selectedFile.text();
             await importEncryptedSettingsFromText(rawText, importPasswordInput.value || '');
@@ -580,7 +592,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             status.textContent = `Import failed: ${error.message || 'Unknown error.'}`;
             status.style.color = 'var(--error)';
+        } finally {
+            isImportingSettings = false;
+            if (importSettingsBtn) importSettingsBtn.disabled = false;
         }
+    }
+
+    importSettingsBtn?.addEventListener('click', async () => {
+        await runImportSettings();
+    });
+
+    importPasswordInput?.addEventListener('keydown', async (event) => {
+        if (event.key !== 'Enter') return;
+        if (!importFileInput.files?.[0]) return;
+        event.preventDefault();
+        await runImportSettings();
     });
 
     resetBtn.addEventListener('click', async () => {
