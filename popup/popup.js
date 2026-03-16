@@ -21,6 +21,16 @@ import { FACTORY_DEFAULT_DISPLAY_SETTINGS, resetToFactoryDefaults } from '../lib
 
 const LAST_BROWSER_WINDOW_ID_KEY = 'lastBrowserWindowId';
 
+// Safely escape text for insertion into innerHTML to prevent XSS.
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const resourceList = document.getElementById('resource-list');
     const loadingOverlay = document.getElementById('loading');
@@ -1758,10 +1768,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             console.error('Proxmox API Error:', error);
             if (showLoading) {
+                const safeMessage = escapeHtml(error && typeof error.message === 'string' ? error.message : error);
                 loadingOverlay.innerHTML = `
                     <div style="color:var(--error); padding: 20px;">
                         <p><strong>Connection Failed</strong></p>
-                        <p style="font-size: 0.8rem; margin: 10px 0;">${error.message}</p>
+                        <p style="font-size: 0.8rem; margin: 10px 0;">${safeMessage}</p>
                         <button id="retry-btn" class="action-btn" style="margin-top: 15px;">Retry</button>
                     </div>
                 `;
