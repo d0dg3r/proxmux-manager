@@ -24,15 +24,15 @@ Current release prep target: `v1.2.0` (align with `CHANGELOG.md` top entry befor
 PROXMUX Manager is the professional Chrome extension for Proxmox VE administrators. Access your virtualization cluster instantly to monitor nodes, VMs, and containers without leaving your current tab.
 
 Key Features:
-- **Interactive Tags**: Discover and click cluster-wide tags for instant categorical filtering.
-- **Uptime Display**: Real-time, human-readable uptime (e.g., 2d 5h) for all running resources.
-- **Improved Monitoring**: See VM/LXC status, OS types, and IP addresses at a glance.
-- **Flexible Launch Modes**: Open the extension in the Chrome Side Panel (default) or a persistent floating window.
-- **Inline Advanced Settings**: Open and edit settings directly inside the active extension view.
-- **Intelligent Consoles**: Support for noVNC, SPICE (remote-viewer), and Node Shells.
-- **Modern Design**: Selection of Dark, Light, or Follow System themes.
-- **High Availability**: Automatic cluster node discovery and seamless failover support.
-- **Secure**: API Tokens are stored locally and never leave your browser.
+- Interactive Tags: Discover and click cluster-wide tags for instant categorical filtering.
+- Uptime Display: Real-time, human-readable uptime (e.g., 2d 5h) for all running resources.
+- Improved Monitoring: See VM/LXC status, OS types, and IP addresses at a glance.
+- Flexible Launch Modes: Open the extension in the Chrome Side Panel (default) or a persistent floating window.
+- Inline Advanced Settings: Open and edit settings directly inside the active extension view.
+- Intelligent Consoles: Support for noVNC, SPICE (remote-viewer), and Node Shells.
+- Modern Design: Selection of Dark, Light, or Follow System themes.
+- High Availability: Automatic cluster node discovery and seamless failover support.
+- Secure: API Tokens are stored locally and never leave your browser.
 
 Perfect for DevOps engineers and home-server enthusiasts who need a fast, professional, and secure way to manage their Proxmox infrastructure.
 ```
