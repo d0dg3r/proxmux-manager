@@ -593,6 +593,157 @@ main {
     overflow-y: auto;
 }
 
+#inline-settings-view {
+    padding: 12px 16px 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.inline-settings-container {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 12px;
+}
+
+.inline-settings-subtabs {
+    display: inline-flex;
+    gap: 6px;
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    margin-bottom: 12px;
+    background: var(--tag-bg);
+}
+
+.inline-settings-subtab-btn {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.inline-settings-subtab-btn.active {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    background: hsla(180, 70%, 50%, 0.12);
+}
+
+.inline-settings-subtab-panel {
+    display: none;
+}
+
+.inline-settings-subtab-panel.active {
+    display: block;
+}
+
+.inline-settings-form-group {
+    margin-bottom: 10px;
+}
+
+.inline-settings-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.inline-settings-form-group input {
+    width: 100%;
+    background-color: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 8px 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 0.84rem;
+}
+
+.inline-settings-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.inline-settings-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.inline-action-btn {
+    margin: 0;
+    min-height: 36px;
+    border-radius: 10px;
+    font-size: 0.83rem;
+    font-weight: 600;
+}
+
+.inline-action-btn.primary {
+    border: none;
+    background: linear-gradient(135deg, #f39c12, #d2691e);
+    color: #fff;
+}
+
+.inline-action-btn.secondary {
+    border: 1px solid var(--text-secondary);
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.inline-action-btn.reset {
+    border: 1px solid hsla(355, 70%, 58%, 0.7);
+    background-color: hsla(355, 42%, 20%, 0.28);
+    color: #ff8b95;
+}
+
+#header-alerts {
+    padding: 0 16px;
+}
+
+.header-alert {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background-color: rgba(248, 81, 73, 0.1);
+    border: 1px solid var(--error);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.header-alert p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+}
+
+.header-alert-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.compact-btn {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-primary);
+}
+
+.compact-btn.primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, #f39c12, #d2691e);
+    color: #fff;
+}
+
 .overlay {
     display: flex;
     flex-direction: column;
@@ -626,6 +777,31 @@ main {
     flex-direction: column;
 }
 
+.mock-cluster-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.cluster-tab {
+    border: 1px solid var(--border);
+    background: var(--panel-bg);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cluster-tab.active {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(135deg, #f39c12, #d2691e);
+}
+
 .resource-item {
     display: flex;
     align-items: center;
@@ -633,6 +809,18 @@ main {
     border-bottom: 1px solid var(--border);
     transition: background-color 0.2s;
     gap: 12px;
+}
+
+.cluster-resource-badge {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    background: var(--tag-bg);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
 }
 
 .resource-details-preview {

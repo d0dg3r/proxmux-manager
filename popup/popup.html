@@ -187,6 +187,8 @@
                 <div class="inline-settings-subtabs" role="tablist" aria-label="Settings Sections">
                     <button type="button" class="inline-settings-subtab-btn active" data-inline-settings-subtab="cluster">Cluster</button>
                     <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="backup">Backup & Restore</button>
+                    <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="help" data-i18n="helpTab">Help</button>
+                    <button type="button" class="inline-settings-subtab-btn" data-inline-settings-subtab="about" data-i18n="aboutTab">About</button>
                 </div>
 
                 <div class="inline-settings-subtab-panel active" data-inline-settings-panel="cluster">
@@ -288,6 +290,84 @@
                     </div>
                     <div class="inline-settings-cluster-actions">
                         <button id="inline-import-settings-btn" type="button" class="inline-action-btn secondary">Import Encrypted Settings</button>
+                    </div>
+                </div>
+                </div>
+
+                <div class="inline-settings-subtab-panel" data-inline-settings-panel="help">
+                <div class="inline-help-card">
+                    <h3 data-i18n="helpTab">Help</h3>
+
+                    <div class="inline-help-section">
+                        <h4 data-i18n="helpTokenSetupTitle">Proxmox API Token Setup</h4>
+                        <ul class="inline-help-list">
+                            <li data-i18n="helpTokenSetupPointDedicated">Default recommendation: create a dedicated API user and assign ACLs explicitly.</li>
+                            <li data-i18n="helpTokenSetupPointRootFallback">Root token setup is available as a fallback for lab/test environments.</li>
+                            <li data-i18n="helpTokenSetupPointStorage">The helper can store the token in a uniquely named local file with restrictive permissions (600).</li>
+                            <li data-i18n="helpTokenSetupPointCleanup">Import the token into your password manager immediately, then delete the local token file (shred -u preferred).</li>
+                        </ul>
+                        <p class="inline-help-text">
+                            <span data-i18n="helpTokenSetupGuideLabel">Full guide:</span>
+                            <a href="https://github.com/d0dg3r/PROXMUX-Manager/blob/main/docs/proxmox-token-setup.md" target="_blank" rel="noreferrer">docs/proxmox-token-setup.md</a>
+                        </p>
+                        <p class="inline-help-text" data-i18n="helpTokenSetupHelperLabel">Run the interactive helper directly on a Proxmox host:</p>
+                        <p class="inline-help-code">curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/refs/heads/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'</p>
+                        <p class="inline-help-text" data-i18n="helpTokenSetupZshLabel">zsh-safe curl sample (quotes are important):</p>
+                        <p class="inline-help-code">curl -k -s -H 'Authorization: PVEAPIToken=USER_REALM!TOKEN_ID=TOKEN_SECRET' 'https://YOUR_HOST:8006/api2/json/cluster/resources?type=vm'</p>
+                    </div>
+
+                    <div class="inline-help-section">
+                        <h4 data-i18n="popupTroubleshootingTitle">Troubleshooting</h4>
+                        <ul class="inline-help-list">
+                            <li data-i18n="popupHelpRequiredPermissions">Required permissions: VM.Console and Sys.Audit (for SPICE also VM.Config.Options or PVEVMAdmin).</li>
+                            <li data-i18n="popupHelpSelfSigned">Self-signed certificates: open your Proxmox URL in a browser tab once and trust the certificate.</li>
+                            <li data-i18n="popupHelpSshAgent">SSH shells need a detected IP; for VMs ensure QEMU Guest Agent is enabled and installed.</li>
+                        </ul>
+                    </div>
+
+                    <div class="inline-help-section">
+                        <h4 data-i18n="helpSupportTitle">Support & Community</h4>
+                        <div class="inline-help-links">
+                            <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" rel="noreferrer" class="inline-help-link" data-i18n="aboutSupportRepo">Repository</a>
+                            <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" rel="noreferrer" class="inline-help-link" data-i18n="aboutSupportIssues">Issues</a>
+                            <a href="https://github.com/d0dg3r" target="_blank" rel="noreferrer" class="inline-help-link" data-i18n="aboutSupportAuthor">Author Profile</a>
+                            <a href="https://github.com/sponsors/d0dg3r" target="_blank" rel="noreferrer" class="inline-help-link sponsor" data-i18n="aboutSupportSponsor">Sponsor</a>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <div class="inline-settings-subtab-panel" data-inline-settings-panel="about">
+                <div class="inline-about-card">
+                    <h3 data-i18n="aboutTab">About</h3>
+                    <p class="inline-about-byline" data-i18n="aboutProjectCredit">Created 2026 by d0dg3r (Joe Mild).</p>
+                    <p class="inline-about-hommage" data-i18n="aboutProjectHomage">
+                        This project is a tribute to Proxmox VE 0.9, first released on April 15, 2008 — and a small nod to the great milestones in computer history: Linux, Git, and Proxmox ;)
+                    </p>
+                    <p class="inline-about-byline">
+                        <span data-i18n="aboutLicenseLabel">License:</span>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/blob/main/LICENSE" target="_blank" rel="noreferrer" data-i18n="aboutLicenseMitLink">MIT</a>
+                    </p>
+                    <div class="inline-about-support">
+                        <p class="inline-about-support-title" data-i18n="aboutSupportTitle">Support & Community</p>
+                        <div class="inline-about-support-links">
+                            <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" rel="noreferrer" class="inline-about-support-link" data-i18n="aboutSupportRepo">Repository</a>
+                            <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" rel="noreferrer" class="inline-about-support-link" data-i18n="aboutSupportIssues">Issues</a>
+                            <a href="https://github.com/d0dg3r" target="_blank" rel="noreferrer" class="inline-about-support-link" data-i18n="aboutSupportAuthor">Author Profile</a>
+                            <a href="https://github.com/sponsors/d0dg3r" target="_blank" rel="noreferrer" class="inline-about-support-link sponsor" data-i18n="aboutSupportSponsor">Sponsor</a>
+                        </div>
+                    </div>
+                    <button id="inline-about-easter-egg-btn" type="button" class="text-btn compact" data-i18n="aboutHideEasterEgg">
+                        Hide classic UI
+                    </button>
+                    <div id="inline-about-legacy-wrap" class="inline-about-legacy-wrap">
+                        <p class="inline-about-legacy-caption" data-i18n="aboutClassicCaption">Classic UI</p>
+                        <img
+                            id="inline-about-legacy-screenshot"
+                            src="../store/proxmox_legacy_0_9_2008.png"
+                            alt="Proxmox classic UI from 2008"
+                            loading="lazy"
+                        >
                     </div>
                 </div>
                 </div>

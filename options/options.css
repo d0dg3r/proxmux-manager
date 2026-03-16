@@ -458,10 +458,33 @@ input.has-clear-control {
     line-height: 1.5;
 }
 
+.help-item p + p {
+    margin-top: 8px;
+}
+
 .help-item code {
     background: var(--hover-bg);
     padding: 2px 4px;
     border-radius: 4px;
+}
+
+.help-list {
+    margin: 0 0 12px 0;
+    padding-left: 20px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.help-list li + li {
+    margin-top: 6px;
+}
+
+.help-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
 }
 
 .about-card {
@@ -479,6 +502,16 @@ input.has-clear-control {
     margin: 0 0 8px 0;
 }
 
+.about-card .license-link {
+    color: var(--brand-mux);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.about-card .license-link:hover {
+    color: #f39c12;
+}
+
 .version {
     font-size: 0.9rem;
     color: var(--text-secondary);
@@ -489,6 +522,13 @@ input.has-clear-control {
     margin-top: 32px;
     padding-top: 24px;
     border-top: 1px solid var(--border);
+}
+
+.about-support-title {
+    margin: 0 0 12px 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .about-links {

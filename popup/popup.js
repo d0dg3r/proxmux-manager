@@ -64,6 +64,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inlineSettingsSubtabPanels = document.querySelectorAll('[data-inline-settings-panel]');
     const inlineSettingsActions = document.querySelector('.inline-settings-actions');
     const inlineSettingsStatus = document.getElementById('inline-settings-status');
+    const inlineAboutEasterEggBtn = document.getElementById('inline-about-easter-egg-btn');
+    const inlineAboutLegacyWrap = document.getElementById('inline-about-legacy-wrap');
     const template = document.getElementById('resource-item-template');
     const currentView = new URLSearchParams(window.location.search).get('view') || 'none';
     let startupWindowType = 'unknown';
@@ -267,19 +269,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.classList.toggle('settings-view-active', isSettingsView);
         inlineSettingsView.classList.toggle('hidden', !isSettingsView);
         mainViewContent.classList.toggle('hidden', isSettingsView);
+        updateClusterTabsVisibility();
         if (!isSettingsView) {
             setInlineSettingsStatus('');
         }
     }
 
+    function updateClusterTabsVisibility() {
+        if (!clusterTabs) return;
+        const hasClusters = getEnabledClusters().length > 0;
+        const isSettingsActive = document.body.classList.contains('settings-view-active');
+        clusterTabs.classList.toggle('hidden', !hasClusters || isSettingsActive);
+    }
+
     function setActiveInlineSettingsSubtab(tab) {
-        const targetTab = tab === 'backup' ? 'backup' : 'cluster';
+        const targetTab = ['cluster', 'backup', 'help', 'about'].includes(tab) ? tab : 'cluster';
         inlineSettingsSubtabButtons.forEach((btn) => {
             btn.classList.toggle('active', btn.dataset.inlineSettingsSubtab === targetTab);
         });
         inlineSettingsSubtabPanels.forEach((panel) => {
             panel.classList.toggle('active', panel.dataset.inlineSettingsPanel === targetTab);
         });
+        inlineSettingsActions?.classList.toggle('hidden', targetTab !== 'cluster');
+    }
+
+    function resetAboutEasterEgg() {
+        inlineAboutLegacyWrap?.classList.remove('hidden');
+        if (inlineAboutEasterEggBtn) {
+            inlineAboutEasterEggBtn.textContent = chrome.i18n.getMessage('aboutHideEasterEgg') || 'Hide classic UI';
+        }
     }
 
     function normalizeAndValidateHttpsUrl(input) {
@@ -473,8 +491,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const scriptsPanel = document.querySelector('.scripts-panel');
         const scriptsInsideMain = Boolean(scriptsPanel && mainViewContent && mainViewContent.contains(scriptsPanel));
         inlineImportOnlyNoConfigMode = Boolean(options.importOnlyWhenNoConfig && options.targetSubtab === 'backup');
+        resetAboutEasterEgg();
         populateInlineSettingsFields();
-        setActiveInlineSettingsSubtab(options.targetSubtab === 'backup' ? 'backup' : 'cluster');
+        setActiveInlineSettingsSubtab(
+            options.targetSubtab === 'backup' || options.targetSubtab === 'help' || options.targetSubtab === 'about'
+                ? options.targetSubtab
+                : 'cluster'
+        );
         updateInlineImportOnlyVisibility();
         setInlineViewMode(true);
     }
@@ -482,6 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function closeInlineSettingsView() {
         inlineImportOnlyNoConfigMode = false;
         updateInlineImportOnlyVisibility();
+        resetAboutEasterEgg();
         resetInlineResetConfirmation();
         setInlineViewMode(false);
     }
@@ -659,10 +683,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (button.dataset.inlineSettingsSubtab !== 'backup') {
                 inlineImportOnlyNoConfigMode = false;
             }
+            if (button.dataset.inlineSettingsSubtab !== 'about') {
+                resetAboutEasterEgg();
+            }
             resetInlineResetConfirmation();
             setActiveInlineSettingsSubtab(button.dataset.inlineSettingsSubtab);
             updateInlineImportOnlyVisibility();
         });
+    });
+
+    inlineAboutEasterEggBtn?.addEventListener('click', () => {
+        const willReveal = inlineAboutLegacyWrap?.classList.contains('hidden');
+        inlineAboutLegacyWrap?.classList.toggle('hidden', !willReveal);
+        inlineAboutEasterEggBtn.textContent = willReveal
+            ? (chrome.i18n.getMessage('aboutHideEasterEgg') || 'Hide classic UI')
+            : (chrome.i18n.getMessage('aboutRevealEasterEgg') || 'Reveal classic UI');
     });
 
     inlineExportSettingsBtn?.addEventListener('click', async () => {
@@ -1431,12 +1466,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!clusterTabs) return;
         const enabledClusters = getEnabledClusters();
         clusterTabs.innerHTML = '';
-
         if (!enabledClusters.length) {
-            clusterTabs.classList.add('hidden');
+            updateClusterTabsVisibility();
             return;
         }
-        clusterTabs.classList.remove('hidden');
 
         const allTab = document.createElement('button');
         allTab.type = 'button';
@@ -1454,6 +1487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             tab.innerHTML = `<span class="cluster-status-dot"></span><span>${cluster.name}</span>`;
             clusterTabs.appendChild(tab);
         });
+        updateClusterTabsVisibility();
     }
 
     async function setActiveClusterTab(nextTabId) {

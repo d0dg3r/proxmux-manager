@@ -322,5 +322,89 @@
     },
     "openFloatingWindowNow": {
         "message": "Open Floating Window now"
+    },
+    "aboutTab": {
+        "message": "About"
+    },
+    "aboutProjectCredit": {
+        "message": "Created 2026 by d0dg3r (Joe Mild)."
+    },
+    "aboutProjectHomage": {
+        "message": "This project is a tribute to Proxmox VE 0.9, first released on April 15, 2008 — and a small nod to the great milestones in computer history: Linux, Git, and Proxmox ;)"
+    },
+    "aboutLicenseLabel": {
+        "message": "License:"
+    },
+    "aboutLicenseMitLink": {
+        "message": "MIT"
+    },
+    "aboutSupportTitle": {
+        "message": "Support & Community"
+    },
+    "aboutSupportRepo": {
+        "message": "Repository"
+    },
+    "aboutSupportIssues": {
+        "message": "Issues"
+    },
+    "aboutSupportAuthor": {
+        "message": "Author Profile"
+    },
+    "aboutSupportSponsor": {
+        "message": "Sponsor"
+    },
+    "helpTab": {
+        "message": "Help"
+    },
+    "aboutMadeFor": {
+        "message": "Made for DevOps & Sysadmins"
+    },
+    "aboutRevealEasterEgg": {
+        "message": "Reveal classic UI"
+    },
+    "aboutHideEasterEgg": {
+        "message": "Hide classic UI"
+    },
+    "aboutClassicCaption": {
+        "message": "Classic UI"
+    },
+    "helpTokenSetupTitle": {
+        "message": "Proxmox API Token Setup"
+    },
+    "helpTokenSetupPointDedicated": {
+        "message": "Default recommendation: create a dedicated API user and assign ACLs explicitly."
+    },
+    "helpTokenSetupPointRootFallback": {
+        "message": "Root token setup is available as a fallback for lab/test environments."
+    },
+    "helpTokenSetupPointStorage": {
+        "message": "The helper can store the token in a uniquely named local file with restrictive permissions (600)."
+    },
+    "helpTokenSetupPointCleanup": {
+        "message": "Import the token into your password manager immediately, then delete the local token file (shred -u preferred)."
+    },
+    "helpTokenSetupGuideLabel": {
+        "message": "Full guide:"
+    },
+    "helpTokenSetupHelperLabel": {
+        "message": "Run the interactive helper directly on a Proxmox host:"
+    },
+    "helpTokenSetupZshLabel": {
+        "message": "zsh-safe curl sample (quotes are important):"
+    },
+    "helpSupportTitle": {
+        "message": "Support & Community"
+    },
+    "popupTroubleshootingTitle": {
+        "message": "Troubleshooting"
+    },
+    "popupHelpRequiredPermissions": {
+        "message": "Required permissions: VM.Console and Sys.Audit (for SPICE also VM.Config.Options or PVEVMAdmin)."
+    },
+    "popupHelpSelfSigned": {
+        "message": "Self-signed certificates: open your Proxmox URL in a browser tab once and trust the certificate."
+    },
+    "popupHelpSshAgent": {
+        "message": "SSH shells need a detected IP; for VMs ensure QEMU Guest Agent is enabled and installed."
     }
 }

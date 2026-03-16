@@ -202,6 +202,37 @@
                 </div>
 
                 <div class="help-item">
+                    <h4 data-i18n="helpTokenSetupTitle">Proxmox API Token Setup</h4>
+                    <ul class="help-list">
+                        <li data-i18n="helpTokenSetupPointDedicated">Default recommendation: create a dedicated API user and assign ACLs explicitly.</li>
+                        <li data-i18n="helpTokenSetupPointRootFallback">Root token setup is available as a fallback for lab/test environments.</li>
+                        <li data-i18n="helpTokenSetupPointStorage">The helper can store the token in a uniquely named local file with restrictive permissions (600).</li>
+                        <li data-i18n="helpTokenSetupPointCleanup">Import the token into your password manager immediately, then delete the local token file (shred -u preferred).</li>
+                    </ul>
+                    <p>
+                        <span data-i18n="helpTokenSetupGuideLabel">Full guide:</span>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/blob/main/docs/proxmox-token-setup.md" target="_blank" rel="noreferrer">docs/proxmox-token-setup.md</a>
+                    </p>
+                    <p data-i18n="helpTokenSetupHelperLabel">Run the interactive helper directly on a Proxmox host:</p>
+                    <p><code>curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/refs/heads/main/scripts/setup_proxmox_token.sh' -o '/tmp/setup_proxmox_token.sh' && chmod 700 '/tmp/setup_proxmox_token.sh' && bash '/tmp/setup_proxmox_token.sh'</code></p>
+                    <p data-i18n="helpTokenSetupZshLabel">zsh-safe curl sample (quotes are important):</p>
+                    <p><code>curl -k -s -H 'Authorization: PVEAPIToken=USER_REALM!TOKEN_ID=TOKEN_SECRET' 'https://YOUR_HOST:8006/api2/json/cluster/resources?type=vm'</code></p>
+                </div>
+
+                <div class="help-item">
+                    <h4 data-i18n="helpSupportTitle">Support & Community</h4>
+                    <div class="help-links">
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportRepo">Repository</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportIssues">Issues</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/d0dg3r" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportAuthor">Author Profile</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/sponsors/d0dg3r" target="_blank" rel="noreferrer" class="sponsor-link" data-i18n="aboutSupportSponsor">Sponsor</a>
+                    </div>
+                </div>
+
+                <div class="help-item">
                     <h4>Firewall & Ports</h4>
                     <p>Ensure your Proxmox node is reachable on port <code>8006</code>. If you are behind a corporate proxy, you might need to whitelist the IP addresses of your cluster nodes.</p>
                 </div>
@@ -229,18 +260,26 @@
             <div class="card about-card">
                 <img src="../store/proxmux_logo.png" alt="Logo" class="about-logo">
                 <h2>PROXMUX Manager</h2>
-                <p class="version">Version 1.2.0</p>
-                <p>A premium extension for managing your Proxmox VE cluster with ease.</p>
+                <p class="version">Version 1.2.0-beta.3</p>
+                <p data-i18n="aboutProjectCredit">Created 2026 by d0dg3r (Joe Mild).</p>
+                <p data-i18n="aboutProjectHomage">This project is a tribute to Proxmox VE 0.9, first released on April 15, 2008 — and a small nod to the great milestones in computer history: Linux, Git, and Proxmox ;)</p>
+                <p>
+                    <span data-i18n="aboutLicenseLabel">License:</span>
+                    <a href="https://github.com/d0dg3r/PROXMUX-Manager/blob/main/LICENSE" target="_blank" rel="noreferrer" class="license-link" data-i18n="aboutLicenseMitLink">MIT</a>
+                </p>
                 <div class="about-footer">
+                    <p class="about-support-title" data-i18n="aboutSupportTitle">Support & Community</p>
                     <div class="about-links">
-                        <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" class="link-btn">GitHub</a>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportRepo">Repository</a>
                         <span class="dot">·</span>
-                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" class="link-btn">Issues</a>
+                        <a href="https://github.com/d0dg3r/PROXMUX-Manager/issues" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportIssues">Issues</a>
                         <span class="dot">·</span>
-                        <a href="https://github.com/sponsors/d0dg3r" target="_blank" class="sponsor-link">Sponsor</a>
+                        <a href="https://github.com/d0dg3r" target="_blank" rel="noreferrer" class="link-btn" data-i18n="aboutSupportAuthor">Author Profile</a>
+                        <span class="dot">·</span>
+                        <a href="https://github.com/sponsors/d0dg3r" target="_blank" rel="noreferrer" class="sponsor-link" data-i18n="aboutSupportSponsor">Sponsor</a>
                     </div>
                     <div class="credits">
-                        Made for DevOps & Sysadmins
+                        <span data-i18n="aboutMadeFor">Made for DevOps & Sysadmins</span>
                     </div>
                 </div>
             </div>

@@ -2,6 +2,8 @@
 
 This document contains all the text, metadata, and justifications required to submit PROXMUX Manager to the Chrome Web Store.
 
+Current release prep target: `v1.2.0-beta.3` (align with `CHANGELOG.md` top entry before submission).
+
 ## 1. Store Metadata
 
 - **Product Name**: PROXMUX Manager
@@ -120,6 +122,11 @@ curl -fsSL 'https://raw.githubusercontent.com/d0dg3r/PROXMUX-Manager/refs/heads/
 
 ## 5. Visual Assets Checklist
 - **Icon**: 128x128 pixels (provided in `store/proxmux_logo.png`).
-- **Screenshots (Primary Store Set)**: 1280x800 PNG (`store/screenshot_dark.png`, `store/screenshot_light.png`).
-- **Screenshots (Compact Variant)**: 640x400 PNG (`store/screenshot_dark_640x400.png`, `store/screenshot_light_640x400.png`).
-- **Marquee/Tile**: 440x280 pixels.
+- **Screenshots (Primary Store Set, combined Light+Dark)**:
+  - `store/screenshot_01_multi_cluster_1280x800.png`
+  - `store/screenshot_02_resource_expanded_1280x800.png`
+  - `store/screenshot_03_onboarding_1280x800.png`
+  - `store/screenshot_04_settings_cluster_1280x800.png`
+  - `store/screenshot_05_settings_backup_1280x800.png`
+- **Source capture model**: Light and Dark are captured per scene at `640x800` and merged side-by-side to one `1280x800` export.
+- **Marquee/Tile**: 440x280 pixels (`store/small_promo_tile_new.png`).
