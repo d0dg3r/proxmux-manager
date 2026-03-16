@@ -1,0 +1,17 @@
+PROXMUX Manager ist die professionelle Chrome-Erweiterung fuer Proxmox VE Administratoren. Greifen Sie direkt im Browser auf Ihren Virtualisierungs-Cluster zu, ueberwachen Sie Nodes, VMs und Container, und starten Sie Konsolen mit wenigen Klicks.
+
+Hauptfunktionen:
+- Interaktive Tags fuer schnelle, kategorische Filterung im gesamten Cluster
+- Uptime-Anzeige in gut lesbarer Form (z. B. 2d 5h)
+- Ueberblick ueber Status, OS-Typen und IP-Adressen von VM/LXC
+- Flexible Startmodi: Side Panel (Standard) oder persistentes Floating Window
+- Inline Advanced Settings direkt in der aktiven Erweiterungsansicht
+- Intelligente Konsolen: noVNC, SPICE (remote-viewer) und Node Shell
+- Modernes Design mit Dark, Light oder System-Theme
+- Hochverfuegbarkeit durch automatische Node-Erkennung und Failover
+- Sichere lokale Speicherung der API-Token (keine Uebertragung an Dritte)
+
+Perfekt fuer DevOps-Teams und Home-Server-Enthusiasten, die Proxmox-Infrastruktur schnell, professionell und sicher im Browser verwalten wollen.
+
+Kurzbeschreibung:
+Proxmox VE Cluster im Browser verwalten: Monitoring, Konsolenzugriff, Failover sowie Side Panel oder Floating Window.
