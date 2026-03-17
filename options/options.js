@@ -32,6 +32,13 @@ import {
     parseSshHostDefaultsText,
     stringifySshHostDefaults
 } from '../lib/ssh-config-export.js';
+import {
+    getUiScalePresetId,
+    normalizeUiScale,
+    resolveUiScalePresetValue,
+    toUiScaleFactor,
+    UI_SCALE_DEFAULT
+} from '../lib/ui-scale.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const proxmoxUrlInput = document.getElementById('proxmox-url');
@@ -39,6 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const apiTokenIdInput = document.getElementById('api-tokenid');
     const apiSecretInput = document.getElementById('api-secret');
     const themeSelect = document.getElementById('theme-select');
+    const uiScalePresetSelect = document.getElementById('ui-scale-preset');
+    const uiScaleSlider = document.getElementById('ui-scale-slider');
+    const uiScaleValue = document.getElementById('ui-scale-value');
     const saveBtn = document.getElementById('save-settings-btn');
     const testBtn = document.getElementById('test-connection-btn');
     const resetBtn = document.getElementById('reset-settings-btn');
@@ -84,6 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         apiUser: 'api-admin@pve',
         apiTokenId: 'full-access',
         theme: 'auto',
+        uiScale: UI_SCALE_DEFAULT,
         consoleTabMode: 'duplicate',
         communityScriptsCacheTtlHours: 12,
         defaultScriptNode: '',
@@ -659,6 +670,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 'auto' does nothing, letting CSS media query handle it
     }
 
+    function applyUiScale(scaleValue) {
+        const normalized = normalizeUiScale(scaleValue, DEFAULT_SETTINGS.uiScale);
+        document.documentElement.style.setProperty('--ui-scale', toUiScaleFactor(normalized));
+        if (uiScaleValue) {
+            uiScaleValue.textContent = `${normalized}%`;
+        }
+        return normalized;
+    }
+
+    function syncUiScaleControls(scaleValue) {
+        const normalized = applyUiScale(scaleValue);
+        if (uiScaleSlider) {
+            uiScaleSlider.value = String(normalized);
+        }
+        if (uiScalePresetSelect) {
+            uiScalePresetSelect.value = getUiScalePresetId(normalized);
+        }
+        return normalized;
+    }
+
     function getActiveCluster() {
         return activeClusterId ? clusters[activeClusterId] : null;
     }
@@ -745,6 +776,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function reloadSettingsFromStorage() {
         const items = await chrome.storage.local.get([
             'theme',
+            'uiScale',
             'consoleTabMode',
             'communityScriptsCacheTtlHours',
             'defaultScriptNode',
@@ -794,6 +826,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             themeSelect.value = DEFAULT_SETTINGS.theme;
             applyTheme(DEFAULT_SETTINGS.theme);
         }
+        syncUiScaleControls(items.uiScale ?? DEFAULT_SETTINGS.uiScale);
         if (items.consoleTabMode) {
             document.getElementById('tab-mode-select').value = items.consoleTabMode;
         } else {
@@ -817,6 +850,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     themeSelect.addEventListener('change', () => {
         applyTheme(themeSelect.value);
+    });
+
+    uiScalePresetSelect?.addEventListener('change', async () => {
+        if (uiScalePresetSelect.value === 'custom') return;
+        const nextScale = resolveUiScalePresetValue(uiScalePresetSelect.value, DEFAULT_SETTINGS.uiScale);
+        const normalized = syncUiScaleControls(nextScale);
+        await chrome.storage.local.set({ uiScale: normalized });
+    });
+
+    uiScaleSlider?.addEventListener('input', async () => {
+        const normalized = syncUiScaleControls(uiScaleSlider.value);
+        await chrome.storage.local.set({ uiScale: normalized });
+    });
+
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName !== 'local') return;
+        if (!Object.prototype.hasOwnProperty.call(changes, 'uiScale')) return;
+        const nextScale = changes.uiScale?.newValue;
+        syncUiScaleControls(nextScale ?? DEFAULT_SETTINGS.uiScale);
     });
 
     clusterSelect?.addEventListener('change', async () => {
@@ -921,6 +973,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tokenId = apiTokenIdInput.value.trim();
         const secret = apiSecretInput.value.trim();
         const theme = themeSelect.value;
+        const uiScale = normalizeUiScale(uiScaleSlider?.value, DEFAULT_SETTINGS.uiScale);
         const communityScriptsCacheTtlHours = Math.max(1, Math.min(168, Number(scriptsCacheTtlInput.value || 12)));
         const defaultScriptNode = defaultScriptNodeInput.value.trim();
         let sshDefaultUser = '';
@@ -958,6 +1011,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await persistClusterFromForm();
         await chrome.storage.local.set({
             theme: theme,
+            uiScale,
             consoleTabMode: document.getElementById('tab-mode-select').value,
             communityScriptsCacheTtlHours,
             defaultScriptNode,

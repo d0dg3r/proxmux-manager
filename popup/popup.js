@@ -36,6 +36,13 @@ import {
     parseSshHostDefaultsText,
     stringifySshHostDefaults
 } from '../lib/ssh-config-export.js';
+import {
+    getUiScalePresetId,
+    normalizeUiScale,
+    resolveUiScalePresetValue,
+    toUiScaleFactor,
+    UI_SCALE_DEFAULT
+} from '../lib/ui-scale.js';
 
 const LAST_BROWSER_WINDOW_ID_KEY = 'lastBrowserWindowId';
 const FAVORITES_TAB_ID = '__favorites__';
@@ -93,6 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inlineApiTokenIdInput = document.getElementById('inline-api-tokenid');
     const inlineApiSecretInput = document.getElementById('inline-api-secret');
     const inlineThemeSelect = document.getElementById('inline-theme-select');
+    const inlineUiScalePresetSelect = document.getElementById('inline-ui-scale-preset');
+    const inlineUiScaleSlider = document.getElementById('inline-ui-scale-slider');
+    const inlineUiScaleValue = document.getElementById('inline-ui-scale-value');
     const inlineTabModeSelect = document.getElementById('inline-tab-mode-select');
     const inlineDefaultActionClickModeSelect = document.getElementById('inline-default-action-click-mode');
     const inlineSshDefaultUserInput = document.getElementById('inline-ssh-default-user');
@@ -181,6 +191,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function applyUiScale(scaleValue) {
+        const normalized = normalizeUiScale(scaleValue, UI_SCALE_DEFAULT);
+        document.documentElement.style.setProperty('--ui-scale', toUiScaleFactor(normalized));
+        if (inlineUiScaleValue) {
+            inlineUiScaleValue.textContent = `${normalized}%`;
+        }
+        return normalized;
+    }
+
+    function syncInlineUiScaleControls(scaleValue) {
+        const normalized = applyUiScale(scaleValue);
+        if (inlineUiScaleSlider) {
+            inlineUiScaleSlider.value = String(normalized);
+        }
+        if (inlineUiScalePresetSelect) {
+            inlineUiScalePresetSelect.value = getUiScalePresetId(normalized);
+        }
+        return normalized;
+    }
+
     function updateThemeIcon(theme) {
         if (!themeIcon) return;
         // Icon represents the TARGET theme (Action)
@@ -235,6 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const scriptsGuideOpenPage = document.getElementById('scripts-guide-open-page');
     const debugStatus = document.getElementById('debug-status');
 
+
     let displaySettings = {
         uptime: true,
         ip: true,
@@ -253,6 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         apiUser: 'api-admin@pve',
         apiTokenId: 'full-access',
         theme: 'auto',
+        uiScale: UI_SCALE_DEFAULT,
         consoleTabMode: 'duplicate',
         sshDefaultUser: '',
         sshDefaultKeyPath: '',
@@ -917,6 +949,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         inlineApiTokenIdInput.value = editableCluster?.apiTokenId || DEFAULT_SETTINGS.apiTokenId;
         inlineApiSecretInput.value = editableCluster?.apiSecret || '';
         inlineThemeSelect.value = settings.theme || 'auto';
+        syncInlineUiScaleControls(settings.uiScale ?? DEFAULT_SETTINGS.uiScale);
         inlineTabModeSelect.value = settings.consoleTabMode || 'duplicate';
         inlineSshDefaultUserInput.value = normalizeSshUser(settings.sshDefaultUser || DEFAULT_SETTINGS.sshDefaultUser);
         const mergedOverrides = mergeHostOverridesWithLegacy(settings.sshHostOverrides, settings.sshUserOverrides);
@@ -1139,6 +1172,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     inlineThemeSelect.addEventListener('change', () => {
         applyTheme(inlineThemeSelect.value);
+    });
+
+    inlineUiScalePresetSelect?.addEventListener('change', async () => {
+        if (inlineUiScalePresetSelect.value === 'custom') return;
+        const nextScale = resolveUiScalePresetValue(
+            inlineUiScalePresetSelect.value,
+            settings.uiScale ?? DEFAULT_SETTINGS.uiScale
+        );
+        const normalized = syncInlineUiScaleControls(nextScale);
+        settings = { ...settings, uiScale: normalized };
+        await chrome.storage.local.set({ uiScale: normalized });
+    });
+
+    inlineUiScaleSlider?.addEventListener('input', async () => {
+        const normalized = syncInlineUiScaleControls(inlineUiScaleSlider.value);
+        settings = { ...settings, uiScale: normalized };
+        await chrome.storage.local.set({ uiScale: normalized });
+    });
+
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+        if (areaName !== 'local') return;
+        if (!Object.prototype.hasOwnProperty.call(changes, 'uiScale')) return;
+        const nextScale = changes.uiScale?.newValue;
+        const normalized = syncInlineUiScaleControls(nextScale ?? DEFAULT_SETTINGS.uiScale);
+        settings = { ...settings, uiScale: normalized };
     });
 
     inlineSettingsSubtabButtons.forEach((button) => {
@@ -1443,6 +1501,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             apiSecret: payload.apiSecret,
             apiToken: payload.apiToken,
             theme: payload.theme,
+            uiScale: payload.uiScale,
             consoleTabMode: payload.consoleTabMode,
             sshDefaultUser: payload.sshDefaultUser,
             sshDefaultKeyPath: payload.sshDefaultKeyPath,
@@ -1501,6 +1560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             apiSecret: secret,
             apiToken: `${user}!${tokenId}=${secret}`,
             theme: inlineThemeSelect.value,
+            uiScale: normalizeUiScale(inlineUiScaleSlider?.value, DEFAULT_SETTINGS.uiScale),
             consoleTabMode: inlineTabModeSelect.value,
             sshDefaultUser,
             sshDefaultKeyPath,
@@ -1515,6 +1575,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await persistActiveClusterPayload(payload);
         settings = { ...settings, ...payload };
         applyTheme(payload.theme);
+        applyUiScale(payload.uiScale);
         inlineImportOnlyNoConfigMode = false;
         updateInlineImportOnlyVisibility();
         setInlineSettingsStatus('Settings saved successfully!', 'success');
@@ -1580,6 +1641,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 apiSecret: secret,
                 apiToken: `${user}!${tokenId}=${secret}`,
                 theme: inlineThemeSelect.value,
+                uiScale: normalizeUiScale(inlineUiScaleSlider?.value, DEFAULT_SETTINGS.uiScale),
                 consoleTabMode: inlineTabModeSelect.value,
                 sshDefaultUser,
                 sshDefaultKeyPath,
@@ -1593,6 +1655,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await persistActiveClusterPayload(payload);
             settings = { ...settings, ...payload };
             applyTheme(payload.theme);
+            applyUiScale(payload.uiScale);
             inlineImportOnlyNoConfigMode = false;
             updateInlineImportOnlyVisibility();
             noAuthOverlay.classList.add('hidden');
@@ -1628,6 +1691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         settings = {
             ...settings,
             theme: resetResult.storagePayload.theme,
+            uiScale: resetResult.storagePayload.uiScale,
             consoleTabMode: resetResult.storagePayload.consoleTabMode,
             defaultActionClickMode: resetResult.storagePayload.defaultActionClickMode,
             communityScriptsCacheTtlHours: resetResult.storagePayload.communityScriptsCacheTtlHours,
@@ -2132,6 +2196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         settings = {
             ...stored,
             theme: stored.theme || DEFAULT_SETTINGS.theme,
+            uiScale: normalizeUiScale(stored.uiScale, DEFAULT_SETTINGS.uiScale),
             consoleTabMode: stored.consoleTabMode || DEFAULT_SETTINGS.consoleTabMode,
             sshDefaultUser,
             sshDefaultKeyPath,
@@ -2270,6 +2335,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load saved settings
     const stored = await chrome.storage.local.get([
         'theme',
+        'uiScale',
         'displaySettings',
         'consoleTabMode',
         'communityScriptsCacheTtlHours',
@@ -2305,6 +2371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (settings.theme) {
         applyTheme(settings.theme);
     }
+    applyUiScale(settings.uiScale ?? DEFAULT_SETTINGS.uiScale);
 
     const scriptsPanelCollapsedOnStartup = typeof settings.scriptsPanelCollapsed === 'undefined'
         ? true
@@ -2708,7 +2775,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
             
-            indicator.classList.add((res.status === 'running' || res.status === 'online') ? 'status-running' : (res.status === 'stopped' ? 'status-stopped' : 'status-unknown'));
+            const isRunning = res.status === 'running' || res.status === 'online';
+            const isStopped = res.status === 'stopped';
+            const statusClass = isRunning ? 'status-running' : (isStopped ? 'status-stopped' : 'status-unknown');
+            const statusLabel = isRunning ? 'running' : (isStopped ? 'stopped' : 'unknown');
+            indicator.classList.add(statusClass);
+            indicator.setAttribute('title', `Status: ${statusLabel}`);
+            indicator.setAttribute('aria-label', `Status ${statusLabel}`);
 
             if (expandDetailsByDefault || currentExpandedId === resId) {
                 item.classList.add('expanded');

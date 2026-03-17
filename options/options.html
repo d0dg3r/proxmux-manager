@@ -82,6 +82,20 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="ui-scale-preset">UI Scale</label>
+                    <select id="ui-scale-preset" class="form-control">
+                        <option value="compact">Compact (90%)</option>
+                        <option value="standard">Standard (100%)</option>
+                        <option value="large">Large (115%)</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                    <div class="ui-scale-row">
+                        <input type="range" id="ui-scale-slider" min="85" max="140" step="1" value="100">
+                        <span id="ui-scale-value">100%</span>
+                    </div>
+                </div>
+
                 <div class="form-group separator">
                     <h3 data-i18n="tabManagement">Tab Management</h3>
                 </div>

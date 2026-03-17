@@ -249,6 +249,20 @@
                 </div>
 
                 <div class="inline-settings-form-group">
+                    <label for="inline-ui-scale-preset">UI Scale</label>
+                    <select id="inline-ui-scale-preset" class="inline-form-control">
+                        <option value="compact">Compact (90%)</option>
+                        <option value="standard">Standard (100%)</option>
+                        <option value="large">Large (115%)</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                    <div class="inline-ui-scale-row">
+                        <input type="range" id="inline-ui-scale-slider" class="inline-ui-scale-slider" min="85" max="140" step="1" value="100">
+                        <span id="inline-ui-scale-value">100%</span>
+                    </div>
+                </div>
+
+                <div class="inline-settings-form-group">
                     <label for="inline-tab-mode-select" data-i18n="consoleTabMode">Console Tab Behavior</label>
                     <select id="inline-tab-mode-select" class="inline-form-control">
                         <option value="multiple" data-i18n="tabMultiple">Open new tab every time</option>

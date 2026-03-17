@@ -1,4 +1,5 @@
 :root {
+    --ui-scale: 1;
     /* Brand Colors */
     --brand-prox: #40E0D0; /* Turquoise */
     --brand-mux: #D2691E; /* Orange/Brown */
@@ -18,6 +19,10 @@
     --glass-bg: hsla(210, 15%, 11%, 0.7);
     --tag-bg: hsla(210, 15%, 15%, 0.9);
     --glass-border: hsla(0, 0%, 100%, 0.1);
+}
+
+html {
+    font-size: calc(16px * var(--ui-scale));
 }
 
 @media (prefers-color-scheme: light) {
@@ -183,6 +188,28 @@ h1.branded-title .title-suffix {
     opacity: 0.8;
 }
 
+.ui-scale-row {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#ui-scale-slider {
+    flex: 1;
+    margin: 0;
+    min-height: auto;
+    padding: 0;
+}
+
+#ui-scale-value {
+    min-width: 48px;
+    text-align: right;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -191,8 +218,8 @@ h1.branded-title .title-suffix {
 
 .settings-subtabs {
     display: inline-flex;
-    gap: 6px;
-    padding: 4px;
+    gap: 8px;
+    padding: 5px;
     border: 1px solid var(--border);
     border-radius: 999px;
     background: var(--tag-bg);
@@ -204,9 +231,9 @@ h1.branded-title .title-suffix {
     background: transparent;
     color: var(--text-secondary);
     border-radius: 999px;
-    padding: 4px 10px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 6px 12px;
+    font-size: 0.86rem;
+    font-weight: 700;
     cursor: pointer;
 }
 
