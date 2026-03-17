@@ -39,6 +39,23 @@ import {
 
 const LAST_BROWSER_WINDOW_ID_KEY = 'lastBrowserWindowId';
 const FAVORITES_TAB_ID = '__favorites__';
+const CLUSTER_COLOR_TOKENS = ['c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'];
+
+function hashClusterId(value) {
+    const input = String(value || '');
+    let hash = 0;
+    for (let index = 0; index < input.length; index += 1) {
+        hash = ((hash << 5) - hash) + input.charCodeAt(index);
+        hash |= 0;
+    }
+    return Math.abs(hash);
+}
+
+function getClusterColorToken(clusterId) {
+    if (!clusterId) return CLUSTER_COLOR_TOKENS[0];
+    const idx = hashClusterId(clusterId) % CLUSTER_COLOR_TOKENS.length;
+    return CLUSTER_COLOR_TOKENS[idx];
+}
 
 // Safely escape text for insertion into innerHTML to prevent XSS.
 function escapeHtml(str) {
@@ -2196,6 +2213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             tab.type = 'button';
             tab.className = `cluster-tab ${activeClusterTabId === cluster.id ? 'active' : ''}`;
             tab.dataset.clusterTab = cluster.id;
+            tab.dataset.clusterColor = getClusterColorToken(cluster.id);
             tab.title = cluster.name;
             tab.innerHTML = `<span class="cluster-status-dot"></span><span>${cluster.name}</span>`;
             clusterTabs.appendChild(tab);
@@ -2605,18 +2623,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? (res.node || res.name || 'Node')
                     : (res.name || res.vmid || res.node || '')
             ).toString();
+            const isMixedClusterView = activeClusterTabId === ALL_CLUSTERS_TAB_ID || activeClusterTabId === FAVORITES_TAB_ID;
             if (nameEl) {
                 nameEl.textContent = displayName;
             }
             if (nameChipsEl && typeNodeEl.parentElement !== nameChipsEl) {
                 nameChipsEl.appendChild(typeNodeEl);
             }
-            if (nameChipsEl && uptimeEl.parentElement !== nameChipsEl) {
-                nameChipsEl.appendChild(uptimeEl);
+            if (subtitleEl && uptimeEl.parentElement !== subtitleEl) {
+                subtitleEl.appendChild(uptimeEl);
             }
             typeNodeEl.textContent = res.type.toUpperCase();
             typeNodeEl.classList.add('subtitle-chip', 'subtitle-type');
             typeNodeEl.classList.add(`subtitle-type-${res.type}`);
+            typeNodeEl.classList.remove('hidden');
 
             const showNodeChip = res.type !== 'node';
             let nodeChipEl = null;
@@ -2624,35 +2644,68 @@ document.addEventListener('DOMContentLoaded', async () => {
                 nodeChipEl = document.createElement('span');
                 nodeChipEl.className = 'subtitle-chip subtitle-node';
                 nodeChipEl.textContent = res.node;
-                subtitleEl?.insertBefore(nodeChipEl, nodeIdEl);
+                if (subtitleEl && osTag?.parentElement === subtitleEl) {
+                    subtitleEl.insertBefore(nodeChipEl, osTag);
+                } else {
+                    subtitleEl?.appendChild(nodeChipEl);
+                }
             }
 
-            if (activeClusterTabId === ALL_CLUSTERS_TAB_ID && res.__clusterName) {
+            if (isMixedClusterView && res.__clusterName) {
                 const clusterBadge = document.createElement('span');
                 clusterBadge.className = 'cluster-resource-badge';
+                clusterBadge.dataset.clusterColor = getClusterColorToken(res.__clusterId);
                 clusterBadge.textContent = res.__clusterName;
                 if (nodeChipEl) {
                     nodeChipEl.appendChild(clusterBadge);
                 } else {
-                    typeNodeEl.appendChild(clusterBadge);
+                    const clusterChip = document.createElement('span');
+                    clusterChip.className = 'subtitle-chip subtitle-node';
+                    clusterChip.textContent = res.__clusterName;
+                    if (subtitleEl && osTag?.parentElement === subtitleEl) {
+                        subtitleEl.insertBefore(clusterChip, osTag);
+                    } else {
+                        subtitleEl?.appendChild(clusterChip);
+                    }
                 }
             }
             if ((res.type === 'qemu' || res.type === 'lxc') && res.vmid) {
                 nodeIdEl.textContent = `ID ${res.vmid}`;
                 nodeIdEl.classList.add('subtitle-chip', 'subtitle-vmid');
                 nodeIdEl.classList.remove('hidden');
+                nameChipsEl?.appendChild(nodeIdEl);
             } else {
                 nodeIdEl.textContent = '';
                 nodeIdEl.classList.add('hidden');
+                nameChipsEl?.appendChild(nodeIdEl);
             }
 
             if (res.uptime && (res.status === 'running' || res.status === 'online')) {
                 uptimeEl.textContent = formatUptime(res.uptime);
+                uptimeEl.classList.remove('tag', 'uptime-meta-tag');
                 uptimeEl.classList.add('subtitle-chip');
+                if (subtitleEl) {
+                    if (osTag?.parentElement === subtitleEl) {
+                        const afterOsTag = osTag.nextElementSibling;
+                        if (afterOsTag) {
+                            subtitleEl.insertBefore(uptimeEl, afterOsTag);
+                        } else {
+                            subtitleEl.appendChild(uptimeEl);
+                        }
+                    } else {
+                        subtitleEl.appendChild(uptimeEl);
+                    }
+                }
                 uptimeEl.classList.remove('hidden');
             } else {
                 uptimeEl.textContent = '';
                 uptimeEl.classList.add('hidden');
+                uptimeEl.classList.remove('tag', 'uptime-meta-tag', 'subtitle-chip');
+                if (subtitleEl) {
+                    subtitleEl.appendChild(uptimeEl);
+                } else {
+                    nameChipsEl?.appendChild(uptimeEl);
+                }
             }
             
             indicator.classList.add((res.status === 'running' || res.status === 'online') ? 'status-running' : (res.status === 'stopped' ? 'status-stopped' : 'status-unknown'));
