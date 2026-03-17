@@ -411,7 +411,7 @@
         "message": "SSH-Shells benötigen eine erkannte IP; bei VMs sicherstellen, dass der QEMU Guest Agent aktiviert und installiert ist."
     },
     "popupHelpSshExport": {
-        "message": "SSH-Config Export liegt im Extras-Tab und unterstützt Key-Katalog-Auswahl, globale Benutzer/Key-Defaults, host-spezifische Benutzer/Key-Overrides und OpenSSH-Directive-Defaults."
+        "message": "SSH-Config Export liegt im Extras-Tab und unterstuetzt OpenSSH-, PuTTY-.reg- und CSV-Ausgabe sowie Key-Katalog-Auswahl, globale Benutzer/Key-Defaults und host-spezifische Benutzer/Key-Overrides."
     },
     "sshConfigExportTitle": {
         "message": "SSH-Config Export"
@@ -457,6 +457,21 @@
     },
     "sshHostDefaultsHelp": {
         "message": "Eine OpenSSH-Directive pro Zeile. Leere Zeilen und # Kommentare sind erlaubt."
+    },
+    "sshExportFormatLabel": {
+        "message": "Export-Format"
+    },
+    "sshExportFormatHelp": {
+        "message": "Ausgabeformat fuer Download/Kopieren waehlen."
+    },
+    "sshExportFormatOptionOpenSsh": {
+        "message": "OpenSSH-Config"
+    },
+    "sshExportFormatOptionPutty": {
+        "message": "PuTTY .reg (Windows)"
+    },
+    "sshExportFormatOptionCsv": {
+        "message": "CSV-Hostliste"
     },
     "sshExportDownloadBtn": {
         "message": "SSH-Config herunterladen"

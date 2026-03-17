@@ -18,6 +18,30 @@
     --tag-bg: hsla(210, 15%, 15%, 0.9);
     --glass-bg: hsla(210, 15%, 11%, 0.75);
     --glass-border: hsla(0, 0%, 100%, 0.1);
+    --chip-bg: var(--tag-bg);
+    --chip-fg: var(--text-primary);
+    --chip-border: var(--border);
+    --type-node-fg: hsl(140, 75%, 72%);
+    --type-node-bg: hsla(140, 60%, 35%, 0.22);
+    --type-node-border: hsla(140, 70%, 52%, 0.55);
+    --type-qemu-fg: hsl(186, 85%, 72%);
+    --type-qemu-bg: hsla(186, 70%, 36%, 0.22);
+    --type-qemu-border: hsla(186, 78%, 56%, 0.55);
+    --type-lxc-fg: hsl(28, 94%, 72%);
+    --type-lxc-bg: hsla(28, 80%, 36%, 0.22);
+    --type-lxc-border: hsla(28, 88%, 54%, 0.56);
+    --console-novnc-fg: var(--type-qemu-fg);
+    --console-novnc-bg: hsla(186, 70%, 50%, 0.14);
+    --console-novnc-border: hsla(186, 76%, 52%, 0.42);
+    --console-ssh-fg: var(--type-node-fg);
+    --console-ssh-bg: hsla(140, 65%, 45%, 0.14);
+    --console-ssh-border: hsla(140, 70%, 50%, 0.42);
+    --console-spice-fg: hsl(280, 86%, 78%);
+    --console-spice-bg: hsla(280, 72%, 52%, 0.16);
+    --console-spice-border: hsla(280, 76%, 60%, 0.42);
+    --console-shell-fg: var(--type-lxc-fg);
+    --console-shell-bg: hsla(28, 86%, 52%, 0.16);
+    --console-shell-border: hsla(28, 90%, 56%, 0.44);
 }
 
 body.light-theme {
@@ -33,6 +57,30 @@ body.light-theme {
     --tag-bg: hsla(210, 20%, 86%, 0.96);
     --glass-bg: hsla(0, 0%, 100%, 0.96);
     --glass-border: hsla(0, 0%, 0%, 0.16);
+    --chip-bg: hsla(210, 24%, 90%, 0.98);
+    --chip-fg: hsl(210, 18%, 20%);
+    --chip-border: hsla(210, 18%, 60%, 0.82);
+    --type-node-fg: hsl(140, 72%, 24%);
+    --type-node-bg: hsla(140, 46%, 74%, 0.62);
+    --type-node-border: hsla(140, 58%, 34%, 0.7);
+    --type-qemu-fg: hsl(192, 84%, 23%);
+    --type-qemu-bg: hsla(192, 52%, 74%, 0.62);
+    --type-qemu-border: hsla(192, 64%, 34%, 0.72);
+    --type-lxc-fg: hsl(26, 82%, 24%);
+    --type-lxc-bg: hsla(26, 60%, 74%, 0.62);
+    --type-lxc-border: hsla(26, 70%, 36%, 0.72);
+    --console-novnc-fg: hsl(192, 84%, 22%);
+    --console-novnc-bg: hsla(192, 64%, 68%, 0.38);
+    --console-novnc-border: hsla(192, 68%, 32%, 0.72);
+    --console-ssh-fg: hsl(140, 72%, 22%);
+    --console-ssh-bg: hsla(140, 54%, 66%, 0.36);
+    --console-ssh-border: hsla(140, 58%, 30%, 0.72);
+    --console-spice-fg: hsl(280, 66%, 26%);
+    --console-spice-bg: hsla(280, 62%, 70%, 0.35);
+    --console-spice-border: hsla(280, 62%, 36%, 0.68);
+    --console-shell-fg: hsl(26, 80%, 24%);
+    --console-shell-bg: hsla(26, 66%, 68%, 0.36);
+    --console-shell-border: hsla(26, 70%, 34%, 0.7);
 }
 
 @media (prefers-color-scheme: light) {
@@ -49,6 +97,30 @@ body.light-theme {
         --tag-bg: hsla(210, 20%, 86%, 0.96);
         --glass-bg: hsla(0, 0%, 100%, 0.96);
         --glass-border: hsla(0, 0%, 0%, 0.16);
+        --chip-bg: hsla(210, 24%, 90%, 0.98);
+        --chip-fg: hsl(210, 18%, 20%);
+        --chip-border: hsla(210, 18%, 60%, 0.82);
+        --type-node-fg: hsl(140, 72%, 24%);
+        --type-node-bg: hsla(140, 46%, 74%, 0.62);
+        --type-node-border: hsla(140, 58%, 34%, 0.7);
+        --type-qemu-fg: hsl(192, 84%, 23%);
+        --type-qemu-bg: hsla(192, 52%, 74%, 0.62);
+        --type-qemu-border: hsla(192, 64%, 34%, 0.72);
+        --type-lxc-fg: hsl(26, 82%, 24%);
+        --type-lxc-bg: hsla(26, 60%, 74%, 0.62);
+        --type-lxc-border: hsla(26, 70%, 36%, 0.72);
+        --console-novnc-fg: hsl(192, 84%, 22%);
+        --console-novnc-bg: hsla(192, 64%, 68%, 0.38);
+        --console-novnc-border: hsla(192, 68%, 32%, 0.72);
+        --console-ssh-fg: hsl(140, 72%, 22%);
+        --console-ssh-bg: hsla(140, 54%, 66%, 0.36);
+        --console-ssh-border: hsla(140, 58%, 30%, 0.72);
+        --console-spice-fg: hsl(280, 66%, 26%);
+        --console-spice-bg: hsla(280, 62%, 70%, 0.35);
+        --console-spice-border: hsla(280, 62%, 36%, 0.68);
+        --console-shell-fg: hsl(26, 80%, 24%);
+        --console-shell-bg: hsla(26, 66%, 68%, 0.36);
+        --console-shell-border: hsla(26, 70%, 34%, 0.7);
     }
 }
 
@@ -1684,6 +1756,18 @@ main {
     padding-left: 22px;
 }
 
+.resource-item.type-node .item-main {
+    box-shadow: inset 3px 0 0 var(--type-node-border);
+}
+
+.resource-item.type-qemu .item-main {
+    box-shadow: inset 3px 0 0 var(--type-qemu-border);
+}
+
+.resource-item.type-lxc .item-main {
+    box-shadow: inset 3px 0 0 var(--type-lxc-border);
+}
+
 .details-drawer {
     display: grid;
     grid-template-rows: 0fr;
@@ -1837,35 +1921,35 @@ body.light-theme .details-drawer {
     font-size: 0.65rem;
     padding: 2px 8px;
     border-radius: 6px;
-    border: 1px solid var(--border);
-    background-color: var(--tag-bg);
-    color: var(--text-primary);
+    border: 1px solid var(--chip-border);
+    background-color: var(--chip-bg);
+    color: var(--chip-fg);
     font-weight: 600;
     letter-spacing: 0.01em;
 }
 
 .subtitle-type {
-    color: var(--accent);
-    background-color: hsla(190, 80%, 40%, 0.1);
-    border-color: hsla(190, 80%, 40%, 0.3);
+    color: var(--type-qemu-fg);
+    background-color: var(--type-qemu-bg);
+    border-color: var(--type-qemu-border);
 }
 
 .subtitle-type-node {
-    color: var(--success);
-    background-color: hsla(140, 60%, 45%, 0.12);
-    border-color: hsla(140, 60%, 45%, 0.35);
+    color: var(--type-node-fg);
+    background-color: var(--type-node-bg);
+    border-color: var(--type-node-border);
 }
 
 .subtitle-type-qemu {
-    color: var(--brand-prox);
-    background-color: hsla(180, 70%, 50%, 0.12);
-    border-color: hsla(180, 70%, 50%, 0.32);
+    color: var(--type-qemu-fg);
+    background-color: var(--type-qemu-bg);
+    border-color: var(--type-qemu-border);
 }
 
 .subtitle-type-lxc {
-    color: var(--brand-mux);
-    background-color: hsla(25, 80%, 50%, 0.12);
-    border-color: hsla(25, 80%, 50%, 0.32);
+    color: var(--type-lxc-fg);
+    background-color: var(--type-lxc-bg);
+    border-color: var(--type-lxc-border);
 }
 
 .subtitle-node {
@@ -1918,9 +2002,9 @@ body.light-theme .details-drawer {
     font-size: 0.65rem;
     padding: 2px 8px;
     border-radius: 6px;
-    background-color: var(--tag-bg);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
+    background-color: var(--chip-bg);
+    border: 1px solid var(--chip-border);
+    color: var(--chip-fg);
     font-weight: 500;
 }
 
@@ -1966,9 +2050,9 @@ body.light-theme .details-drawer {
 }
 
 .action-btn {
-    background-color: var(--tag-bg);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
+    background-color: var(--chip-bg);
+    color: var(--chip-fg);
+    border: 1px solid var(--chip-border);
     padding: 4px 10px;
     border-radius: 8px;
     font-size: 0.75rem;
@@ -1984,9 +2068,9 @@ body.light-theme .details-drawer {
 }
 
 .action-btn.novnc {
-    background-color: hsla(180, 70%, 50%, 0.1);
-    color: var(--brand-prox);
-    border-color: hsla(180, 70%, 50%, 0.3);
+    background-color: var(--console-novnc-bg);
+    color: var(--console-novnc-fg);
+    border-color: var(--console-novnc-border);
 }
 
 .action-btn.novnc:hover {
@@ -1997,9 +2081,9 @@ body.light-theme .details-drawer {
 }
 
 .action-btn.ssh {
-    background-color: hsla(140, 60%, 45%, 0.1);
-    color: var(--success);
-    border-color: hsla(140, 60%, 45%, 0.3);
+    background-color: var(--console-ssh-bg);
+    color: var(--console-ssh-fg);
+    border-color: var(--console-ssh-border);
 }
 
 .action-btn.ssh:hover {
@@ -2010,9 +2094,9 @@ body.light-theme .details-drawer {
 }
 
 .action-btn.spice {
-    background-color: hsla(280, 70%, 52%, 0.12);
-    color: hsl(280, 72%, 68%);
-    border-color: hsla(280, 70%, 52%, 0.34);
+    background-color: var(--console-spice-bg);
+    color: var(--console-spice-fg);
+    border-color: var(--console-spice-border);
 }
 
 .action-btn.spice:hover {
@@ -2023,9 +2107,9 @@ body.light-theme .details-drawer {
 }
 
 .action-btn.shell {
-    background-color: hsla(25, 80%, 50%, 0.12);
-    color: hsl(25, 90%, 64%);
-    border-color: hsla(25, 80%, 50%, 0.36);
+    background-color: var(--console-shell-bg);
+    color: var(--console-shell-fg);
+    border-color: var(--console-shell-border);
 }
 
 .action-btn.shell:hover {
@@ -2311,9 +2395,9 @@ body.light-theme .tag,
 body.light-theme .tag-pill,
 body.light-theme .scripts-btn.ghost,
 body.light-theme .action-btn {
-    border-color: hsla(210, 18%, 62%, 0.75);
-    background-color: hsla(210, 24%, 90%, 0.98);
-    color: hsl(210, 18%, 24%);
+    border-color: var(--chip-border);
+    background-color: var(--chip-bg);
+    color: var(--chip-fg);
 }
 
 body.light-theme .inline-action-btn.secondary {
@@ -2370,30 +2454,6 @@ body.light-theme .tag-filter-pill.active {
     text-shadow: none;
 }
 
-body.light-theme .action-btn.novnc {
-    background-color: hsla(180, 72%, 50%, 0.2);
-    border-color: hsla(180, 72%, 42%, 0.56);
-    color: hsl(190, 76%, 29%);
-}
-
-body.light-theme .action-btn.ssh {
-    background-color: hsla(140, 60%, 45%, 0.2);
-    border-color: hsla(140, 58%, 36%, 0.52);
-    color: hsl(140, 62%, 24%);
-}
-
-body.light-theme .action-btn.spice {
-    background-color: hsla(280, 72%, 48%, 0.2);
-    border-color: hsla(280, 64%, 42%, 0.52);
-    color: hsl(280, 60%, 31%);
-}
-
-body.light-theme .action-btn.shell {
-    background-color: hsla(25, 84%, 46%, 0.2);
-    border-color: hsla(25, 80%, 40%, 0.56);
-    color: hsl(25, 76%, 26%);
-}
-
 /* Balanced contrast boost for auto light mode */
 @media (prefers-color-scheme: light) {
     body:not(.dark-theme) .top-bar {
@@ -2417,9 +2477,9 @@ body.light-theme .action-btn.shell {
     body:not(.dark-theme) .tag-pill,
     body:not(.dark-theme) .scripts-btn.ghost,
     body:not(.dark-theme) .action-btn {
-        border-color: hsla(210, 18%, 62%, 0.75);
-        background-color: hsla(210, 24%, 90%, 0.98);
-        color: hsl(210, 18%, 24%);
+        border-color: var(--chip-border);
+        background-color: var(--chip-bg);
+        color: var(--chip-fg);
     }
 
     body:not(.dark-theme) .inline-action-btn.secondary {
@@ -2476,27 +2536,4 @@ body.light-theme .action-btn.shell {
         text-shadow: none;
     }
 
-    body:not(.dark-theme) .action-btn.novnc {
-        background-color: hsla(180, 72%, 50%, 0.2);
-        border-color: hsla(180, 72%, 42%, 0.56);
-        color: hsl(190, 76%, 29%);
-    }
-
-    body:not(.dark-theme) .action-btn.ssh {
-        background-color: hsla(140, 60%, 45%, 0.2);
-        border-color: hsla(140, 58%, 36%, 0.52);
-        color: hsl(140, 62%, 24%);
-    }
-
-    body:not(.dark-theme) .action-btn.spice {
-        background-color: hsla(280, 72%, 48%, 0.2);
-        border-color: hsla(280, 64%, 42%, 0.52);
-        color: hsl(280, 60%, 31%);
-    }
-
-    body:not(.dark-theme) .action-btn.shell {
-        background-color: hsla(25, 84%, 46%, 0.2);
-        border-color: hsla(25, 80%, 40%, 0.56);
-        color: hsl(25, 76%, 26%);
-    }
 }

@@ -17,11 +17,12 @@ import {
 import { resetToFactoryDefaults } from '../lib/settings-reset.js';
 import {
     buildMergedSshKeyCatalog,
-    buildSshConfigFilename,
-    buildSshConfigText,
+    buildSshExportFilename,
+    buildSshExportText,
     collectSshExportTargets,
     findSshKeyById,
     findSshKeyIdByPath,
+    normalizeSshExportFormat,
     normalizeSshKeyCatalog,
     normalizeSshHostDefaults,
     normalizeSshHostOverrides,
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sshKeyCatalogList = document.getElementById('ssh-key-catalog-list');
     const addSshKeyCatalogBtn = document.getElementById('add-ssh-key-catalog-btn');
     const sshHostDefaultsInput = document.getElementById('ssh-host-defaults');
+    const sshExportFormatSelect = document.getElementById('ssh-export-format');
     const exportSshConfigBtn = document.getElementById('export-ssh-config-btn');
     const copySshConfigBtn = document.getElementById('copy-ssh-config-btn');
     const defaultActionClickModeSelect = document.getElementById('default-action-click-mode');
@@ -472,6 +474,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function getSshExportFormatLabel(format) {
+        if (format === 'putty') return 'PuTTY registry file';
+        if (format === 'csv') return 'SSH host CSV';
+        return 'SSH config';
+    }
+
     async function buildSshConfigForExport() {
         const {
             sshDefaultUser,
@@ -488,7 +496,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!targets.length) {
             throw new Error('No Linux hosts with detected IP were found for SSH export.');
         }
-        const text = buildSshConfigText(targets, {
+        const exportFormat = normalizeSshExportFormat(sshExportFormatSelect?.value || 'openssh');
+        const text = buildSshExportText(targets, exportFormat, {
             defaultUser: sshDefaultUser,
             defaultKeyPath: sshDefaultKeyPath,
             selectedDefaultKeyId: sshSelectedDefaultKeyId,
@@ -497,7 +506,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             userOverrides: sshUserOverrides,
             hostDefaults: sshHostDefaults
         });
-        return { text, targetCount: targets.length, errorCount: errors.length };
+        return { text, targetCount: targets.length, errorCount: errors.length, exportFormat };
     }
 
     async function downloadTextFile(content, filename) {
@@ -1041,11 +1050,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         try {
             await persistClusterFromForm();
-            const { text, targetCount, errorCount } = await buildSshConfigForExport();
-            await downloadTextFile(text, buildSshConfigFilename());
+            const { text, targetCount, errorCount, exportFormat } = await buildSshConfigForExport();
+            await downloadTextFile(text, buildSshExportFilename(exportFormat));
+            const formatLabel = getSshExportFormatLabel(exportFormat);
             const message = errorCount > 0
-                ? `SSH config downloaded (${targetCount} hosts, ${errorCount} cluster errors).`
-                : `SSH config downloaded (${targetCount} hosts).`;
+                ? `${formatLabel} downloaded (${targetCount} hosts, ${errorCount} cluster errors).`
+                : `${formatLabel} downloaded (${targetCount} hosts).`;
             if (extrasStatus) {
                 extrasStatus.textContent = message;
                 extrasStatus.style.color = 'var(--success)';
@@ -1066,11 +1076,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         try {
             await persistClusterFromForm();
-            const { text, targetCount, errorCount } = await buildSshConfigForExport();
+            const { text, targetCount, errorCount, exportFormat } = await buildSshConfigForExport();
             await navigator.clipboard.writeText(text);
+            const formatLabel = getSshExportFormatLabel(exportFormat);
             const message = errorCount > 0
-                ? `SSH config copied (${targetCount} hosts, ${errorCount} cluster errors).`
-                : `SSH config copied (${targetCount} hosts).`;
+                ? `${formatLabel} copied (${targetCount} hosts, ${errorCount} cluster errors).`
+                : `${formatLabel} copied (${targetCount} hosts).`;
             if (extrasStatus) {
                 extrasStatus.textContent = message;
                 extrasStatus.style.color = 'var(--success)';

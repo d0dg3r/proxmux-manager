@@ -411,7 +411,7 @@
         "message": "SSH shells need a detected IP; for VMs ensure QEMU Guest Agent is enabled and installed."
     },
     "popupHelpSshExport": {
-        "message": "SSH Config Export is in the Extras tab and supports key catalog selection, global user/key defaults, per-host user/key overrides, and OpenSSH directive defaults."
+        "message": "SSH Config Export is in the Extras tab and supports OpenSSH, PuTTY .reg, and CSV output, plus key catalog selection, global user/key defaults, and per-host user/key overrides."
     },
     "sshConfigExportTitle": {
         "message": "SSH Config Export"
@@ -457,6 +457,21 @@
     },
     "sshHostDefaultsHelp": {
         "message": "Use one OpenSSH directive per line. Empty lines and # comments are allowed."
+    },
+    "sshExportFormatLabel": {
+        "message": "Export format"
+    },
+    "sshExportFormatHelp": {
+        "message": "Choose output format for download/copy."
+    },
+    "sshExportFormatOptionOpenSsh": {
+        "message": "OpenSSH config"
+    },
+    "sshExportFormatOptionPutty": {
+        "message": "PuTTY .reg (Windows)"
+    },
+    "sshExportFormatOptionCsv": {
+        "message": "CSV host list"
     },
     "sshExportDownloadBtn": {
         "message": "Download SSH Config"

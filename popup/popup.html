@@ -332,6 +332,15 @@
                     <textarea id="inline-ssh-host-defaults" class="inline-form-control" rows="5" placeholder="# Applied to every exported host&#10;Port 22&#10;IdentityFile ~/.ssh/id_ed25519&#10;ProxyJump bastion.example.com"></textarea>
                     <small data-i18n="sshHostDefaultsHelp">Use one OpenSSH directive per line. Empty lines and # comments are allowed.</small>
                 </div>
+                <div class="inline-settings-form-group">
+                    <label for="inline-ssh-export-format" data-i18n="sshExportFormatLabel">Export format</label>
+                    <select id="inline-ssh-export-format" class="inline-form-control">
+                        <option value="openssh" data-i18n="sshExportFormatOptionOpenSsh">OpenSSH config</option>
+                        <option value="putty" data-i18n="sshExportFormatOptionPutty">PuTTY .reg (Windows)</option>
+                        <option value="csv" data-i18n="sshExportFormatOptionCsv">CSV host list</option>
+                    </select>
+                    <small data-i18n="sshExportFormatHelp">Choose output format for download/copy.</small>
+                </div>
 
                 <div class="inline-settings-cluster-actions">
                     <button id="inline-export-ssh-config-btn" type="button" class="inline-action-btn secondary" data-i18n="sshExportDownloadBtn">Download SSH Config</button>

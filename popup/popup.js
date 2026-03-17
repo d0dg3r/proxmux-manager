@@ -21,11 +21,12 @@ import {
 import { FACTORY_DEFAULT_DISPLAY_SETTINGS, resetToFactoryDefaults } from '../lib/settings-reset.js';
 import {
     buildMergedSshKeyCatalog,
-    buildSshConfigFilename,
-    buildSshConfigText,
+    buildSshExportFilename,
+    buildSshExportText,
     collectSshExportTargets,
     findSshKeyById,
     findSshKeyIdByPath,
+    normalizeSshExportFormat,
     normalizeSshKeyCatalog,
     normalizeSshHostDefaults,
     normalizeSshHostOverrides,
@@ -83,6 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inlineSshKeyCatalogList = document.getElementById('inline-ssh-key-catalog-list');
     const inlineAddSshKeyCatalogBtn = document.getElementById('inline-add-ssh-key-catalog-btn');
     const inlineSshHostDefaultsInput = document.getElementById('inline-ssh-host-defaults');
+    const inlineSshExportFormatSelect = document.getElementById('inline-ssh-export-format');
     const inlineExportSshConfigBtn = document.getElementById('inline-export-ssh-config-btn');
     const inlineCopySshConfigBtn = document.getElementById('inline-copy-ssh-config-btn');
     const inlineToggleSecretBtn = document.getElementById('inline-toggle-secret');
@@ -590,6 +592,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function getSshExportFormatLabel(format) {
+        if (format === 'putty') return 'PuTTY registry file';
+        if (format === 'csv') return 'SSH host CSV';
+        return 'SSH config';
+    }
+
     async function buildInlineSshConfig() {
         const { targets, errors } = await collectSshExportTargets(clusters, (cluster) => (
             new ProxmoxAPI(cluster.proxmoxUrl, cluster.apiToken, cluster.failoverUrls || [])
@@ -598,7 +606,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('No Linux hosts with detected IP were found for SSH export.');
         }
         const sshSettings = getInlineSshSettingsFromInputs();
-        const text = buildSshConfigText(targets, {
+        const exportFormat = normalizeSshExportFormat(inlineSshExportFormatSelect?.value || 'openssh');
+        const text = buildSshExportText(targets, exportFormat, {
             defaultUser: sshSettings.sshDefaultUser,
             defaultKeyPath: sshSettings.sshDefaultKeyPath,
             selectedDefaultKeyId: sshSettings.sshSelectedDefaultKeyId,
@@ -607,7 +616,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             userOverrides: sshSettings.sshUserOverrides,
             hostDefaults: sshSettings.sshHostDefaults
         });
-        return { text, targetCount: targets.length, errorCount: errors.length, ...sshSettings };
+        return { text, targetCount: targets.length, errorCount: errors.length, exportFormat, ...sshSettings };
     }
 
     function attachClearButtonsToInputs(inputIds) {
@@ -1159,7 +1168,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sshKeyCatalog,
                 sshHostOverrides,
                 sshUserOverrides,
-                sshHostDefaults
+                sshHostDefaults,
+                exportFormat
             } = await buildInlineSshConfig();
             await chrome.storage.local.set({
                 sshDefaultUser,
@@ -1180,11 +1190,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sshUserOverrides,
                 sshHostDefaults
             };
-            await downloadTextFile(text, buildSshConfigFilename());
+            await downloadTextFile(text, buildSshExportFilename(exportFormat));
+            const formatLabel = getSshExportFormatLabel(exportFormat);
             setInlineSettingsStatus(
                 errorCount > 0
-                    ? `SSH config downloaded (${targetCount} hosts, ${errorCount} cluster errors).`
-                    : `SSH config downloaded (${targetCount} hosts).`,
+                    ? `${formatLabel} downloaded (${targetCount} hosts, ${errorCount} cluster errors).`
+                    : `${formatLabel} downloaded (${targetCount} hosts).`,
                 'success'
             );
         } catch (error) {
@@ -1206,7 +1217,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sshKeyCatalog,
                 sshHostOverrides,
                 sshUserOverrides,
-                sshHostDefaults
+                sshHostDefaults,
+                exportFormat
             } = await buildInlineSshConfig();
             await chrome.storage.local.set({
                 sshDefaultUser,
@@ -1228,10 +1240,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sshHostDefaults
             };
             await navigator.clipboard.writeText(text);
+            const formatLabel = getSshExportFormatLabel(exportFormat);
             setInlineSettingsStatus(
                 errorCount > 0
-                    ? `SSH config copied (${targetCount} hosts, ${errorCount} cluster errors).`
-                    : `SSH config copied (${targetCount} hosts).`,
+                    ? `${formatLabel} copied (${targetCount} hosts, ${errorCount} cluster errors).`
+                    : `${formatLabel} copied (${targetCount} hosts).`,
                 'success'
             );
         } catch (error) {
@@ -2541,37 +2554,48 @@ document.addEventListener('DOMContentLoaded', async () => {
             const resourceApi = apiClients.get(res.__clusterId) || api;
             const clone = template.content.cloneNode(true);
             const item = clone.querySelector('.resource-item');
+            if (!item) {
+                continue;
+            }
             
             // Set unique ID for persistence
             const resId = getFavoriteResourceId(res);
             item.setAttribute('data-id', resId);
+            item.classList.add(`type-${res.type}`);
 
-            const itemMain = clone.querySelector('.item-main');
-            const indicator = clone.querySelector('.status-indicator');
-            const nameEl = clone.querySelector('.name');
-            const subtitleEl = clone.querySelector('.resource-subtitle');
-            const typeNodeEl = clone.querySelector('.type-node');
-            const nodeIdEl = clone.querySelector('.node-id');
-            const uptimeEl = clone.querySelector('.uptime');
-            const osTag = clone.querySelector('.tag.os');
-            const ipTag = clone.querySelector('.tag.ip');
-            const novncBtn = clone.querySelector('.novnc');
-            const spiceBtn = clone.querySelector('.spice');
-            const sshBtn = clone.querySelector('.ssh');
-            const shellBtn = clone.querySelector('.shell');
-            const userTags = clone.querySelector('.user-tags');
-            const actionsEl = clone.querySelector('.actions');
+            const itemMain = item.querySelector('.item-main');
+            const indicator = item.querySelector('.status-indicator');
+            const nameEl = item.querySelector('.name');
+            const subtitleEl = item.querySelector('.resource-subtitle');
+            const typeNodeEl = item.querySelector('.type-node');
+            const nodeIdEl = item.querySelector('.node-id');
+            const uptimeEl = item.querySelector('.uptime');
+            const osTag = item.querySelector('.tag.os');
+            const ipTag = item.querySelector('.tag.ip');
+            const novncBtn = item.querySelector('.novnc');
+            const spiceBtn = item.querySelector('.spice');
+            const sshBtn = item.querySelector('.ssh');
+            const shellBtn = item.querySelector('.shell');
+            const userTags = item.querySelector('.user-tags');
+            const actionsEl = item.querySelector('.actions');
 
             // Resource Details Elements
-            const cpuBar = clone.querySelector('.cpu-bar');
-            const cpuValue = clone.querySelector('.cpu-value');
-            const memBar = clone.querySelector('.mem-bar');
-            const memValue = clone.querySelector('.mem-value');
-            const diskBar = clone.querySelector('.disk-bar');
-            const diskValue = clone.querySelector('.disk-value');
-            const diskRow = clone.querySelector('#disk-row');
+            const cpuBar = item.querySelector('.cpu-bar');
+            const cpuValue = item.querySelector('.cpu-value');
+            const memBar = item.querySelector('.mem-bar');
+            const memValue = item.querySelector('.mem-value');
+            const diskBar = item.querySelector('.disk-bar');
+            const diskValue = item.querySelector('.disk-value');
+            const diskRow = item.querySelector('#disk-row');
 
-            nameEl.textContent = res.name || res.vmid || res.node;
+            const displayName = (
+                res.type === 'node'
+                    ? (res.node || res.name || 'Node')
+                    : (res.name || res.vmid || res.node || '')
+            ).toString();
+            if (nameEl) {
+                nameEl.textContent = displayName;
+            }
             typeNodeEl.textContent = res.type.toUpperCase();
             typeNodeEl.classList.add('subtitle-chip', 'subtitle-type');
             typeNodeEl.classList.add(`subtitle-type-${res.type}`);
@@ -2653,7 +2677,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             actionsEl?.append(favoriteBtn);
 
             // Usage Stats (Initial from cluster/resources)
-            updateUsageStats(clone, res);
+            updateUsageStats(item, res);
 
             // Fetch details (IP, OS, Disks) for all types if status allows
             if (resourceApi && (res.status === 'running' || res.status === 'online' || res.type === 'node')) {
@@ -2730,7 +2754,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }).catch(err => console.error('Details error:', err));
             }
 
-            const tagsContainer = clone.querySelector('.user-tags');
+            const tagsContainer = item.querySelector('.user-tags');
             if (res.tags) {
                 tagsContainer.innerHTML = '';
                 tagsContainer.classList.remove('hidden');
@@ -2745,14 +2769,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // Power Controls
-            const powerControls = clone.querySelector('.power-controls');
-            const btnStart = powerControls.querySelector('.b-start');
-            const btnShutdown = powerControls.querySelector('.b-shutdown');
-            const btnStop = powerControls.querySelector('.b-stop');
-            const btnReboot = powerControls.querySelector('.b-reboot');
-            const powerStatus = powerControls.querySelector('.power-status');
+            const powerControls = item.querySelector('.power-controls');
+            const btnStart = powerControls?.querySelector('.b-start');
+            const btnShutdown = powerControls?.querySelector('.b-shutdown');
+            const btnStop = powerControls?.querySelector('.b-stop');
+            const btnReboot = powerControls?.querySelector('.b-reboot');
+            const powerStatus = powerControls?.querySelector('.power-status');
+            const hasPowerControls = Boolean(powerControls && btnStart && btnShutdown && btnStop && btnReboot && powerStatus);
 
             const updatePowerButtons = () => {
+                if (!hasPowerControls) return;
                 const status = res.status;
                 const type = res.type;
                 [btnStart, btnShutdown, btnStop, btnReboot].forEach(b => b.classList.add('hidden'));
@@ -2774,6 +2800,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             updatePowerButtons();
 
             const pollStatus = async (targetStatus, maxAttempts = 20) => {
+                if (!hasPowerControls) return;
                 let attempts = 0;
                 const check = async () => {
                     attempts++;
@@ -2813,6 +2840,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             const handleAction = async (action) => {
+                if (!hasPowerControls) return;
                 powerStatus.classList.remove('hidden');
                 powerStatus.textContent = chrome.i18n.getMessage('sendingAction') || 'Sending...';
                 [btnStart, btnShutdown, btnStop, btnReboot].forEach(b => b.style.pointerEvents = 'none');
@@ -2849,10 +2877,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             };
 
-            btnStart.onclick = (e) => { e.stopPropagation(); handleAction('start'); };
-            btnShutdown.onclick = (e) => { e.stopPropagation(); handleAction('shutdown'); };
-            btnStop.onclick = (e) => { e.stopPropagation(); handleAction('stop'); };
-            btnReboot.onclick = (e) => { e.stopPropagation(); handleAction('reboot'); };
+            if (hasPowerControls) {
+                btnStart.onclick = (e) => { e.stopPropagation(); handleAction('start'); };
+                btnShutdown.onclick = (e) => { e.stopPropagation(); handleAction('shutdown'); };
+                btnStop.onclick = (e) => { e.stopPropagation(); handleAction('stop'); };
+                btnReboot.onclick = (e) => { e.stopPropagation(); handleAction('reboot'); };
+            }
 
             // Console and Spice Logic
             if (res.type === 'node') {
@@ -2881,7 +2911,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            resourceList.appendChild(clone);
+            resourceList.appendChild(item);
         }
 
         // Persistence: Check if we need to scroll to an item

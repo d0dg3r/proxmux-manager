@@ -13,7 +13,10 @@ const mod = await import(moduleUrl);
 
 const {
   buildSshAlias,
+  buildPuttyRegText,
+  buildSshCsvText,
   buildMergedSshKeyCatalog,
+  buildSshExportFilename,
   buildSshConfigText,
   collectSshExportTargets,
   findSshKeyIdByPath,
@@ -192,6 +195,54 @@ test('maps legacy key paths to catalog ids', async () => {
   const catalog = buildMergedSshKeyCatalog([], ['~/.ssh/legacy_key']);
   const keyId = findSshKeyIdByPath(catalog, '~/.ssh/legacy_key');
   expect(keyId).toBeTruthy();
+});
+
+test('builds PuTTY registry export with user and key overrides', async () => {
+  const text = buildPuttyRegText(
+    [{ alias: 'web-01', ip: '10.0.0.10' }, { alias: 'db-01', ip: '10.0.0.11' }],
+    {
+      defaultUser: 'root',
+      defaultKeyPath: '~/.ssh/id_default',
+      hostDefaults: { Port: '2222' },
+      hostOverrides: {
+        'web-01': { user: 'ubuntu', keyPath: '~/.ssh/id_web' }
+      }
+    }
+  );
+  expect(text).toContain('Windows Registry Editor Version 5.00');
+  expect(text).toContain('[HKEY_CURRENT_USER\\Software\\SimonTatham\\PuTTY\\Sessions\\web-01]');
+  expect(text).toContain('"HostName"="10.0.0.10"');
+  expect(text).toContain('"UserName"="ubuntu"');
+  expect(text).toContain('"PortNumber"=dword:000008ae');
+  expect(text).toContain('"PublicKeyFile"="~/.ssh/id_web"');
+  expect(text).toContain('[HKEY_CURRENT_USER\\Software\\SimonTatham\\PuTTY\\Sessions\\db-01]');
+  expect(text).toContain('"UserName"="root"');
+  expect(text).toContain('"PublicKeyFile"="~/.ssh/id_default"');
+});
+
+test('builds CSV export with stable columns', async () => {
+  const text = buildSshCsvText(
+    [{ alias: 'web-01', ip: '10.0.0.10', clusterName: 'Prod', type: 'qemu', vmid: 101 }],
+    {
+      defaultUser: 'root',
+      hostOverrides: {
+        'web-01': { user: 'ubuntu', keyPath: '~/.ssh/id_web' }
+      }
+    }
+  );
+  const lines = text.trim().split('\n');
+  expect(lines[0]).toBe('alias,hostName,user,identityFile,type,node,vmid,clusterName,clusterId');
+  expect(lines[1]).toContain('web-01,10.0.0.10,ubuntu,~/.ssh/id_web,qemu,,101,Prod,');
+});
+
+test('builds format-aware export filenames', async () => {
+  const openssh = buildSshExportFilename('openssh');
+  const putty = buildSshExportFilename('putty');
+  const csv = buildSshExportFilename('csv');
+
+  expect(openssh).toMatch(/^proxmux-ssh-config-.+\.txt$/);
+  expect(putty).toMatch(/^proxmux-ssh-putty-.+\.reg$/);
+  expect(csv).toMatch(/^proxmux-ssh-hosts-.+\.csv$/);
 });
 
 test('collects only Linux-capable resources with IP addresses', async () => {
