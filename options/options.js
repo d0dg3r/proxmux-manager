@@ -22,6 +22,7 @@ import {
     collectSshExportTargets,
     findSshKeyById,
     findSshKeyIdByPath,
+    getSshExportMimeType,
     normalizeSshExportFormat,
     normalizeSshKeyCatalog,
     normalizeSshHostDefaults,
@@ -506,11 +507,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             userOverrides: sshUserOverrides,
             hostDefaults: sshHostDefaults
         });
-        return { text, targetCount: targets.length, errorCount: errors.length, exportFormat };
+        return {
+            text,
+            targetCount: targets.length,
+            errorCount: errors.length,
+            exportFormat,
+            filename: buildSshExportFilename(exportFormat),
+            mimeType: getSshExportMimeType(exportFormat)
+        };
     }
 
-    async function downloadTextFile(content, filename) {
-        const blob = new Blob([content], { type: 'text/plain' });
+    async function downloadTextFile(content, filename, mimeType = 'text/plain;charset=utf-8') {
+        const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
         try {
             await new Promise((resolve, reject) => {
@@ -1050,8 +1058,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         try {
             await persistClusterFromForm();
-            const { text, targetCount, errorCount, exportFormat } = await buildSshConfigForExport();
-            await downloadTextFile(text, buildSshExportFilename(exportFormat));
+            const { text, targetCount, errorCount, exportFormat, filename, mimeType } = await buildSshConfigForExport();
+            await downloadTextFile(text, filename, mimeType);
             const formatLabel = getSshExportFormatLabel(exportFormat);
             const message = errorCount > 0
                 ? `${formatLabel} downloaded (${targetCount} hosts, ${errorCount} cluster errors).`

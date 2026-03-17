@@ -1908,6 +1908,23 @@ body.light-theme .details-drawer {
     letter-spacing: -0.01em;
 }
 
+.name-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.name-chips {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
 .resource-subtitle {
     display: flex;
     align-items: center;
@@ -1990,6 +2007,17 @@ body.light-theme .details-drawer {
     content: "•";
     margin-right: 4px;
     opacity: 0.5;
+}
+
+.name-chips .uptime {
+    font-size: inherit;
+    color: inherit;
+    font-style: normal;
+    opacity: 1;
+}
+
+.name-chips .uptime::before {
+    content: none;
 }
 
 .meta-tags {

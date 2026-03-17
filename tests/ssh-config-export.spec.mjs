@@ -17,6 +17,7 @@ const {
   buildSshCsvText,
   buildMergedSshKeyCatalog,
   buildSshExportFilename,
+  getSshExportMimeType,
   buildSshConfigText,
   collectSshExportTargets,
   findSshKeyIdByPath,
@@ -243,6 +244,12 @@ test('builds format-aware export filenames', async () => {
   expect(openssh).toMatch(/^proxmux-ssh-config-.+\.txt$/);
   expect(putty).toMatch(/^proxmux-ssh-putty-.+\.reg$/);
   expect(csv).toMatch(/^proxmux-ssh-hosts-.+\.csv$/);
+});
+
+test('builds format-aware export mime types', async () => {
+  expect(getSshExportMimeType('openssh')).toBe('text/plain;charset=utf-8');
+  expect(getSshExportMimeType('putty')).toBe('application/x-windows-registry');
+  expect(getSshExportMimeType('csv')).toBe('text/csv;charset=utf-8');
 });
 
 test('collects only Linux-capable resources with IP addresses', async () => {

@@ -26,6 +26,7 @@ import {
     collectSshExportTargets,
     findSshKeyById,
     findSshKeyIdByPath,
+    getSshExportMimeType,
     normalizeSshExportFormat,
     normalizeSshKeyCatalog,
     normalizeSshHostDefaults,
@@ -567,8 +568,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    async function downloadTextFile(content, filename) {
-        const blob = new Blob([content], { type: 'text/plain' });
+    async function downloadTextFile(content, filename, mimeType = 'text/plain;charset=utf-8') {
+        const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
         try {
             await new Promise((resolve, reject) => {
@@ -616,7 +617,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             userOverrides: sshSettings.sshUserOverrides,
             hostDefaults: sshSettings.sshHostDefaults
         });
-        return { text, targetCount: targets.length, errorCount: errors.length, exportFormat, ...sshSettings };
+        return {
+            text,
+            targetCount: targets.length,
+            errorCount: errors.length,
+            exportFormat,
+            filename: buildSshExportFilename(exportFormat),
+            mimeType: getSshExportMimeType(exportFormat),
+            ...sshSettings
+        };
     }
 
     function attachClearButtonsToInputs(inputIds) {
@@ -1169,7 +1178,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sshHostOverrides,
                 sshUserOverrides,
                 sshHostDefaults,
-                exportFormat
+                exportFormat,
+                filename,
+                mimeType
             } = await buildInlineSshConfig();
             await chrome.storage.local.set({
                 sshDefaultUser,
@@ -1190,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sshUserOverrides,
                 sshHostDefaults
             };
-            await downloadTextFile(text, buildSshExportFilename(exportFormat));
+            await downloadTextFile(text, filename, mimeType);
             const formatLabel = getSshExportFormatLabel(exportFormat);
             setInlineSettingsStatus(
                 errorCount > 0
@@ -2566,6 +2577,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const itemMain = item.querySelector('.item-main');
             const indicator = item.querySelector('.status-indicator');
             const nameEl = item.querySelector('.name');
+            const nameChipsEl = item.querySelector('.name-chips');
             const subtitleEl = item.querySelector('.resource-subtitle');
             const typeNodeEl = item.querySelector('.type-node');
             const nodeIdEl = item.querySelector('.node-id');
@@ -2595,6 +2607,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             ).toString();
             if (nameEl) {
                 nameEl.textContent = displayName;
+            }
+            if (nameChipsEl && typeNodeEl.parentElement !== nameChipsEl) {
+                nameChipsEl.appendChild(typeNodeEl);
+            }
+            if (nameChipsEl && uptimeEl.parentElement !== nameChipsEl) {
+                nameChipsEl.appendChild(uptimeEl);
             }
             typeNodeEl.textContent = res.type.toUpperCase();
             typeNodeEl.classList.add('subtitle-chip', 'subtitle-type');
@@ -2630,7 +2648,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (res.uptime && (res.status === 'running' || res.status === 'online')) {
                 uptimeEl.textContent = formatUptime(res.uptime);
+                uptimeEl.classList.add('subtitle-chip');
                 uptimeEl.classList.remove('hidden');
+            } else {
+                uptimeEl.textContent = '';
+                uptimeEl.classList.add('hidden');
             }
             
             indicator.classList.add((res.status === 'running' || res.status === 'online') ? 'status-running' : (res.status === 'stopped' ? 'status-stopped' : 'status-unknown'));
