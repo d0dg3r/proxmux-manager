@@ -1,6 +1,6 @@
 {
   "name": "PROXMUX-Manager",
-  "version": "1.2.1-beta.2",
+  "version": "1.2.1",
   "scripts": {
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui"

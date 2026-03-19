@@ -90,8 +90,9 @@ The popup top-bar search pipeline is designed for fast iterative filtering:
 1. User input updates `localStorage` and triggers immediate in-memory filtering.
 2. A context-aware clear control is shown only when a query exists.
 3. Search reset works via clear button and `Escape`, then re-renders the full filtered list.
-4. Filter group visibility is controlled by a collapsible toggle with an explicit active/collapsed visual state.
-5. Search, filters, and expanded row state are restored when the popup opens again.
+4. Type/status filters are independent multi-toggle groups (`Node`, `VM`, `LXC`, `Online`, `Offline`) with OR logic inside each group.
+5. Filter group visibility is controlled by a collapsible toggle with an explicit active/collapsed visual state.
+6. Search, filters, and expanded row state are restored when the popup opens again.
 
 ### 4.5 Community Scripts Assisted Install Flow
 1. Popup loads Community Scripts catalog via hybrid source strategy (API/JSON first, website fallback).
@@ -138,6 +139,7 @@ The popup top-bar search pipeline is designed for fast iterative filtering:
 10. Global default selected key is emitted as `IdentityFile` only when host defaults do not already define `IdentityFile`.
 11. User-selected export format routes output generation to OpenSSH config, PuTTY `.reg`, or CSV host list.
 12. Extension returns format-specific filename and MIME type for download/copy actions.
+13. Node status normalization maps `online/offline` to `running/stopped` during status filtering to keep node cards aligned with status pills.
 
 ## 5. Security Model
 - **Token Security**: API Tokens are stored locally in the browser's profile and are never transmitted to any third-party.

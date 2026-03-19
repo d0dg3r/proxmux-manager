@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-03-16
+
+### Added
+- **Calm Premium Navigation System**: Introduced a calmer, premium visual hierarchy for cluster tabs and filter rows with a single strong active-state signal.
+
+### Changed
+- **Filter Interaction Model**: Replaced single-select `All` type behavior with independent multi-toggle filters for `Node`, `VM`, `LXC`, `Online`, and `Offline`.
+- **Default Filter Semantics**: Type and status filters now initialize with all toggles enabled and persist per-scope multi-select state.
+
+### Fixed
+- **Node Visibility With Status Filters**: Mapped node statuses (`online`/`offline`) to filter statuses (`running`/`stopped`) so nodes remain visible under active status filtering.
+
 ## [1.2.1-beta.2] - 2026-03-16
 
 ### Added
@@ -185,6 +197,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Side Panel support for persistent cluster management.
 - Proxmox API integration for resource monitoring.
 
+[1.2.1]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.2.1-beta.2...v1.2.1
 [1.2.1-beta.2]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.2.0...v1.2.1-beta.2
 [1.2.0]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.2.0-beta.3...v1.2.0
 [1.2.0-beta.3]: https://github.com/d0dg3r/PROXMUX-Manager/compare/v1.2.0-beta.2...v1.2.0-beta.3

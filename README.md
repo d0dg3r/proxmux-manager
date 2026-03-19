@@ -125,11 +125,14 @@ If PROXMUX only shows nodes but not VMs/LXCs, validate token rights first (`Sys.
   - `store/screenshot_04_settings_cluster_1280x800.png`
   - `store/screenshot_05_settings_backup_1280x800.png`
 
-## What's New in v1.2.1-beta.2
+## What's New in v1.2.1
 
 - **Global UI Scaling**: Added presets plus fine slider with live sync between open popup/sidepanel/options surfaces.
 - **SSH Export Formats**: Added OpenSSH, PuTTY `.reg`, and CSV outputs with matching file extensions on download.
 - **Resource Card Layout Cleanup**: Unified row/chip placement across mixed views and cluster tabs for consistent scanning.
+- **Calm Premium Filter UX**: Reworked tabs and filter/chip rows for clearer active-state contrast and calmer visual density.
+- **Multi-Toggle Filter Model**: Type and status filters are independently toggleable (`Node/VM/LXC`, `Online/Offline`) with OR logic within each group.
+- **Node Filter Compatibility Fix**: Node `online/offline` states are normalized to the status filter model so node visibility remains correct.
 - **Status UX Refresh**: Modernized running/stopped/unknown visuals, status filter pills, and power action feedback chip.
 - **Stats Column Alignment**: Detail bars now share consistent width and value text aligns to one left-starting vertical value column.
 

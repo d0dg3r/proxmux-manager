@@ -2,7 +2,7 @@
 
 This document contains all the text, metadata, and justifications required to submit PROXMUX Manager to the Chrome Web Store.
 
-Current release prep target: `v1.2.1-beta.2` (align with `CHANGELOG.md` top entry before submission).
+Current release prep target: `v1.2.1` (align with `CHANGELOG.md` top entry before submission).
 
 ## 1. Store Metadata
 
