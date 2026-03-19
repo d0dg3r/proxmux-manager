@@ -46,7 +46,7 @@
 }
 
 html {
-    font-size: calc(16px * var(--ui-scale));
+    font-size: calc(100% * var(--ui-scale));
 }
 
 body.light-theme {
