@@ -46,7 +46,7 @@ Additional screenshots:
 
 ### From Chrome Web Store (Recommended)
 
-You can install PROXMUX Manager directly from the [Chrome Web Store](https://chrome.google.com/webstore/detail/proxmux-manager) (Coming Soon).
+You can install PROXMUX Manager directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/proxmux-manager).
 
 ### From Source (Developer Mode)
 
